@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img">
+  <rect width="800" height="600" fill="#F4F7F9"/>
+  <rect x="120" y="100" width="560" height="360" rx="16" fill="#D5DEE5"/>
+  <rect x="200" y="180" width="400" height="200" rx="12" fill="#24627F" opacity="0.2"/>
+  <text x="400" y="520" text-anchor="middle" fill="#5C6B7A" font-family="system-ui,sans-serif" font-size="20">Peça automotiva  foto 2</text>
+</svg>

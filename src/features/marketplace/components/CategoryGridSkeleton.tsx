@@ -1,0 +1,24 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
+function CategoryGridSkeleton() {
+  return (
+    <div
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:gap-4"
+      aria-busy="true"
+      aria-label="Carregando categorias"
+    >
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div
+          key={index}
+          className="flex flex-col items-center gap-2 rounded-xl border p-4"
+        >
+          <Skeleton className="size-12 rounded-lg" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export { CategoryGridSkeleton };

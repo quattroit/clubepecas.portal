@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img">
+  <rect width="800" height="600" fill="#E8EEF2"/>
+  <rect x="80" y="80" width="640" height="440" rx="16" fill="#D5DEE5"/>
+  <circle cx="280" cy="260" r="48" fill="#24627F" opacity="0.35"/>
+  <rect x="360" y="230" width="220" height="20" rx="6" fill="#5C6B7A" opacity="0.4"/>
+  <rect x="360" y="270" width="160" height="16" rx="6" fill="#5C6B7A" opacity="0.25"/>
+  <text x="400" y="520" text-anchor="middle" fill="#5C6B7A" font-family="system-ui,sans-serif" font-size="20">Peça automotiva  foto 1</text>
+</svg>
