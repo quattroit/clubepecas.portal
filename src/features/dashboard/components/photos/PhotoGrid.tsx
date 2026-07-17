@@ -20,6 +20,8 @@ import {
   QueuePhotoCard,
   SavedPhotoCard,
 } from "@/features/dashboard/components/photos/PhotoCard";
+import { PhotoDropzone } from "@/features/dashboard/components/photos/PhotoDropzone";
+import { photoGalleryGridClassName } from "@/features/dashboard/components/photos/photoGalleryLayout";
 import type { UploadQueueItem } from "@/features/dashboard/components/photos/usePhotoUploadQueue";
 import type { AdvertisementPhotoDto } from "@/contracts/advertisements/responses";
 
@@ -28,11 +30,16 @@ type PhotoGridProps = {
   queueItems: UploadQueueItem[];
   disabled?: boolean;
   busyPhotoId?: string | null;
+  remaining: number;
+  maxPhotos: number;
+  usedCount: number;
+  maxFileSizeMB: number;
   onReorder: (photos: AdvertisementPhotoDto[]) => void;
   onSetPrimary: (photoId: string) => void;
   onDelete: (photoId: string) => void;
   onCancelUpload: (localId: string) => void;
   onRemoveUpload: (localId: string) => void;
+  onFilesSelected: (files: FileList | File[]) => void;
 };
 
 function PhotoGrid({
@@ -40,11 +47,16 @@ function PhotoGrid({
   queueItems,
   disabled = false,
   busyPhotoId = null,
+  remaining,
+  maxPhotos,
+  usedCount,
+  maxFileSizeMB,
   onReorder,
   onSetPrimary,
   onDelete,
   onCancelUpload,
   onRemoveUpload,
+  onFilesSelected,
 }: PhotoGridProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -64,54 +76,68 @@ function PhotoGrid({
     onReorder(arrayMove(photos, oldIndex, newIndex));
   };
 
-  if (photos.length === 0 && queueItems.length === 0) {
-    return (
-      <p className="text-muted-foreground text-sm" role="status">
-        Nenhuma foto cadastrada ainda.
-      </p>
-    );
-  }
+  const occupied = photos.length + queueItems.length;
+  const emptySlots = Math.max(0, maxPhotos - occupied - (remaining > 0 ? 1 : 0));
 
   return (
-    <div className="flex flex-col gap-4">
-      {photos.length > 0 ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+    <div className="flex flex-col gap-2">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={photos.map((photo) => photo.id)}
+          strategy={rectSortingStrategy}
         >
-          <SortableContext
-            items={photos.map((photo) => photo.id)}
-            strategy={rectSortingStrategy}
-          >
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {photos.map((photo) => (
-                <SavedPhotoCard
-                  key={photo.id}
-                  photo={photo}
-                  disabled={disabled}
-                  busy={busyPhotoId === photo.id}
-                  onSetPrimary={onSetPrimary}
-                  onDelete={onDelete}
-                />
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
-      ) : null}
+          <ul className={photoGalleryGridClassName}>
+            {photos.map((photo) => (
+              <SavedPhotoCard
+                key={photo.id}
+                photo={photo}
+                disabled={disabled}
+                busy={busyPhotoId === photo.id}
+                onSetPrimary={onSetPrimary}
+                onDelete={onDelete}
+              />
+            ))}
 
-      {queueItems.length > 0 ? (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {queueItems.map((item) => (
-            <QueuePhotoCard
-              key={item.localId}
-              item={item}
-              onCancel={onCancelUpload}
-              onRemove={onRemoveUpload}
-            />
-          ))}
-        </ul>
-      ) : null}
+            {queueItems.map((item) => (
+              <QueuePhotoCard
+                key={item.localId}
+                item={item}
+                onCancel={onCancelUpload}
+                onRemove={onRemoveUpload}
+              />
+            ))}
+
+            {remaining > 0 ? (
+              <li>
+                <PhotoDropzone
+                  disabled={disabled}
+                  remaining={remaining}
+                  maxPhotos={maxPhotos}
+                  usedCount={usedCount}
+                  maxFileSizeMB={maxFileSizeMB}
+                  onFilesSelected={onFilesSelected}
+                />
+              </li>
+            ) : null}
+
+            {Array.from({ length: emptySlots }).map((_, index) => (
+              <li
+                key={`empty-${index}`}
+                className="border-border/70 bg-muted/40 aspect-square rounded-lg border border-dashed"
+                aria-hidden
+              />
+            ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
+
+      <p className="text-muted-foreground text-[11px]">
+        JPG, PNG ou WEBP · até {maxFileSizeMB} MB cada
+      </p>
     </div>
   );
 }

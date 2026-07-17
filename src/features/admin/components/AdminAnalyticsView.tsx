@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -29,6 +28,7 @@ import {
   AdminTable,
 } from "@/components/admin";
 import type { AdminTableColumn } from "@/components/admin";
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Button } from "@/components/ui/button";
 import {
   adminAdvertisementPath,
@@ -157,7 +157,7 @@ function AdminAnalyticsView() {
       cell: (row) => (
         <div className="bg-muted relative size-12 overflow-hidden rounded-lg">
           {row.thumbnailUrl ? (
-            <Image
+            <RemoteImage
               src={row.thumbnailUrl}
               alt=""
               fill

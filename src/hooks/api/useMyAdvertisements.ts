@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { mapMyAdvertisementItemToAdvertisement } from "@/mappers/advertisement.mapper";
 import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
+import { resolveListingPhotoUrl } from "@/lib/photo-url";
 import { queryKeys } from "@/lib/queryKeys";
 import { advertisementService } from "@/services/advertisement.service";
 
@@ -33,7 +34,9 @@ export function useMyAdvertisements() {
             })[0];
 
             return mapMyAdvertisementItemToAdvertisement(item, {
-              imageUrl: firstPhoto?.publicUrl ?? null,
+              imageUrl: firstPhoto
+                ? resolveListingPhotoUrl(firstPhoto)
+                : null,
             });
           } catch {
             return mapMyAdvertisementItemToAdvertisement(item);

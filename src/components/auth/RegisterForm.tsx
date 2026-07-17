@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
@@ -18,6 +18,11 @@ import { useRegister } from "@/hooks/api/useRegister";
 import { getSafeAuthNextPath } from "@/lib/announce-flow";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { passwordSchema } from "@/lib/auth/passwordPolicy";
+import {
+  formatDocumentAuto,
+  isValidDocumentAuto,
+  onlyDigits,
+} from "@/utils/document";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "Informe o nome"),
@@ -32,6 +37,11 @@ const registerSchema = z.object({
       (value) => value.replace(/\D/g, "").length >= 8,
       "Informe um telefone válido com DDD",
     ),
+  document: z
+    .string()
+    .trim()
+    .min(1, "Informe o CPF ou CNPJ")
+    .refine(isValidDocumentAuto, "Informe um CPF ou CNPJ válido"),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -47,6 +57,7 @@ function RegisterForm() {
   const {
     register,
     handleSubmit,
+    control,
     watch,
     formState: { errors },
   } = useForm<RegisterFormValues>({
@@ -58,6 +69,7 @@ function RegisterForm() {
       email: "",
       password: "",
       phoneNumber: "",
+      document: "",
     },
   });
 
@@ -72,6 +84,7 @@ function RegisterForm() {
       email: values.email,
       password: values.password,
       phoneNumber: values.phoneNumber.trim(),
+      document: onlyDigits(values.document),
     });
   });
 
@@ -143,6 +156,48 @@ function RegisterForm() {
             </p>
           ) : null}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="register-document">CPF/CNPJ</Label>
+        <Controller
+          name="document"
+          control={control}
+          render={({ field }) => (
+            <Input
+              id="register-document"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="000.000.000-00 ou 00.000.000/0000-00"
+              aria-invalid={Boolean(errors.document)}
+              aria-describedby={
+                errors.document
+                  ? "register-document-error"
+                  : "register-document-hint"
+              }
+              disabled={isPending}
+              value={field.value}
+              onChange={(event) =>
+                field.onChange(formatDocumentAuto(event.target.value))
+              }
+              onBlur={field.onBlur}
+              name={field.name}
+              ref={field.ref}
+            />
+          )}
+        />
+        <p id="register-document-hint" className="text-muted-foreground text-xs">
+          Obrigatório. Usado para identificar seu cadastro de vendedor.
+        </p>
+        {errors.document ? (
+          <p
+            id="register-document-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            {errors.document.message}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">

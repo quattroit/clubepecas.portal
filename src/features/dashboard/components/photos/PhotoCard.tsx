@@ -44,34 +44,38 @@ function SavedPhotoCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "border-border bg-background group relative flex flex-col overflow-hidden rounded-xl border transition-shadow",
-        isDragging && "z-10 shadow-lg ring-2 ring-primary/30",
-        photo.isPrimary && "ring-primary/40 ring-2",
+        "border-border bg-background group relative aspect-square w-full overflow-hidden rounded-lg border transition-shadow",
+        isDragging && "z-10 shadow-md ring-2 ring-primary/40",
+        photo.isPrimary && "ring-primary ring-2",
       )}
     >
       <button
         type="button"
-        className="cursor-grab touch-none text-left active:cursor-grabbing"
+        className="block size-full cursor-grab touch-none text-left active:cursor-grabbing"
         aria-label={`Arrastar foto${photo.isPrimary ? " principal" : ""}`}
         disabled={disabled}
         {...attributes}
         {...listeners}
       >
-        <PhotoPreview src={photo.publicUrl} alt="" />
+        <PhotoPreview
+          src={photo.thumbnailPublicUrl || photo.publicUrl}
+          alt=""
+          className="size-full"
+        />
       </button>
 
       {photo.isPrimary ? (
-        <span className="bg-foreground/85 text-background absolute top-2 left-2 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
+        <span className="bg-primary text-primary-foreground absolute top-1.5 left-1.5 rounded px-1.5 py-0.5 text-[9px] font-bold tracking-wide uppercase shadow-sm">
           Principal
         </span>
       ) : null}
 
-      <div className="absolute top-2 right-2 flex gap-1">
+      <div className="absolute top-1.5 right-1.5 flex gap-0.5 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
         <Button
           type="button"
           size="icon-xs"
           variant={photo.isPrimary ? "primary" : "outline"}
-          className="bg-background/90 backdrop-blur-sm"
+          className="bg-background/95 size-7 shadow-sm backdrop-blur-sm"
           disabled={disabled || busy || photo.isPrimary}
           aria-label={
             photo.isPrimary ? "Foto principal" : "Definir como principal"
@@ -79,13 +83,10 @@ function SavedPhotoCard({
           onClick={() => onSetPrimary(photo.id)}
         >
           {busy ? (
-            <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            <Loader2 className="size-3 animate-spin" aria-hidden />
           ) : (
             <Star
-              className={cn(
-                "size-3.5",
-                photo.isPrimary && "fill-current",
-              )}
+              className={cn("size-3", photo.isPrimary && "fill-current")}
               aria-hidden
             />
           )}
@@ -94,15 +95,15 @@ function SavedPhotoCard({
           type="button"
           size="icon-xs"
           variant="outline"
-          className="bg-background/90 backdrop-blur-sm"
+          className="bg-background/95 size-7 shadow-sm backdrop-blur-sm"
           disabled={disabled || busy}
           aria-label="Excluir foto"
           onClick={() => onDelete(photo.id)}
         >
           {busy ? (
-            <Loader2 className="size-3.5 animate-spin" aria-hidden />
+            <Loader2 className="size-3 animate-spin" aria-hidden />
           ) : (
-            <Trash2 className="size-3.5" aria-hidden />
+            <Trash2 className="size-3" aria-hidden />
           )}
         </Button>
       </div>
@@ -140,53 +141,48 @@ function QueuePhotoCard({ item, onCancel, onRemove }: QueuePhotoCardProps) {
     item.status === "error" || item.status === "cancelled";
 
   return (
-    <li className="border-border bg-background flex flex-col overflow-hidden rounded-xl border">
-      <div className="relative">
-        <PhotoPreview src={item.previewUrl} alt={item.file.name} />
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-x-0 bottom-0 p-3">
-          {(item.status === "queued" || item.status === "uploading") && (
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between gap-2 text-[11px] text-white/90">
-                <span>{statusLabel(item)}</span>
-                <span className="tabular-nums">
-                  {Math.round(item.progress)}%
-                </span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-white/25">
-                <div
-                  className="h-full rounded-full bg-white transition-[width] duration-200"
-                  style={{
-                    width: `${Math.max(0, Math.min(100, item.progress))}%`,
-                  }}
-                />
-              </div>
+    <li className="border-border bg-background relative aspect-square w-full overflow-hidden rounded-lg border">
+      <PhotoPreview src={item.previewUrl} alt={item.file.name} className="size-full" />
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-x-0 bottom-0 p-2">
+        {(item.status === "queued" || item.status === "uploading") && (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between gap-1 text-[10px] text-white/95">
+              <span className="font-medium">{statusLabel(item)}</span>
+              <span className="tabular-nums">
+                {Math.round(item.progress)}%
+              </span>
             </div>
-          )}
-          {(item.status === "error" || item.status === "cancelled") && (
-            <p className="text-xs text-white" role="alert">
-              {item.errorMessage ?? statusLabel(item)}
-            </p>
-          )}
-        </div>
-        {canCancel || canRemove ? (
-          <Button
-            type="button"
-            size="icon-xs"
-            variant="outline"
-            className="bg-background/90 absolute top-2 right-2 backdrop-blur-sm"
-            aria-label={canCancel ? "Cancelar envio" : "Remover"}
-            onClick={() =>
-              canCancel ? onCancel(item.localId) : onRemove(item.localId)
-            }
-          >
-            <X className="size-3.5" aria-hidden />
-          </Button>
-        ) : null}
+            <div className="h-1 overflow-hidden rounded-full bg-white/25">
+              <div
+                className="h-full rounded-full bg-white transition-[width] duration-200"
+                style={{
+                  width: `${Math.max(0, Math.min(100, item.progress))}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+        {(item.status === "error" || item.status === "cancelled") && (
+          <p className="line-clamp-2 text-[10px] text-white" role="alert">
+            {item.errorMessage ?? statusLabel(item)}
+          </p>
+        )}
       </div>
-      <p className="text-muted-foreground truncate px-3 py-2 text-xs">
-        {item.file.name}
-      </p>
+      {canCancel || canRemove ? (
+        <Button
+          type="button"
+          size="icon-xs"
+          variant="outline"
+          className="bg-background/95 absolute top-1.5 right-1.5 size-7 shadow-sm backdrop-blur-sm"
+          aria-label={canCancel ? "Cancelar envio" : "Remover"}
+          onClick={() =>
+            canCancel ? onCancel(item.localId) : onRemove(item.localId)
+          }
+        >
+          <X className="size-3" aria-hidden />
+        </Button>
+      ) : null}
     </li>
   );
 }

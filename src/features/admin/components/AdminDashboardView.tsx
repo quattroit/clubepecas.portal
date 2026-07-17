@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -33,6 +32,7 @@ import {
   AdminTableSkeleton,
 } from "@/components/admin";
 import type { AdminTableColumn } from "@/components/admin";
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Button } from "@/components/ui/button";
 import {
   advertisementPath,
@@ -450,7 +450,7 @@ function AdminDashboardView() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
                 <div className="bg-muted relative aspect-[5/3] w-full shrink-0 overflow-hidden rounded-xl sm:aspect-square sm:size-28">
                   {data.bestListing.thumbnailUrl ? (
-                    <Image
+                    <RemoteImage
                       src={data.bestListing.thumbnailUrl}
                       alt={`Foto de ${data.bestListing.title}`}
                       fill

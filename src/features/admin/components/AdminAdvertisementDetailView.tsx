@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+
+import { RemoteImage } from "@/components/media/RemoteImage";
 import {
   Eye,
   ExternalLink,
@@ -277,7 +278,7 @@ function AdminAdvertisementDetailView() {
                 key={`${url}-${index}`}
                 className="bg-muted relative aspect-square overflow-hidden rounded-xl"
               >
-                <Image
+                <RemoteImage
                   src={url}
                   alt={`Foto ${index + 1} de ${data.title}`}
                   fill

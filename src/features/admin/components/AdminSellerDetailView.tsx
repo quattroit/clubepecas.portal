@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+
+import { RemoteImage } from "@/components/media/RemoteImage";
 import {
   Eye,
   MessageCircle,
@@ -132,7 +133,7 @@ function AdminSellerDetailView() {
         cell: (row) => (
           <div className="bg-muted relative size-12 overflow-hidden rounded-lg">
             {row.thumbnailUrl ? (
-              <Image
+              <RemoteImage
                 src={row.thumbnailUrl}
                 alt=""
                 fill

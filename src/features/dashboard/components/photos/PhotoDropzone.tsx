@@ -15,12 +15,14 @@ type PhotoDropzoneProps = {
   onFilesSelected: (files: FileList | File[]) => void;
 };
 
+/**
+ * Tile quadrado de upload — sempre no tamanho da grade de fotos.
+ */
 function PhotoDropzone({
   disabled = false,
   remaining,
   maxPhotos,
   usedCount,
-  maxFileSizeMB,
   onFilesSelected,
 }: PhotoDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,7 +48,7 @@ function PhotoDropzone({
       role="button"
       tabIndex={isDisabled ? -1 : 0}
       aria-disabled={isDisabled}
-      aria-label="Área para adicionar fotos. Clique ou arraste imagens."
+      aria-label="Adicionar fotos. Clique ou arraste imagens."
       onClick={openPicker}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -68,11 +70,13 @@ function PhotoDropzone({
       }}
       onDrop={handleDrop}
       className={cn(
-        "border-border bg-background focus-visible:ring-ring/50 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-8 text-center transition-colors outline-none focus-visible:ring-3",
-        dragging && !isDisabled && "border-primary bg-primary/5",
+        "focus-visible:ring-ring/50 flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed px-2 text-center outline-none transition-all focus-visible:ring-3",
+        dragging && !isDisabled
+          ? "border-primary bg-primary/10"
+          : "border-primary/40 bg-primary/[0.04]",
         isDisabled
-          ? "cursor-not-allowed opacity-60"
-          : "hover:border-primary/50 hover:bg-muted/40 cursor-pointer",
+          ? "cursor-not-allowed opacity-55"
+          : "hover:border-primary hover:bg-primary/[0.08] cursor-pointer",
       )}
     >
       <input
@@ -90,19 +94,16 @@ function PhotoDropzone({
         }}
       />
 
-      <span className="bg-muted text-foreground flex size-11 items-center justify-center rounded-full">
-        <ImagePlus className="size-5" aria-hidden />
+      <span className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-full shadow-sm">
+        <ImagePlus className="size-4" aria-hidden />
       </span>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-foreground text-sm font-medium">
-          {remaining <= 0
-            ? "Limite de fotos atingido"
-            : "Arraste imagens ou clique para selecionar"}
+      <div className="flex flex-col gap-0.5">
+        <p className="text-foreground text-xs leading-tight font-semibold">
+          {remaining <= 0 ? "Limite" : "Adicionar"}
         </p>
-        <p className="text-muted-foreground text-xs">
-          JPG, PNG ou WEBP · até {maxFileSizeMB} MB cada · {usedCount}/
-          {maxPhotos} usadas · {remaining} restantes
+        <p className="text-muted-foreground text-[11px] leading-tight tabular-nums">
+          {usedCount}/{maxPhotos}
         </p>
       </div>
     </div>

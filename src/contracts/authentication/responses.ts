@@ -21,6 +21,8 @@ export type CurrentUserResponse = {
   name: string;
   email: string;
   role: UserRole;
+  document?: string | null;
+  personType?: number | null;
 };
 
 export type ChangePasswordResponse = {

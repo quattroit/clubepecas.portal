@@ -61,6 +61,33 @@ export function isValidDocument(
     : isValidCnpj(value);
 }
 
+/** Valida CPF (11) ou CNPJ (14) pelo tamanho dos dígitos. */
+export function isValidDocumentAuto(value: string): boolean {
+  const digits = onlyDigits(value);
+  if (digits.length === 11) return isValidCpf(digits);
+  if (digits.length === 14) return isValidCnpj(digits);
+  return false;
+}
+
+/** Máscara progressiva CPF → CNPJ conforme a quantidade de dígitos. */
+export function formatDocumentAuto(value: string): string {
+  const digits = onlyDigits(value).slice(0, 14);
+  if (digits.length <= 11) {
+    return formatDocumentInput(digits, PersonType.Individual);
+  }
+  return formatDocumentInput(digits, PersonType.Company);
+}
+
+/** Infere PersonType pelo tamanho do documento. */
+export function inferPersonTypeFromDocument(
+  value: string,
+): PersonType | null {
+  const digits = onlyDigits(value);
+  if (digits.length === 11) return PersonType.Individual;
+  if (digits.length === 14) return PersonType.Company;
+  return null;
+}
+
 /** Aplica máscara progressiva conforme o tipo de pessoa. */
 export function formatDocumentInput(
   value: string,

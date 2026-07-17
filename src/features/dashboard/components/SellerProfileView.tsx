@@ -13,6 +13,7 @@ import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerPro
 import type { SellerProfileFormValues } from "@/features/dashboard/schemas/sellerProfileFormSchema";
 import { ROUTES } from "@/constants/routes";
 import { useCreateSeller } from "@/hooks/api/useCreateSeller";
+import { useCurrentUser } from "@/hooks/api/useCurrentUser";
 import { useSeller } from "@/hooks/api/useSeller";
 import { useUpdateSeller } from "@/hooks/api/useUpdateSeller";
 import { ANNOUNCE_PROFILE_PARAM } from "@/lib/announce-flow";
@@ -22,6 +23,11 @@ import {
   mapSellerProfileFormToUpdateRequest,
   mapSellerToProfileFormValues,
 } from "@/mappers/seller-form.mapper";
+import { PersonType } from "@/contracts/common/enums";
+import {
+  formatDocumentInput,
+  inferPersonTypeFromDocument,
+} from "@/utils/document";
 
 function SellerProfileView() {
   const router = useRouter();
@@ -29,10 +35,27 @@ function SellerProfileView() {
   const fromAnnounce = searchParams.get(ANNOUNCE_PROFILE_PARAM) === "1";
 
   const sellerQuery = useSeller();
+  const currentUserQuery = useCurrentUser();
   const createMutation = useCreateSeller();
   const updateMutation = useUpdateSeller();
   const [isCreating, setIsCreating] = useState(false);
   const [dismissedAnnounceForm, setDismissedAnnounceForm] = useState(false);
+  const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
+
+  const createDefaults = useMemo(() => {
+    const document = currentUserQuery.data?.document?.trim();
+    if (!document) return undefined;
+
+    const personType =
+      (currentUserQuery.data?.personType as PersonType | null | undefined) ??
+      inferPersonTypeFromDocument(document) ??
+      PersonType.Individual;
+
+    return {
+      personType,
+      document: formatDocumentInput(document, personType),
+    };
+  }, [currentUserQuery.data?.document, currentUserQuery.data?.personType]);
 
   const showCreateForm =
     !sellerQuery.isLoading &&
@@ -46,14 +69,24 @@ function SellerProfileView() {
   }, [sellerQuery.data]);
 
   const handleCreate = (values: SellerProfileFormValues) => {
-    createMutation.mutate(mapSellerProfileFormToCreateRequest(values), {
-      onSuccess: () => {
-        setIsCreating(false);
-        if (fromAnnounce) {
-          router.replace(ROUTES.NEW_ADVERTISEMENT);
-        }
+    createMutation.mutate(
+      {
+        request: mapSellerProfileFormToCreateRequest({
+          ...values,
+          photoUrl: "",
+        }),
+        photoFile: pendingPhotoFile,
       },
-    });
+      {
+        onSuccess: () => {
+          setIsCreating(false);
+          setPendingPhotoFile(null);
+          if (fromAnnounce) {
+            router.replace(ROUTES.NEW_ADVERTISEMENT);
+          }
+        },
+      },
+    );
   };
 
   const handleUpdate = (values: SellerProfileFormValues) => {
@@ -113,16 +146,23 @@ function SellerProfileView() {
       {showCreateForm ? (
         <SellerProfileForm
           mode="create"
+          defaultValues={createDefaults}
           isSubmitting={createMutation.isPending}
           submitError={
             createMutation.isError ? createMutation.error : undefined
           }
+          pendingPhotoFile={pendingPhotoFile}
+          onPendingPhotoFileChange={setPendingPhotoFile}
           onSubmit={handleCreate}
           onCancel={() => {
             setIsCreating(false);
             setDismissedAnnounceForm(true);
+            setPendingPhotoFile(null);
             createMutation.reset();
           }}
+          submittingLabel={
+            pendingPhotoFile ? "Criando e enviando foto…" : undefined
+          }
         />
       ) : null}
 

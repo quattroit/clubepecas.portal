@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { Package } from "lucide-react";
 import { useState } from "react";
 
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { cn } from "@/lib/utils";
 
 type ImageGalleryProps = {
@@ -24,7 +24,7 @@ function ImageGallery({ images, alt, className }: ImageGalleryProps) {
     <div className={cn("flex flex-col gap-3", className)}>
       <div className="bg-muted ring-border relative aspect-[4/3] overflow-hidden rounded-xl shadow-xs ring-1">
         {activeImage ? (
-          <Image
+          <RemoteImage
             src={activeImage}
             alt={`${alt} — foto ${activeIndex + 1}`}
             fill
@@ -65,7 +65,7 @@ function ImageGallery({ images, alt, className }: ImageGalleryProps) {
                       : "ring-border opacity-80 hover:opacity-100 hover:ring-primary/40",
                   )}
                 >
-                  <Image
+                  <RemoteImage
                     src={image}
                     alt=""
                     fill

@@ -153,7 +153,7 @@ export const platformSettingsFormDefaultValues: PlatformSettingsFormValues = {
   whatsAppEnabled: true,
   instagramEnabled: true,
   defaultAdvertisementLimit: 20,
-  defaultImagesPerAdvertisement: 10,
+  defaultImagesPerAdvertisement: 3,
   maxImageSizeMb: 5,
   onlineTimeoutMinutes: 15,
 };

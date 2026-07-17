@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Package } from "lucide-react";
 
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { advertisementPath } from "@/constants/routes";
@@ -51,7 +51,7 @@ function AdvertisementCard({
       <Card size="sm" className="card-interactive h-full gap-0 rounded-2xl py-0">
         <div className="bg-muted relative aspect-[16/10] overflow-hidden">
           {imageUrl ? (
-            <Image
+            <RemoteImage
               src={imageUrl}
               alt={`Foto do anúncio: ${title}`}
               fill

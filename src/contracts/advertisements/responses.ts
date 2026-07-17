@@ -115,10 +115,13 @@ export type AdvertisementPhotoDto = {
   advertisementId: string;
   storageKey?: string | null;
   publicUrl: string;
+  thumbnailStorageKey?: string | null;
+  thumbnailPublicUrl?: string | null;
   contentType?: string | null;
   fileSize?: number | null;
   width?: number | null;
   height?: number | null;
+  checksum?: string | null;
   isPrimary: boolean;
   displayOrder: number;
   createdAt: string;

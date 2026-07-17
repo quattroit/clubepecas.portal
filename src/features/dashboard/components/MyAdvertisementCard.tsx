@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Package, Pencil, Trash2 } from "lucide-react";
 
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -78,7 +78,7 @@ function MyAdvertisementCard({
     >
       <div className="bg-muted relative aspect-[5/3] overflow-hidden">
         {imageUrl ? (
-          <Image
+          <RemoteImage
             src={imageUrl}
             alt={`Foto do anúncio: ${title}`}
             fill

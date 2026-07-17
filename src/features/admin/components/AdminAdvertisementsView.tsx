@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -17,6 +16,7 @@ import {
   ConfirmDialog,
 } from "@/components/admin";
 import type { AdminTableColumn } from "@/components/admin";
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Pagination } from "@/components/navigation/Pagination";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,7 +135,7 @@ function AdminAdvertisementsView() {
       cell: (row) => (
         <div className="bg-muted relative size-12 overflow-hidden rounded-lg">
           {row.thumbnailUrl ? (
-            <Image
+            <RemoteImage
               src={row.thumbnailUrl}
               alt=""
               fill

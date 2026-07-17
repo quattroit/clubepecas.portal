@@ -4,6 +4,7 @@ export type RegisterUserRequest = {
   email: string;
   password: string;
   phoneNumber: string;
+  document: string;
 };
 
 export type LoginRequest = {

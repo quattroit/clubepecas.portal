@@ -83,4 +83,23 @@ export const sellerService = {
       .delete<SellerSubscriptionDto>("/api/v1/seller/subscription")
       .then((response) => response.data);
   },
+
+  uploadPhoto(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api
+      .post<{ photoUrl: string; thumbnailPublicUrl?: string | null }>(
+        "/api/v1/seller/me/photo/upload",
+        formData,
+        { timeout: 120_000 },
+      )
+      .then((response) => response.data);
+  },
+
+  deletePhoto() {
+    return api
+      .delete<{ sellerId: string }>("/api/v1/seller/me/photo")
+      .then((response) => response.data);
+  },
 };

@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Package, Trophy } from "lucide-react";
 
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { editAdvertisementPath } from "@/constants/routes";
@@ -26,7 +26,7 @@ function BestListingCard({ listing, className }: BestListingCardProps) {
       <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5">
         <div className="bg-muted relative aspect-[5/3] w-full shrink-0 overflow-hidden rounded-xl sm:aspect-square sm:size-28">
           {listing.thumbnailUrl ? (
-            <Image
+            <RemoteImage
               src={listing.thumbnailUrl}
               alt={`Foto de ${listing.title}`}
               fill

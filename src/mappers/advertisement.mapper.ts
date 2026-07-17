@@ -5,6 +5,7 @@ import type {
 import type { MarketplaceItemDto } from "@/contracts/categories/responses";
 import type { PublicSellerAdvertisementDto } from "@/contracts/seller/responses";
 import { getStatusLabel, isNewCondition } from "@/mappers/categoryMeta";
+import { resolveMediaUrl } from "@/lib/photo-url";
 import type { Advertisement } from "@/types/Advertisement";
 
 export function mapMarketplaceItemToAdvertisement(
@@ -31,8 +32,10 @@ export function mapMarketplaceItemToAdvertisement(
     vehicleModelSlug: item.vehicleModelSlug ?? undefined,
     manufacturingYear: item.manufacturingYear,
     modelYear: item.modelYear,
-    imageUrl: item.thumbnailUrl,
-    images: item.thumbnailUrl ? [item.thumbnailUrl] : [],
+    imageUrl: resolveMediaUrl(item.thumbnailUrl),
+    images: item.thumbnailUrl
+      ? [resolveMediaUrl(item.thumbnailUrl)]
+      : [],
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
   };
@@ -44,7 +47,9 @@ export function mapAdvertisementBySlugToAdvertisement(
   const photos = [...dto.photos].sort(
     (a, b) => a.displayOrder - b.displayOrder,
   );
-  const images = photos.map((photo) => photo.url);
+  const images = photos
+    .map((photo) => resolveMediaUrl(photo.url))
+    .filter(Boolean);
 
   return {
     id: dto.slug,
@@ -96,8 +101,10 @@ export function mapPublicSellerAdvertisementToAdvertisement(
     vehicleModelSlug: item.vehicleModelSlug ?? undefined,
     manufacturingYear: item.manufacturingYear,
     modelYear: item.modelYear,
-    imageUrl: item.thumbnailUrl,
-    images: item.thumbnailUrl ? [item.thumbnailUrl] : [],
+    imageUrl: resolveMediaUrl(item.thumbnailUrl),
+    images: item.thumbnailUrl
+      ? [resolveMediaUrl(item.thumbnailUrl)]
+      : [],
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
   };
@@ -107,7 +114,7 @@ export function mapMyAdvertisementItemToAdvertisement(
   item: AdvertisementListItemDto,
   options?: { imageUrl?: string | null },
 ): Advertisement {
-  const imageUrl = options?.imageUrl ?? null;
+  const imageUrl = resolveMediaUrl(options?.imageUrl) || null;
 
   return {
     id: item.id,

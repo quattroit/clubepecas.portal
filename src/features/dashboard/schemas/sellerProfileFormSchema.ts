@@ -9,8 +9,11 @@ const optionalUrl = z
   .string()
   .trim()
   .refine(
-    (value) => value === "" || z.url().safeParse(value).success,
-    "Informe uma URL válida (https://…)",
+    (value) =>
+      value === "" ||
+      z.url().safeParse(value).success ||
+      value.startsWith("/uploads/"),
+    "Informe uma URL válida",
   );
 
 /**

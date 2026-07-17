@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { SellerPhotoPicker } from "@/features/dashboard/components/photos/SellerPhotoPicker";
 import { PersonType } from "@/contracts/common/enums";
 import {
   sellerProfileFormDefaultValues,
@@ -21,7 +22,6 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { formatCityLabel } from "@/mappers/city.mapper";
 import {
-  documentLabel,
   documentPlaceholder,
   formatDocumentInput,
 } from "@/utils/document";
@@ -40,6 +40,9 @@ type SellerProfileFormProps = {
   onCancel?: () => void;
   submitLabel?: string;
   submittingLabel?: string;
+  /** Arquivo pendente (create) — enviado após criar o perfil. */
+  pendingPhotoFile?: File | null;
+  onPendingPhotoFileChange?: (file: File | null) => void;
 };
 
 /**
@@ -55,6 +58,8 @@ function SellerProfileForm({
   onCancel,
   submitLabel = mode === "edit" ? "Salvar alterações" : "Criar perfil",
   submittingLabel = mode === "edit" ? "Salvando…" : "Criando…",
+  pendingPhotoFile = null,
+  onPendingPhotoFileChange,
 }: SellerProfileFormProps) {
   const citiesQuery = useCities();
   const cities = citiesQuery.data ?? [];
@@ -76,6 +81,7 @@ function SellerProfileForm({
   });
 
   const personType = useWatch({ control, name: "personType" });
+  const photoUrl = useWatch({ control, name: "photoUrl" }) ?? "";
 
   useEffect(() => {
     reset({
@@ -189,7 +195,7 @@ function SellerProfileForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-document">{documentLabel(personType)}</Label>
+          <Label htmlFor="seller-document">CPF/CNPJ</Label>
           <Controller
             name="document"
             control={control}
@@ -368,29 +374,19 @@ function SellerProfileForm({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="seller-photo-url">URL da foto (opcional)</Label>
-        <Input
-          id="seller-photo-url"
-          type="url"
-          placeholder="https://…"
-          aria-invalid={Boolean(errors.photoUrl)}
-          aria-describedby={
-            errors.photoUrl ? "seller-photo-url-error" : undefined
-          }
-          disabled={isSubmitting}
-          {...register("photoUrl")}
-        />
-        {errors.photoUrl ? (
-          <p
-            id="seller-photo-url-error"
-            className="text-destructive text-xs"
-            role="alert"
-          >
-            {errors.photoUrl.message}
-          </p>
-        ) : null}
-      </div>
+      <SellerPhotoPicker
+        mode={mode}
+        value={photoUrl}
+        onChange={(nextPhotoUrl) =>
+          setValue("photoUrl", nextPhotoUrl, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
+        }
+        pendingFile={pendingPhotoFile}
+        onPendingFileChange={(file) => onPendingPhotoFileChange?.(file)}
+        disabled={isSubmitting}
+      />
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         {onCancel ? (

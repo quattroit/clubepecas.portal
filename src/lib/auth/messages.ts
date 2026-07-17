@@ -43,6 +43,11 @@ const CODE_MESSAGES: Record<string, string> = {
   "rate_limit.exceeded":
     "Muitas requisições. Aguarde um momento e tente novamente.",
   "user.email.already_exists": "Este e-mail já está cadastrado.",
+  "user.document.required": "Informe o CPF ou CNPJ.",
+  "user.document.invalid": "Informe um CPF ou CNPJ válido.",
+  "user.document.already_exists":
+    "Já existe um cadastro vinculado a este CPF ou CNPJ.",
+  "user.phone_number.required": "Informe o telefone.",
   "advertisement.title.required": "Informe o título do anúncio.",
   "advertisement.description.required": "Informe a descrição do anúncio.",
   "advertisement.compatibility_description.required":
@@ -121,6 +126,8 @@ const CODE_MESSAGES: Record<string, string> = {
     "O conteúdo do arquivo não é uma imagem JPG, PNG ou WEBP válida.",
   "photo.signature.mismatch":
     "A extensão do arquivo não corresponde ao conteúdo real da imagem.",
+  "photo.processing.failed":
+    "Não foi possível processar a imagem. Tente outro arquivo.",
   "photo.file.too_large": "O arquivo excede o limite permitido.",
   "photo.limit.reached": "Limite de fotos por anúncio atingido.",
   "photo.upload.failed": "Não foi possível salvar o arquivo. Tente novamente.",
