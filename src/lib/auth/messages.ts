@@ -38,6 +38,10 @@ const CODE_MESSAGES: Record<string, string> = {
     "Este link expirou. Solicite um novo envio.",
   "auth.reset_token.used":
     "Este link já foi utilizado. Solicite um novo envio.",
+  "auth.account_locked":
+    "Conta temporariamente bloqueada. Tente novamente mais tarde.",
+  "rate_limit.exceeded":
+    "Muitas requisições. Aguarde um momento e tente novamente.",
   "user.email.already_exists": "Este e-mail já está cadastrado.",
   "advertisement.title.required": "Informe o título do anúncio.",
   "advertisement.description.required": "Informe a descrição do anúncio.",
@@ -120,6 +124,13 @@ const CODE_MESSAGES: Record<string, string> = {
  */
 export function getFriendlyErrorMessage(error: unknown): string {
   if (error instanceof UnauthorizedError) {
+    if (error.code === "auth.account_locked") {
+      const apiMessage = error.errors
+        .find((item) => item.code === "auth.account_locked")
+        ?.message?.trim();
+      return apiMessage || CODE_MESSAGES["auth.account_locked"];
+    }
+
     return (
       CODE_MESSAGES[error.code ?? ""] ??
       CODE_MESSAGES["authentication.unauthorized"]
@@ -127,10 +138,24 @@ export function getFriendlyErrorMessage(error: unknown): string {
   }
 
   if (error instanceof ForbiddenError) {
+    if (error.code === "auth.account_locked") {
+      const apiMessage = error.errors
+        .find((item) => item.code === "auth.account_locked")
+        ?.message?.trim();
+      return apiMessage || CODE_MESSAGES["auth.account_locked"];
+    }
+
     return CODE_MESSAGES[error.code ?? ""] ?? CODE_MESSAGES.forbidden;
   }
 
   if (error instanceof ApiError) {
+    if (error.code === "auth.account_locked") {
+      const apiMessage = error.errors
+        .find((item) => item.code === "auth.account_locked")
+        ?.message?.trim();
+      return apiMessage || CODE_MESSAGES["auth.account_locked"];
+    }
+
     if (error.code && CODE_MESSAGES[error.code]) {
       return CODE_MESSAGES[error.code];
     }

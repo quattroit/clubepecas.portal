@@ -7,6 +7,10 @@ import type {
 } from "@/contracts/admin/advertisements";
 import type { AdminAnalyticsResponse } from "@/contracts/admin/analytics";
 import type {
+  AdminAuditListParams,
+  AdminAuditListResponse,
+} from "@/contracts/admin/audit";
+import type {
   AdminCategoriesListParams,
   CreateAdminCategoryRequest,
   GetAdminCategoriesResponse,
@@ -389,6 +393,12 @@ export const adminService = {
   deleteSubscriptionPlan(id: string) {
     return api
       .delete(`/api/v1/admin/subscription-plans/${id}`)
+      .then((response) => response.data);
+  },
+
+  listAuditLogs(params: AdminAuditListParams = {}) {
+    return api
+      .get<AdminAuditListResponse>("/api/v1/admin/audit", { params })
       .then((response) => response.data);
   },
 };

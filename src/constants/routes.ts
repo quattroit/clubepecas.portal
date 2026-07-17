@@ -32,6 +32,7 @@ export const ROUTES = {
   ADMIN_VEHICLE_MODELS: "/admin/modelos",
   ADMIN_ANALYTICS: "/admin/analytics",
   ADMIN_PLANS: "/admin/planos",
+  ADMIN_AUDIT: "/admin/auditoria",
   ADMIN_SETTINGS: "/admin/configuracoes",
 } as const;
 
@@ -116,6 +117,7 @@ export const ADMIN_ROUTES = {
   ADMIN_VEHICLE_MODELS: ROUTES.ADMIN_VEHICLE_MODELS,
   ADMIN_ANALYTICS: ROUTES.ADMIN_ANALYTICS,
   ADMIN_PLANS: ROUTES.ADMIN_PLANS,
+  ADMIN_AUDIT: ROUTES.ADMIN_AUDIT,
   ADMIN_SETTINGS: ROUTES.ADMIN_SETTINGS,
 } as const;
 

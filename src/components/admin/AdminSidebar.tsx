@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   MapPin,
   Package,
+  ScrollText,
   Settings,
   Store,
   type LucideIcon,
@@ -80,6 +81,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_PLANS,
     label: "Planos",
     icon: CreditCard,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_AUDIT,
+    label: "Auditoria",
+    icon: ScrollText,
     exact: false,
   },
   {
