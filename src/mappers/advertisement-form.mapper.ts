@@ -3,10 +3,7 @@ import type {
   UpdateAdvertisementRequest,
 } from "@/contracts/advertisements/requests";
 import type { AdvertisementDetailDto } from "@/contracts/advertisements/responses";
-import type {
-  AdvertisementCategory,
-  AdvertisementCondition,
-} from "@/contracts/common/enums";
+import type { AdvertisementCondition } from "@/contracts/common/enums";
 import type { AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
 import { parsePriceInput } from "@/utils/parsePriceInput";
 
@@ -38,10 +35,13 @@ export function mapAdvertisementDetailToFormValues(
   return {
     title: dto.title,
     description: dto.description,
-    category: String(dto.category),
+    categoryId: dto.categoryId,
+    vehicleBrandId: dto.vehicleBrandId,
+    vehicleModelId: dto.vehicleModelId ?? "",
     compatibilityDescription: dto.compatibilityDescription,
     condition: String(dto.condition),
     price: dto.price.toFixed(2).replace(".", ","),
+    stockQuantity: String(dto.stockQuantity),
     photoUrls: mapPhotosToFormUrls(photos),
   };
 }
@@ -75,9 +75,12 @@ function mapAdvertisementFormToRequest(
   return {
     title: values.title.trim(),
     description: values.description.trim(),
-    category: Number(values.category) as AdvertisementCategory,
+    categoryId: values.categoryId,
+    vehicleBrandId: values.vehicleBrandId,
+    vehicleModelId: values.vehicleModelId,
     compatibilityDescription: values.compatibilityDescription.trim(),
     condition: Number(values.condition) as AdvertisementCondition,
     price: parsePriceInput(values.price),
+    stockQuantity: Number(values.stockQuantity),
   };
 }

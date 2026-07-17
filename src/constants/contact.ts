@@ -5,6 +5,14 @@
 export const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "pecasclube@gmail.com";
 
+/** Perfil público no Instagram. */
+export const INSTAGRAM_HANDLE =
+  process.env.NEXT_PUBLIC_INSTAGRAM_HANDLE ?? "siteclubepecas";
+
+export const INSTAGRAM_URL =
+  process.env.NEXT_PUBLIC_INSTAGRAM_URL ??
+  `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
+
 export const CONTACT_HOURS =
   process.env.NEXT_PUBLIC_CONTACT_HOURS ??
   "Segunda a sexta, das 9h às 18h (horário de Brasília)";

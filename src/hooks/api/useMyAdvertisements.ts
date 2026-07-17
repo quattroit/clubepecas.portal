@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { mapMyAdvertisementItemToAdvertisement } from "@/mappers/advertisement.mapper";
+import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
 import { queryKeys } from "@/lib/queryKeys";
 import { advertisementService } from "@/services/advertisement.service";
 
@@ -11,8 +12,12 @@ import { advertisementService } from "@/services/advertisement.service";
  * Enriquece com a 1ª foto via GET .../photos — a listagem "me" não devolve thumbnail.
  */
 export function useMyAdvertisements() {
+  const authReady = useAuthQueryEnabled();
+
   return useQuery({
     queryKey: queryKeys.advertisements.me,
+    enabled: authReady,
+    refetchOnMount: "always",
     queryFn: async () => {
       const response = await advertisementService.getMine();
 

@@ -2,20 +2,20 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { mapCategoryEnumToCategory } from "@/mappers/category.mapper";
+import { mapCategoryItemsToCategories } from "@/mappers/category.mapper";
 import { queryKeys } from "@/lib/queryKeys";
 import { categoryService } from "@/services/category.service";
 
 /**
- * Catálogo de categorias (enum AdvertisementCategory via categoryService).
+ * Catálogo público de categorias (GET /api/v1/categories).
  */
 export function useCategories() {
   return useQuery({
     queryKey: queryKeys.categories.all,
     queryFn: async () => {
-      const categories = await categoryService.listCategories();
-      return categories.map((category) => mapCategoryEnumToCategory(category));
+      const response = await categoryService.listCategories();
+      return mapCategoryItemsToCategories(response.items);
     },
-    staleTime: Infinity,
+    staleTime: 60_000,
   });
 }

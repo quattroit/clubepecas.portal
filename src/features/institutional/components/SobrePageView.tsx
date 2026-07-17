@@ -17,7 +17,7 @@ function SobrePageView() {
     <InstitutionalPageShell
       breadcrumbLabel="Sobre"
       title={`Sobre o ${APP_NAME}`}
-      description="O marketplace que conecta oficinas, autopeças e compradores a peças automotivas com mais confiança e praticidade."
+      description="O marketplace que conecta oficinas, autopeças e vendedores a peças automotivas com mais confiança e praticidade."
     >
       <InstitutionalSection id="o-que-e" title={`O que é o ${APP_NAME}`}>
         <p>
@@ -27,15 +27,16 @@ function SobrePageView() {
           claras, contato direto e uma experiência simples de navegação.
         </p>
         <p>
-          Aqui, vendedores e lojas publicam anúncios; compradores pesquisam por
+          Aqui, vendedores e lojas publicam anúncios; visitantes pesquisam por
           categoria, localização e compatibilidade; e o diálogo acontece de
-          forma direta entre as partes.
+          forma direta entre as partes, sem necessidade de cadastro para quem
+          apenas busca.
         </p>
       </InstitutionalSection>
 
       <InstitutionalSection id="missao" title="Missão">
         <p>
-          Tornar a compra e a venda de peças automotivas mais ágeis, transparentes
+          Tornar a busca e a venda de peças automotivas mais ágeis, transparentes
           e acessíveis, reduzindo a dificuldade de encontrar a peça certa no
           momento certo.
         </p>
@@ -64,26 +65,27 @@ function SobrePageView() {
 
       <InstitutionalSection id="para-quem" title="Para quem foi criado">
         <p>
-          O {APP_NAME} foi pensado para profissionais e consumidores do
+          O {APP_NAME} foi pensado para profissionais e visitantes do
           ecossistema automotivo:
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>Oficinas e mecânicos em busca de reposição rápida</li>
           <li>Autopeças e lojas que desejam ampliar o alcance dos anúncios</li>
-          <li>Compradores particulares que precisam da peça certa com confiança</li>
+          <li>Quem precisa da peça certa e prefere contato direto com a loja</li>
           <li>Vendedores independentes com estoque de peças novas ou seminovas</li>
         </ul>
       </InstitutionalSection>
 
       <InstitutionalSection
-        id="beneficios-compradores"
-        title="Benefícios para compradores"
+        id="beneficios-visitantes"
+        title="Benefícios para quem pesquisa"
       >
         <ul className="list-disc space-y-2 pl-5">
           <li>Busca organizada por categorias e filtros úteis</li>
-          <li>Detalhes de compatibilidade para reduzir compras erradas</li>
+          <li>Detalhes de compatibilidade para reduzir erros</li>
           <li>Acesso a lojas e vendedores da sua região e de outras localidades</li>
           <li>Contato direto com o anunciante, sem intermediários no diálogo</li>
+          <li>Navegação pública — sem precisar criar conta</li>
         </ul>
       </InstitutionalSection>
 
@@ -94,7 +96,7 @@ function SobrePageView() {
         <ul className="list-disc space-y-2 pl-5">
           <li>Publicação simples de anúncios com fotos e descrição</li>
           <li>Vitrine pública da sua loja no marketplace</li>
-          <li>Alcance de compradores além do círculo local tradicional</li>
+          <li>Alcance de visitantes além do círculo local tradicional</li>
           <li>Painel para gerenciar perfil e peças anunciadas</li>
         </ul>
       </InstitutionalSection>
@@ -111,8 +113,8 @@ function SobrePageView() {
             Pronto para começar?
           </h2>
           <p className="text-primary-foreground/85 text-sm leading-relaxed">
-            Cadastre-se gratuitamente, complete seu perfil de vendedor e publique
-            sua primeira peça no {APP_NAME}.
+            Cadastre-se gratuitamente como vendedor, complete seu perfil e
+            publique sua primeira peça no {APP_NAME}.
           </p>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <AnnounceButton variant="secondary" size="lg">

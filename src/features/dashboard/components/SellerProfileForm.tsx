@@ -15,8 +15,15 @@ import {
   sellerProfileFormSchema,
   type SellerProfileFormValues,
 } from "@/features/dashboard/schemas/sellerProfileFormSchema";
+import { useCities } from "@/hooks/api/useCities";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
+import { formatCityLabel } from "@/mappers/city.mapper";
+
+const selectClassName = cn(
+  "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+);
 
 type SellerProfileFormProps = {
   mode: "create" | "edit";
@@ -43,6 +50,9 @@ function SellerProfileForm({
   submitLabel = mode === "edit" ? "Salvar alterações" : "Criar perfil",
   submittingLabel = mode === "edit" ? "Salvando…" : "Criando…",
 }: SellerProfileFormProps) {
+  const citiesQuery = useCities();
+  const cities = citiesQuery.data ?? [];
+
   const {
     register,
     handleSubmit,
@@ -69,10 +79,13 @@ function SellerProfileForm({
     onSubmit(values);
   });
 
+  const citiesLoading = citiesQuery.isLoading;
+  const citiesDisabled = isSubmitting || citiesLoading || citiesQuery.isError;
+
   return (
     <form
       onSubmit={submit}
-      className="flex w-full max-w-2xl flex-col gap-5"
+      className="flex w-full max-w-2xl flex-col gap-6"
       noValidate
       aria-busy={isSubmitting}
     >
@@ -133,54 +146,53 @@ function SellerProfileForm({
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-city">Cidade</Label>
-          <Input
-            id="seller-city"
-            aria-invalid={Boolean(errors.city)}
-            aria-describedby={errors.city ? "seller-city-error" : undefined}
-            disabled={isSubmitting}
-            {...register("city")}
-          />
-          {errors.city ? (
-            <p
-              id="seller-city-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.city.message}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-state">Estado</Label>
-          <Input
-            id="seller-state"
-            placeholder="UF"
-            maxLength={2}
-            className="uppercase"
-            aria-invalid={Boolean(errors.state)}
-            aria-describedby={
-              errors.state ? "seller-state-error" : "seller-state-hint"
-            }
-            disabled={isSubmitting}
-            {...register("state")}
-          />
-          <p id="seller-state-hint" className="text-muted-foreground text-xs">
-            Use a sigla do estado (ex.: PR, SP).
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="seller-city">Cidade</Label>
+        <select
+          id="seller-city"
+          className={selectClassName}
+          aria-invalid={Boolean(errors.cityId)}
+          aria-describedby={
+            errors.cityId
+              ? "seller-city-error"
+              : citiesQuery.isError
+                ? "seller-city-load-error"
+                : "seller-city-hint"
+          }
+          disabled={citiesDisabled}
+          {...register("cityId")}
+        >
+          <option value="">
+            {citiesLoading ? "Carregando cidades…" : "Selecione a cidade"}
+          </option>
+          {cities.map((city) => (
+            <option key={city.id} value={city.id}>
+              {formatCityLabel(city)}
+            </option>
+          ))}
+        </select>
+        {citiesQuery.isError ? (
+          <p
+            id="seller-city-load-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            Não foi possível carregar as cidades. Tente novamente mais tarde.
           </p>
-          {errors.state ? (
-            <p
-              id="seller-state-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.state.message}
-            </p>
-          ) : null}
-        </div>
+        ) : (
+          <p id="seller-city-hint" className="text-muted-foreground text-xs">
+            Selecione a cidade onde a loja atua.
+          </p>
+        )}
+        {errors.cityId ? (
+          <p
+            id="seller-city-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            {errors.cityId.message}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -201,7 +213,7 @@ function SellerProfileForm({
           id="seller-description-hint"
           className="text-muted-foreground text-xs"
         >
-          Conte um pouco sobre a loja para os compradores.
+          Conte um pouco sobre a loja para quem busca peças.
         </p>
         {errors.description ? (
           <p
@@ -216,7 +228,7 @@ function SellerProfileForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-whatsapp">WhatsApp (opcional)</Label>
+          <Label htmlFor="seller-whatsapp">WhatsApp</Label>
           <Input
             id="seller-whatsapp"
             type="tel"
@@ -229,7 +241,7 @@ function SellerProfileForm({
             {...register("whatsApp")}
           />
           <p id="seller-whatsapp-hint" className="text-muted-foreground text-xs">
-            Preferencialmente só números, com DDI.
+            Obrigatório. Preferencialmente só números, com DDI.
           </p>
           {errors.whatsApp ? (
             <p
@@ -243,28 +255,61 @@ function SellerProfileForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-photo-url">URL da foto (opcional)</Label>
+          <Label htmlFor="seller-instagram">Instagram (opcional)</Label>
           <Input
-            id="seller-photo-url"
-            type="url"
-            placeholder="https://…"
-            aria-invalid={Boolean(errors.photoUrl)}
+            id="seller-instagram"
+            type="text"
+            placeholder="@sualoja"
+            autoComplete="off"
+            aria-invalid={Boolean(errors.instagram)}
             aria-describedby={
-              errors.photoUrl ? "seller-photo-url-error" : undefined
+              errors.instagram
+                ? "seller-instagram-error"
+                : "seller-instagram-hint"
             }
             disabled={isSubmitting}
-            {...register("photoUrl")}
+            {...register("instagram")}
           />
-          {errors.photoUrl ? (
+          <p
+            id="seller-instagram-hint"
+            className="text-muted-foreground text-xs"
+          >
+            Informe o @usuário ou a URL do perfil.
+          </p>
+          {errors.instagram ? (
             <p
-              id="seller-photo-url-error"
+              id="seller-instagram-error"
               className="text-destructive text-xs"
               role="alert"
             >
-              {errors.photoUrl.message}
+              {errors.instagram.message}
             </p>
           ) : null}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="seller-photo-url">URL da foto (opcional)</Label>
+        <Input
+          id="seller-photo-url"
+          type="url"
+          placeholder="https://…"
+          aria-invalid={Boolean(errors.photoUrl)}
+          aria-describedby={
+            errors.photoUrl ? "seller-photo-url-error" : undefined
+          }
+          disabled={isSubmitting}
+          {...register("photoUrl")}
+        />
+        {errors.photoUrl ? (
+          <p
+            id="seller-photo-url-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            {errors.photoUrl.message}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

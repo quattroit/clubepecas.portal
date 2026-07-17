@@ -17,7 +17,7 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="md:hidden">
           <Sidebar />
         </div>
-        <main id="conteudo-principal" className="flex-1 p-4 sm:p-6">
+        <main id="conteudo-principal" className="flex-1 p-5 sm:p-8 md:p-10">
           {children}
         </main>
       </div>

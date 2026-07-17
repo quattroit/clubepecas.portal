@@ -1,3 +1,5 @@
+import { MapPin } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Advertisement } from "@/types/Advertisement";
@@ -29,6 +31,7 @@ function AdvertisementDetails({
   const {
     title,
     price,
+    stockQuantity,
     isNew,
     category,
     city,
@@ -40,38 +43,47 @@ function AdvertisementDetails({
   const publishedLabel = formatPublishedAt(publishedAt);
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
+    <div className={cn("flex flex-col gap-5", className)}>
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-small text-muted-foreground">{category}</p>
-        {isNew ? <Badge variant="success">Novo</Badge> : null}
+        <p className="text-small text-category font-medium">{category}</p>
+        {isNew ? <Badge variant="success">Novo</Badge> : (
+          <Badge variant="secondary">Usado</Badge>
+        )}
       </div>
 
       <h1 className="text-h1">{title}</h1>
 
-      <p className="text-primary text-2xl font-semibold">
-        {formatCurrency(price)}
-      </p>
+      <p className="text-price-lg">{formatCurrency(price)}</p>
 
-      <dl className="text-small grid gap-2 sm:grid-cols-2">
+      <dl className="text-small grid gap-3 sm:grid-cols-2">
         <div>
-          <dt className="text-muted-foreground">Localização</dt>
-          <dd className="font-medium">
+          <dt className="text-muted-foreground mb-0.5">Localização</dt>
+          <dd className="text-foreground flex items-center gap-1.5 font-medium">
+            <MapPin className="text-location size-3.5 shrink-0" aria-hidden />
             {city}, {state}
           </dd>
         </div>
+        {typeof stockQuantity === "number" ? (
+          <div>
+            <dt className="text-muted-foreground mb-0.5">Estoque</dt>
+            <dd className="text-foreground font-medium">
+              {stockQuantity} {stockQuantity === 1 ? "unidade" : "unidades"}
+            </dd>
+          </div>
+        ) : null}
         {publishedLabel ? (
           <div>
-            <dt className="text-muted-foreground">Publicado em</dt>
-            <dd className="font-medium">{publishedLabel}</dd>
+            <dt className="text-muted-foreground mb-0.5">Publicado em</dt>
+            <dd className="text-foreground font-medium">{publishedLabel}</dd>
           </div>
         ) : null}
       </dl>
 
       <Separator />
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         <h2 className="text-h3">Descrição</h2>
-        <p className="text-body text-muted-foreground whitespace-pre-line">
+        <p className="text-body whitespace-pre-line">
           {description ?? "Sem descrição disponível."}
         </p>
       </div>

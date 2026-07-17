@@ -7,7 +7,7 @@ import { buildPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildPageMetadata({
   title: "Sobre",
   description:
-    "Conheça o ClubePeças: marketplace de peças automotivas para oficinas, autopeças, vendedores e compradores.",
+    "Conheça o ClubePeças: marketplace de peças automotivas para oficinas, autopeças e vendedores.",
   path: ROUTES.ABOUT,
 });
 

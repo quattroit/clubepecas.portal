@@ -1,24 +1,27 @@
-import type {
-  AdvertisementCategory,
-  AdvertisementCondition,
-} from "@/contracts/common/enums";
+import type { AdvertisementCondition } from "@/contracts/common/enums";
 
 export type CreateAdvertisementRequest = {
   title: string;
   description: string;
-  category: AdvertisementCategory;
+  categoryId: string;
+  vehicleBrandId: string;
+  vehicleModelId: string;
   compatibilityDescription: string;
   condition: AdvertisementCondition;
   price: number;
+  stockQuantity: number;
 };
 
 export type UpdateAdvertisementRequest = {
   title: string;
   description: string;
-  category: AdvertisementCategory;
+  categoryId: string;
+  vehicleBrandId: string;
+  vehicleModelId: string;
   compatibilityDescription: string;
   condition: AdvertisementCondition;
   price: number;
+  stockQuantity: number;
 };
 
 export type CreatePhotoRequest = {

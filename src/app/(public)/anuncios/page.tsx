@@ -1,5 +1,8 @@
+import { Suspense } from "react";
+
 import type { Metadata } from "next";
 
+import { PageLoader } from "@/components/feedback/PageLoader";
 import { APP_NAME } from "@/constants/app";
 import { ROUTES } from "@/constants/routes";
 import { AdvertisementsPageView } from "@/features/marketplace/components/AdvertisementsPageView";
@@ -29,5 +32,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdvertisementsPage() {
-  return <AdvertisementsPageView />;
+  return (
+    <Suspense fallback={<PageLoader label="Carregando anúncios…" />}>
+      <AdvertisementsPageView />
+    </Suspense>
+  );
 }

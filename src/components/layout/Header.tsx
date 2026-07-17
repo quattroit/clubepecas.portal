@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Menu } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { AnnounceButton } from "@/components/announce/AnnounceButton";
 import { Logo } from "@/components/layout/Logo";
@@ -21,17 +21,56 @@ import { getVisibleNavItems, MAIN_NAV_ITEMS } from "@/constants/navigation";
 import { ROUTES } from "@/constants/routes";
 import { SearchInput } from "@/features/marketplace";
 import { cn } from "@/lib/utils";
+import { normalizeSearchQuery } from "@/utils/marketplace-search";
+
+function HeaderSearchField({
+  id,
+  tone,
+}: {
+  id: string;
+  tone: "on-brand";
+}) {
+  const searchParams = useSearchParams();
+  const q = normalizeSearchQuery(searchParams.get("q") ?? "");
+
+  return (
+    <SearchInput
+      key={`${id}-${q}`}
+      id={id}
+      tone={tone}
+      defaultValue={q}
+    />
+  );
+}
+
+function HeaderSearch({
+  id,
+  className,
+}: {
+  id: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <Suspense fallback={<SearchInput id={id} tone="on-brand" />}>
+        <HeaderSearchField id={id} tone="on-brand" />
+      </Suspense>
+    </div>
+  );
+}
 
 function HeaderNavLink({
   href,
   label,
   className,
   onNavigate,
+  onBrand = false,
 }: {
   href: string;
   label: string;
   className?: string;
   onNavigate?: () => void;
+  onBrand?: boolean;
 }) {
   const pathname = usePathname();
   const isActive = pathname === href;
@@ -42,8 +81,16 @@ function HeaderNavLink({
       aria-current={isActive ? "page" : undefined}
       onClick={onNavigate}
       className={cn(
-        "text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-md px-2 py-1.5 text-sm font-medium outline-none focus-visible:ring-2",
-        isActive && "text-foreground",
+        "focus-visible:ring-ring rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:ring-2",
+        onBrand
+          ? cn(
+              "text-brand-muted hover:bg-brand-foreground/10 hover:text-brand-foreground",
+              isActive && "bg-brand-foreground/12 text-brand-foreground",
+            )
+          : cn(
+              "text-muted-foreground hover:bg-muted hover:text-foreground",
+              isActive && "bg-primary/10 text-primary",
+            ),
         className,
       )}
     >
@@ -64,14 +111,20 @@ function GuestActions({
       <Link
         href={ROUTES.LOGIN}
         onClick={onNavigate}
-        className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+        className={cn(
+          buttonVariants({ variant: "ghost", size: "sm" }),
+          "text-brand-muted hover:bg-brand-foreground/10 hover:text-brand-foreground",
+        )}
       >
         Entrar
       </Link>
       <Link
         href={ROUTES.REGISTER}
         onClick={onNavigate}
-        className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+        className={cn(
+          buttonVariants({ variant: "outline", size: "sm" }),
+          "border-brand-border bg-transparent text-brand-foreground hover:bg-brand-foreground/10",
+        )}
       >
         Cadastrar
       </Link>
@@ -88,14 +141,15 @@ function Header() {
   const closeMenu = () => setOpen(false);
 
   return (
-    <header className="bg-surface/95 border-border sticky top-0 z-40 border-b backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6">
+    <header className="surface-brand border-brand-border sticky top-0 z-40 border-b">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3.5 sm:px-6">
         <div className="flex items-center gap-3">
-          <Logo className="shrink-0" size="sm" priority />
+          <Logo className="shrink-0" size="sm" priority onBrand />
 
-          <div className="mx-2 hidden min-w-0 flex-1 md:block">
-            <SearchInput id="header-search-desktop" />
-          </div>
+          <HeaderSearch
+            id="header-search-desktop"
+            className="mx-2 hidden min-w-0 flex-1 md:block"
+          />
 
           <nav
             aria-label="Principal"
@@ -106,6 +160,7 @@ function Header() {
                 key={item.href}
                 href={item.href}
                 label={item.label}
+                onBrand
               />
             ))}
           </nav>
@@ -119,7 +174,7 @@ function Header() {
                   className="hidden sm:inline-flex"
                 />
                 <div className="hidden sm:block">
-                  <UserMenu />
+                  <UserMenu tone="on-brand" />
                 </div>
               </>
             ) : null}
@@ -136,7 +191,7 @@ function Header() {
                   <Button
                     variant="outline"
                     size="icon-sm"
-                    className="lg:hidden"
+                    className="border-brand-border bg-transparent text-brand-foreground hover:bg-brand-foreground/10 lg:hidden"
                     aria-label="Abrir menu de navegação"
                   />
                 }
@@ -243,9 +298,7 @@ function Header() {
           </div>
         </div>
 
-        <div className="md:hidden">
-          <SearchInput id="header-search-mobile" />
-        </div>
+        <HeaderSearch id="header-search-mobile" className="md:hidden" />
       </div>
     </header>
   );

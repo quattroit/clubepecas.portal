@@ -12,21 +12,22 @@ type ShareButtonsProps = {
  */
 function ShareButtons({ className }: ShareButtonsProps) {
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
-      <p className="text-small font-medium">Compartilhar</p>
+    <div className={cn("flex flex-col gap-2.5", className)}>
+      <p className="text-small font-medium text-share">Compartilhar</p>
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           variant="outline"
           size="sm"
           aria-label="Copiar link"
+          className="text-share"
         >
           <Copy className="size-4" />
           Copiar link
         </Button>
         <Button
           type="button"
-          variant="outline"
+          variant="whatsapp"
           size="sm"
           aria-label="Compartilhar no WhatsApp"
         >
@@ -35,7 +36,7 @@ function ShareButtons({ className }: ShareButtonsProps) {
         </Button>
         <Button
           type="button"
-          variant="outline"
+          variant="facebook"
           size="sm"
           aria-label="Compartilhar no Facebook"
         >

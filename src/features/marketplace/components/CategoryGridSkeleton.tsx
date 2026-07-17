@@ -10,7 +10,7 @@ function CategoryGridSkeleton() {
       {Array.from({ length: 8 }).map((_, index) => (
         <div
           key={index}
-          className="flex flex-col items-center gap-2 rounded-xl border p-4"
+          className="flex flex-col items-center gap-2 rounded-2xl border p-3"
         >
           <Skeleton className="size-12 rounded-lg" />
           <Skeleton className="h-4 w-20" />

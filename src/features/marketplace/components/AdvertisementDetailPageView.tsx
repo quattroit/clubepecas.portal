@@ -14,6 +14,7 @@ import {
   ShareButtons,
 } from "@/features/marketplace";
 import { AdvertisementDetailSkeleton } from "@/features/marketplace/components/AdvertisementDetailSkeleton";
+import { useTrackListingView } from "@/hooks/analytics/useTrackPageViews";
 import { useAdvertisement } from "@/hooks/api/useAdvertisement";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { NotFoundError } from "@/lib/errors";
@@ -26,6 +27,9 @@ function AdvertisementDetailPageView() {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
   const detailQuery = useAdvertisement(slug ?? "");
+  useTrackListingView(
+    detailQuery.isSuccess && detailQuery.data ? slug : null,
+  );
 
   if (detailQuery.isLoading) {
     return <AdvertisementDetailSkeleton />;
@@ -80,6 +84,7 @@ function AdvertisementDetailPageView() {
           <SellerContactCard
             seller={seller}
             advertisementTitle={advertisement.title}
+            listingSlug={advertisement.slug ?? slug}
           />
           <ShareButtons />
         </div>

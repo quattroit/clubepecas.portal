@@ -17,6 +17,7 @@ import {
   StoreStats,
 } from "@/features/marketplace";
 import { StoreDetailSkeleton } from "@/features/marketplace/components/StoreDetailSkeleton";
+import { useTrackStoreView } from "@/hooks/analytics/useTrackPageViews";
 import { useStore } from "@/hooks/api/useStore";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { NotFoundError } from "@/lib/errors";
@@ -29,6 +30,7 @@ function StoreDetailPageView() {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
   const storeQuery = useStore(slug ?? "");
+  useTrackStoreView(storeQuery.isSuccess && storeQuery.data ? slug : null);
 
   if (storeQuery.isLoading) {
     return <StoreDetailSkeleton />;
@@ -106,19 +108,18 @@ function StoreDetailPageView() {
 
       <section
         aria-labelledby="store-cta-heading"
-        className="bg-primary text-primary-foreground rounded-xl px-6 py-10 text-center sm:px-10 sm:py-12"
+        className="surface-brand overflow-hidden rounded-3xl shadow-md"
       >
-        <div className="mx-auto flex max-w-lg flex-col items-center gap-4">
-          <h2
-            id="store-cta-heading"
-            className="font-heading text-primary-foreground text-2xl font-semibold tracking-tight"
-          >
-            Tem peças para vender?
-          </h2>
-          <p className="text-primary-foreground/85 text-sm leading-relaxed">
-            Crie sua loja no ClubePeças e anuncie para oficinas e compradores.
-          </p>
-          <AnnounceButton variant="secondary" size="lg">
+        <div className="flex flex-col items-center gap-7 px-6 py-14 text-center sm:flex-row sm:justify-between sm:px-12 sm:py-16 sm:text-left">
+          <div className="max-w-lg space-y-3">
+            <h2 id="store-cta-heading" className="text-h2">
+              Tem peças para vender?
+            </h2>
+            <p className="text-body">
+              Crie sua loja no ClubePeças e anuncie para oficinas e profissionais da região.
+            </p>
+          </div>
+          <AnnounceButton variant="primary" size="lg" className="shrink-0">
             Anunciar peça
           </AnnounceButton>
         </div>

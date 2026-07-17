@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { NotFoundError } from "@/lib/errors";
+import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
 import { queryKeys } from "@/lib/queryKeys";
 import { mapSellerMeToSeller } from "@/mappers/seller.mapper";
 import { sellerService } from "@/services/seller.service";
@@ -20,8 +21,12 @@ function isSellerNotFound(error: unknown): boolean {
  * `seller.not_found` → data: null (fluxo normal, sem ErrorMessage).
  */
 export function useSeller() {
+  const authReady = useAuthQueryEnabled();
+
   return useQuery({
     queryKey: queryKeys.seller.me,
+    enabled: authReady,
+    refetchOnMount: "always",
     queryFn: async () => {
       try {
         const dto = await sellerService.getMe();

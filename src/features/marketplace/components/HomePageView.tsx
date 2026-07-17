@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { createElement } from "react";
 import {
@@ -15,7 +16,7 @@ import { AnnounceButton } from "@/components/announce/AnnounceButton";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { APP_DESCRIPTION } from "@/constants/app";
+import { APP_DESCRIPTION, APP_HERO_BG_SRC } from "@/constants/app";
 import { ROUTES } from "@/constants/routes";
 import {
   AdvertisementGrid,
@@ -26,11 +27,11 @@ import {
   SellerGrid,
   StoresGridSkeleton,
 } from "@/features/marketplace";
+import { HeroStats } from "@/features/marketplace/components/HeroStats";
 import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useStores } from "@/hooks/api/useStores";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { mapCategoriesWithAdvertisementCounts } from "@/mappers/category.mapper";
 import { cn } from "@/lib/utils";
 
 const HOME_RECENT_ADS_LIMIT = 6;
@@ -74,7 +75,7 @@ function SectionHeading({
   actionHref?: string;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <h2 id={id} className="text-h2">
         {title}
       </h2>
@@ -82,14 +83,14 @@ function SectionHeading({
         <Link
           href={actionHref}
           className={cn(
-            buttonVariants({ variant: "outline", size: "sm" }),
+            buttonVariants({ variant: "primary", size: "sm" }),
             "w-fit",
           )}
         >
           {actionLabel}
         </Link>
       ) : (
-        <Button type="button" variant="outline" size="sm" className="w-fit">
+        <Button type="button" variant="primary" size="sm" className="w-fit">
           {actionLabel}
         </Button>
       )}
@@ -107,14 +108,7 @@ function HomePageView() {
   const storesQuery = useStores();
 
   const marketplaceItems = advertisementsQuery.data?.items;
-  const categories = !categoriesQuery.data
-    ? []
-    : !marketplaceItems
-      ? categoriesQuery.data
-      : mapCategoriesWithAdvertisementCounts(
-          categoriesQuery.data,
-          marketplaceItems.map((item) => item.category),
-        );
+  const categories = categoriesQuery.data ?? [];
 
   const recentAdvertisements = (marketplaceItems ?? []).slice(
     0,
@@ -127,27 +121,50 @@ function HomePageView() {
   );
 
   return (
-    <div className="flex flex-col gap-14 sm:gap-16 md:gap-20">
+    <div className="flex flex-col gap-20 sm:gap-24 md:gap-28">
       <section
         aria-labelledby="hero-heading"
-        className="flex flex-col items-center gap-6 pt-2 text-center sm:pt-4 md:pt-6"
+        className="surface-brand relative overflow-hidden rounded-3xl shadow-lg"
       >
-        <div className="flex max-w-2xl flex-col gap-3">
-          <h1 id="hero-heading" className="text-display">
-            Peças automotivas com confiança
-          </h1>
-          <p className="text-body text-muted-foreground">{APP_DESCRIPTION}</p>
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 w-full md:w-[58%]"
+          aria-hidden
+        >
+          <Image
+            src={APP_HERO_BG_SRC}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 58vw"
+            className="object-cover object-center opacity-40 md:opacity-55"
+          />
+          <div className="from-brand via-brand/85 absolute inset-0 bg-linear-to-r to-transparent md:via-brand/70" />
+          <div className="from-brand absolute inset-x-0 bottom-0 h-24 bg-linear-to-t to-transparent md:hidden" />
         </div>
 
-        <div className="w-full max-w-xl">
-          <SearchInput id="home-search" />
+        <div className="relative z-10 grid gap-10 px-6 py-12 sm:px-10 sm:py-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:items-center md:gap-8 md:px-12 md:py-16 lg:px-14 lg:py-20">
+          <div className="flex max-w-xl flex-col items-start gap-6 text-left sm:gap-7">
+            <div className="flex flex-col gap-4">
+              <h1 id="hero-heading" className="text-display">
+                Peças automotivas
+                <br />
+                com <span className="text-primary">confiança</span>
+              </h1>
+              <p className="text-body max-w-md">{APP_DESCRIPTION}</p>
+            </div>
+
+            <div className="relative z-20 w-full max-w-lg">
+              <SearchInput id="home-search" tone="hero" />
+            </div>
+
+            <AnnounceButton variant="primary" size="lg" />
+          </div>
+
+          <div className="pointer-events-none hidden min-h-48 md:block" aria-hidden />
         </div>
 
-        <div className="flex flex-col items-center gap-3">
-          <AnnounceButton variant="primary" size="lg" />
-          <p className="text-small">
-            Milhares de peças automotivas anunciadas em um só lugar.
-          </p>
+        <div className="border-brand-border relative z-10 border-t bg-brand/40 backdrop-blur-[2px]">
+          <HeroStats />
         </div>
       </section>
 
@@ -180,6 +197,7 @@ function HomePageView() {
           <EmptyState
             title="Nenhuma categoria disponível"
             description="As categorias aparecerão aqui em breve."
+            icon={<Package aria-hidden />}
           />
         ) : null}
       </section>
@@ -269,22 +287,24 @@ function HomePageView() {
       </section>
 
       <section aria-labelledby="how-heading">
-        <h2 id="how-heading" className="text-h2 mb-6 text-center sm:mb-8">
+        <h2 id="how-heading" className="text-h2 mb-10 text-center sm:mb-12">
           Como funciona
         </h2>
-        <ol className="grid list-none grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-4">
+        <ol className="grid list-none grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-7">
           {HOW_IT_WORKS.map(({ step, title, description, icon }) => (
             <li
               key={step}
-              className="bg-surface border-border flex flex-col items-center gap-3 rounded-xl border p-6 text-center shadow-xs"
+              className="card-interactive bg-card flex flex-col items-center gap-4 rounded-3xl p-8 text-center sm:p-9"
             >
               <div
-                className="bg-secondary text-secondary-foreground flex size-12 items-center justify-center rounded-lg"
+                className="bg-primary/10 text-primary flex size-16 items-center justify-center rounded-full"
                 aria-hidden
               >
-                {createElement(icon, { className: "size-6" })}
+                {createElement(icon, { className: "size-7" })}
               </div>
-              <p className="text-small font-medium">Passo {step}</p>
+              <p className="text-primary text-xs font-semibold tracking-wider uppercase">
+                Passo {step}
+              </p>
               <h3 className="text-h3">{title}</h3>
               <p className="text-small">{description}</p>
             </li>
@@ -294,20 +314,19 @@ function HomePageView() {
 
       <section
         aria-labelledby="cta-heading"
-        className="bg-primary text-primary-foreground rounded-xl px-6 py-10 text-center sm:px-10 sm:py-12"
+        className="surface-brand overflow-hidden rounded-3xl shadow-md"
       >
-        <div className="mx-auto flex max-w-lg flex-col items-center gap-4">
-          <h2
-            id="cta-heading"
-            className="font-heading text-primary-foreground text-2xl font-semibold tracking-tight"
-          >
-            Tem peças para vender?
-          </h2>
-          <p className="text-primary-foreground/85 text-sm leading-relaxed">
-            Anuncie no ClubePeças e alcance oficinas e compradores da sua
-            região.
-          </p>
-          <AnnounceButton variant="secondary" size="lg" className="mt-1">
+        <div className="flex flex-col items-center gap-7 px-6 py-14 text-center sm:flex-row sm:justify-between sm:px-12 sm:py-16 sm:text-left">
+          <div className="max-w-lg space-y-3">
+            <h2 id="cta-heading" className="text-h2">
+              Tem peças para vender?
+            </h2>
+            <p className="text-body">
+              Anuncie no ClubePeças e alcance oficinas e profissionais da sua
+              região.
+            </p>
+          </div>
+          <AnnounceButton variant="primary" size="lg" className="shrink-0">
             Começar agora
           </AnnounceButton>
         </div>

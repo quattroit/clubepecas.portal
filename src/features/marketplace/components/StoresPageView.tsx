@@ -23,14 +23,14 @@ function StoresPageView() {
       : `${stores.length} lojas no marketplace`;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-3">
         <Breadcrumb
           items={[{ label: "Home", href: ROUTES.HOME }, { label: "Lojas" }]}
         />
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           <h1 className="text-h1">Lojas</h1>
-          <p className="text-small">
+          <p className="text-body text-muted-foreground">
             {storesQuery.isLoading ? "Carregando lojas…" : totalLabel}
           </p>
         </div>

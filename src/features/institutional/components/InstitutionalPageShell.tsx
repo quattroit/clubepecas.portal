@@ -79,15 +79,15 @@ function InstitutionalToc({ items }: InstitutionalTocProps) {
   return (
     <nav
       aria-label="Nesta página"
-      className="border-border bg-surface rounded-xl border p-4 sm:p-5"
+      className="border-border bg-muted/30 rounded-xl border p-4 shadow-xs sm:p-5"
     >
-      <p className="mb-3 text-sm font-medium">Nesta página</p>
+      <p className="mb-3 text-sm font-semibold">Nesta página</p>
       <ol className="flex flex-col gap-2">
         {items.map((item, index) => (
           <li key={item.id}>
             <a
               href={`#${item.id}`}
-              className="text-small text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm outline-none focus-visible:ring-2"
+              className="text-small text-muted-foreground hover:text-primary focus-visible:ring-ring rounded-sm transition-colors outline-none focus-visible:ring-2"
             >
               {index + 1}. {item.label}
             </a>

@@ -17,7 +17,7 @@ export const ADVERTISEMENT_CATEGORY_META: Record<
   [AdvertisementCategory.Transmission]: {
     name: "Transmissão",
     slug: "transmissao",
-    iconName: "Disc",
+    iconName: "Workflow",
     description: "Câmbio, embreagem e transmissão.",
   },
   [AdvertisementCategory.Suspension]: {
@@ -29,7 +29,7 @@ export const ADVERTISEMENT_CATEGORY_META: Record<
   [AdvertisementCategory.Body]: {
     name: "Carroceria",
     slug: "carroceria",
-    iconName: "Car",
+    iconName: "CarFront",
     description: "Lataria e componentes de carroceria.",
   },
   [AdvertisementCategory.Electrical]: {
@@ -41,25 +41,25 @@ export const ADVERTISEMENT_CATEGORY_META: Record<
   [AdvertisementCategory.Interior]: {
     name: "Interior",
     slug: "interior",
-    iconName: "Package",
+    iconName: "Armchair",
     description: "Acabamento e acessórios internos.",
   },
   [AdvertisementCategory.WheelsAndTires]: {
     name: "Rodas e Pneus",
     slug: "rodas-e-pneus",
-    iconName: "CircleStop",
+    iconName: "CircleDot",
     description: "Rodas, pneus e relacionados.",
   },
   [AdvertisementCategory.Accessory]: {
     name: "Acessórios",
     slug: "acessorios",
-    iconName: "Package",
+    iconName: "PackageOpen",
     description: "Acessórios automotivos em geral.",
   },
   [AdvertisementCategory.Other]: {
     name: "Outros",
     slug: "outros",
-    iconName: "Package",
+    iconName: "Boxes",
     description: "Demais categorias de peças.",
   },
 };

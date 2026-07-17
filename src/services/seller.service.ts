@@ -3,6 +3,10 @@ import type {
   UpdateSellerRequest,
 } from "@/contracts/seller/requests";
 import type {
+  MetricsPeriodParam,
+  SellerDashboardMetricsResponse,
+} from "@/contracts/seller/metrics";
+import type {
   CreateSellerResponse,
   SellerMeDto,
   SellerPublicProfileResponse,
@@ -29,6 +33,15 @@ export const sellerService = {
   update(payload: UpdateSellerRequest) {
     return api
       .put<SellerMeDto>("/api/v1/seller/me", payload)
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/me/metrics — métricas consolidadas do painel. */
+  getMyMetrics(period: MetricsPeriodParam = "all") {
+    return api
+      .get<SellerDashboardMetricsResponse>("/api/v1/seller/me/metrics", {
+        params: { period },
+      })
       .then((response) => response.data);
   },
 

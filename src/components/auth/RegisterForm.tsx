@@ -5,35 +5,36 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
+import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserRole } from "@/contracts/common/enums";
+import { PasswordInput } from "@/components/ui/password-input";
 import { ROUTES } from "@/constants/routes";
 import { useRegister } from "@/hooks/api/useRegister";
 import { getSafeAuthNextPath } from "@/lib/announce-flow";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-
-const BUYER = String(UserRole.Buyer);
-const SELLER = String(UserRole.Seller);
+import { passwordSchema } from "@/lib/auth/passwordPolicy";
 
 const registerSchema = z.object({
   firstName: z.string().min(1, "Informe o nome"),
   lastName: z.string().min(1, "Informe o sobrenome"),
   email: z.string().min(1, "Informe o e-mail").email("E-mail inválido"),
-  password: z.string().min(8, "A senha deve ter pelo menos 8 caracteres"),
-  phoneNumber: z.string().optional(),
-  userRole: z.enum([BUYER, SELLER], {
-    message: "Selecione o tipo de conta",
-  }),
+  password: passwordSchema,
+  phoneNumber: z
+    .string()
+    .trim()
+    .min(1, "Informe o telefone")
+    .refine(
+      (value) => value.replace(/\D/g, "").length >= 8,
+      "Informe um telefone válido com DDD",
+    ),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
-
-const selectClassName =
-  "border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50";
 
 function RegisterForm() {
   const searchParams = useSearchParams();
@@ -46,6 +47,7 @@ function RegisterForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -56,11 +58,11 @@ function RegisterForm() {
       email: "",
       password: "",
       phoneNumber: "",
-      userRole: BUYER,
     },
   });
 
   const isPending = registerMutation.isPending;
+  const passwordValue = watch("password") ?? "";
 
   const onSubmit = handleSubmit((values) => {
     if (isPending) return;
@@ -69,23 +71,23 @@ function RegisterForm() {
       lastName: values.lastName,
       email: values.email,
       password: values.password,
-      phoneNumber: values.phoneNumber?.trim()
-        ? values.phoneNumber.trim()
-        : null,
-      userRole: Number(values.userRole) as UserRole,
+      phoneNumber: values.phoneNumber.trim(),
     });
   });
 
   return (
     <form
       onSubmit={onSubmit}
-      className="flex w-full flex-col gap-4"
+      className="flex w-full flex-col gap-5"
       noValidate
       aria-busy={isPending}
     >
       <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-h1">Criar conta</h1>
-        <p className="text-small">Cadastre-se no ClubePeças.</p>
+        <h1 className="text-h1">Criar conta de vendedor</h1>
+        <p className="text-small">
+          Cadastre-se para anunciar peças no ClubePeças. Visitantes navegam e
+          entram em contato sem precisar de conta.
+        </p>
       </div>
 
       {registerMutation.isError ? (
@@ -169,16 +171,21 @@ function RegisterForm() {
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="register-password">Senha</Label>
-        <Input
+        <PasswordInput
           id="register-password"
-          type="password"
           autoComplete="new-password"
           aria-invalid={Boolean(errors.password)}
           aria-describedby={
-            errors.password ? "register-password-error" : undefined
+            errors.password
+              ? "register-password-error register-password-requirements"
+              : "register-password-requirements"
           }
           disabled={isPending}
           {...register("password")}
+        />
+        <PasswordRequirements
+          id="register-password-requirements"
+          password={passwordValue}
         />
         {errors.password ? (
           <p
@@ -192,38 +199,29 @@ function RegisterForm() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="register-phone">Telefone (opcional)</Label>
+        <Label htmlFor="register-phone">Telefone / WhatsApp</Label>
         <Input
           id="register-phone"
           type="tel"
           autoComplete="tel"
+          placeholder="11999999999"
+          aria-invalid={Boolean(errors.phoneNumber)}
+          aria-describedby={
+            errors.phoneNumber ? "register-phone-error" : "register-phone-hint"
+          }
           disabled={isPending}
           {...register("phoneNumber")}
         />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="register-role">Tipo de conta</Label>
-        <select
-          id="register-role"
-          className={selectClassName}
-          aria-invalid={Boolean(errors.userRole)}
-          aria-describedby={
-            errors.userRole ? "register-role-error" : undefined
-          }
-          disabled={isPending}
-          {...register("userRole")}
-        >
-          <option value={BUYER}>Comprador</option>
-          <option value={SELLER}>Vendedor</option>
-        </select>
-        {errors.userRole ? (
+        <p id="register-phone-hint" className="text-muted-foreground text-xs">
+          Obrigatório. Preferencialmente com DDD, só números.
+        </p>
+        {errors.phoneNumber ? (
           <p
-            id="register-role-error"
+            id="register-phone-error"
             className="text-destructive text-xs"
             role="alert"
           >
-            {errors.userRole.message}
+            {errors.phoneNumber.message}
           </p>
         ) : null}
       </div>
@@ -233,8 +231,16 @@ function RegisterForm() {
         variant="primary"
         className="w-full"
         disabled={isPending}
+        aria-busy={isPending}
       >
-        {isPending ? "Criando conta…" : "Criar conta"}
+        {isPending ? (
+          <>
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+            Criando conta…
+          </>
+        ) : (
+          "Criar conta de vendedor"
+        )}
       </Button>
 
       <p className="text-small text-center">

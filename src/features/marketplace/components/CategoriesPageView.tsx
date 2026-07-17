@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { FolderOpen } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
@@ -9,29 +8,19 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ROUTES } from "@/constants/routes";
 import { CategoryGrid } from "@/features/marketplace";
 import { CategoryGridSkeleton } from "@/features/marketplace/components/CategoryGridSkeleton";
-import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { mapCategoriesWithAdvertisementCounts } from "@/mappers/category.mapper";
 
 /**
- * Listagem pública /categorias — mesma UI, dados do enum + contagens do marketplace.
+ * Listagem pública /categorias — dados e contagens vêm da API (GET /categories).
  */
 function CategoriesPageView() {
   const categoriesQuery = useCategories();
-  const marketplaceQuery = useAdvertisements({ page: 1 });
 
-  const categories = useMemo(() => {
-    if (!categoriesQuery.data) return [];
-    return mapCategoriesWithAdvertisementCounts(
-      categoriesQuery.data,
-      (marketplaceQuery.data?.items ?? []).map((item) => item.category),
-    );
-  }, [categoriesQuery.data, marketplaceQuery.data?.items]);
-
-  const isLoading = categoriesQuery.isLoading || marketplaceQuery.isLoading;
-  const isError = categoriesQuery.isError || marketplaceQuery.isError;
-  const error = categoriesQuery.error ?? marketplaceQuery.error;
+  const categories = categoriesQuery.data ?? [];
+  const isLoading = categoriesQuery.isLoading;
+  const isError = categoriesQuery.isError;
+  const error = categoriesQuery.error;
 
   return (
     <div className="flex flex-col gap-8">

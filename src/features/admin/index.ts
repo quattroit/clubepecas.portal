@@ -1,0 +1,11 @@
+export { AdminDashboardView } from "@/features/admin/components/AdminDashboardView";
+export { AdminSellersView } from "@/features/admin/components/AdminSellersView";
+export { AdminSellerDetailView } from "@/features/admin/components/AdminSellerDetailView";
+export { AdminAdvertisementsView } from "@/features/admin/components/AdminAdvertisementsView";
+export { AdminAdvertisementDetailView } from "@/features/admin/components/AdminAdvertisementDetailView";
+export { AdminCategoriesView } from "@/features/admin/components/AdminCategoriesView";
+export { AdminCitiesView } from "@/features/admin/components/AdminCitiesView";
+export { AdminVehicleBrandsView } from "@/features/admin/components/AdminVehicleBrandsView";
+export { AdminVehicleModelsView } from "@/features/admin/components/AdminVehicleModelsView";
+export { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsView";
+export { AdminSettingsView } from "@/features/admin/components/AdminSettingsView";

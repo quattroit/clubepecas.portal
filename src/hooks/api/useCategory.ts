@@ -2,48 +2,43 @@
 
 import { useMemo } from "react";
 
-import type { AdvertisementCategory } from "@/contracts/common/enums";
 import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
-import {
-  getCategoryBySlug,
-  getCategoryEnumBySlug,
-} from "@/mappers/category.mapper";
+import { findCategoryBySlug } from "@/mappers/category.mapper";
 
 /**
- * Detalhe de categoria por slug + anúncios filtrados na API.
- * Reutiliza useCategories (cache enum) e useAdvertisements (marketplace.list).
+ * Detalhe de categoria por slug + anúncios filtrados na API (categorySlug).
+ * Reutiliza useCategories (catálogo) e useAdvertisements (marketplace.list).
  */
 export function useCategory(slug: string) {
-  const categoryEnum = useMemo(
-    () => (slug ? getCategoryEnumBySlug(slug) : undefined),
-    [slug],
-  );
+  const categoriesQuery = useCategories();
 
   const category = useMemo(
-    () => (slug ? getCategoryBySlug(slug) : undefined),
-    [slug],
+    () =>
+      slug && categoriesQuery.data
+        ? findCategoryBySlug(categoriesQuery.data, slug)
+        : undefined,
+    [categoriesQuery.data, slug],
   );
 
-  const categoriesQuery = useCategories();
+  const categoryExists = Boolean(category);
+
   const advertisementsQuery = useAdvertisements(
-    categoryEnum !== undefined
-      ? { category: categoryEnum as AdvertisementCategory, page: 1 }
-      : { page: 1 },
-    { enabled: categoryEnum !== undefined },
+    slug ? { categorySlug: slug, page: 1 } : { page: 1 },
+    { enabled: Boolean(slug) && categoryExists },
   );
 
   return {
     category,
-    categoryExists: categoryEnum !== undefined,
+    categoryExists,
     advertisements: advertisementsQuery.data?.items ?? [],
     total: advertisementsQuery.data?.total ?? 0,
     page: advertisementsQuery.data?.page ?? 1,
     totalPages: advertisementsQuery.data?.totalPages ?? 1,
     categories: categoriesQuery.data ?? [],
     isLoading:
-      (categoryEnum !== undefined && advertisementsQuery.isLoading) ||
-      categoriesQuery.isLoading,
+      categoriesQuery.isLoading ||
+      (categoryExists && advertisementsQuery.isLoading),
     isError: categoriesQuery.isError || advertisementsQuery.isError,
     error: categoriesQuery.error ?? advertisementsQuery.error,
   };

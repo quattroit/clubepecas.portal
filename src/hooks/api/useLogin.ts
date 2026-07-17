@@ -1,12 +1,13 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/providers/AuthProvider";
 import type { LoginRequest } from "@/contracts/authentication/requests";
 import { ROUTES } from "@/constants/routes";
 import { readAuthNextFromLocation } from "@/lib/announce-flow";
+import { invalidateAuthenticatedQueries } from "@/lib/auth/authenticatedQueries";
 import { mapLoginResponseToSession } from "@/mappers/authentication.mapper";
 import { authenticationService } from "@/services/authentication.service";
 
@@ -17,15 +18,20 @@ import { authenticationService } from "@/services/authentication.service";
 export function useLogin() {
   const { login } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (payload: LoginRequest) => {
       const response = await authenticationService.login(payload);
       return mapLoginResponseToSession(response);
     },
-    onSuccess: (session) => {
+    onSuccess: async (session) => {
       login(session);
-      router.replace(readAuthNextFromLocation() ?? ROUTES.DASHBOARD);
+      await invalidateAuthenticatedQueries(queryClient);
+      const next = readAuthNextFromLocation();
+      router.replace(
+        next?.startsWith("/painel") ? next : ROUTES.DASHBOARD,
+      );
     },
   });
 }

@@ -1,13 +1,13 @@
 /**
  * Modelo de UI de categoria.
- * No backend, categorias = enum AdvertisementCategory (sem CRUD).
+ * Backend: CRUD administrativo (Sprint 4.3.6) — `id` é Guid.
  */
 export type Category = {
   id: string;
   slug: string;
   name: string;
   advertisementCount: number;
-  /** Nome do ícone Lucide (ex.: "Cog", "Car") */
+  /** Valor do ícone (ex.: nome Lucide "Cog") — vem de `iconValue` da API. */
   iconName: string;
   description?: string;
 };

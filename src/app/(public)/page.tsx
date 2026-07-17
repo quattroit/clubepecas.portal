@@ -10,7 +10,7 @@ const SITE_URL =
 
 const HOME_TITLE = "Marketplace de Peças Automotivas";
 const HOME_DESCRIPTION =
-  "Encontre e anuncie peças automotivas com confiança. Oficinas, autopeças e compradores em um só lugar.";
+  "Encontre e anuncie peças automotivas com confiança. Oficinas, autopeças e vendedores em um só lugar.";
 
 export const metadata: Metadata = {
   title: HOME_TITLE,

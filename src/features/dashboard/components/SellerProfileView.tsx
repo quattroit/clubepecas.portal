@@ -8,6 +8,7 @@ import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SellerProfileForm } from "@/features/dashboard/components/SellerProfileForm";
+import { ChangePasswordForm } from "@/features/dashboard/components/ChangePasswordForm";
 import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 import type { SellerProfileFormValues } from "@/features/dashboard/schemas/sellerProfileFormSchema";
 import { ROUTES } from "@/constants/routes";
@@ -128,16 +129,19 @@ function SellerProfileView() {
       {!sellerQuery.isLoading &&
       !sellerQuery.isError &&
       sellerQuery.data ? (
-        <SellerProfileForm
-          key={sellerQuery.data.id}
-          mode="edit"
-          defaultValues={editDefaults}
-          isSubmitting={updateMutation.isPending}
-          submitError={
-            updateMutation.isError ? updateMutation.error : undefined
-          }
-          onSubmit={handleUpdate}
-        />
+        <>
+          <SellerProfileForm
+            key={sellerQuery.data.id}
+            mode="edit"
+            defaultValues={editDefaults}
+            isSubmitting={updateMutation.isPending}
+            submitError={
+              updateMutation.isError ? updateMutation.error : undefined
+            }
+            onSubmit={handleUpdate}
+          />
+          <ChangePasswordForm />
+        </>
       ) : null}
     </div>
   );

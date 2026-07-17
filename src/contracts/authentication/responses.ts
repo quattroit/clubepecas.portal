@@ -22,3 +22,15 @@ export type CurrentUserResponse = {
   email: string;
   role: UserRole;
 };
+
+export type ChangePasswordResponse = {
+  success: boolean;
+};
+
+export type ForgotPasswordResponse = {
+  message: string;
+};
+
+export type ResetPasswordResponse = {
+  success: boolean;
+};

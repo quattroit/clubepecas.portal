@@ -1,12 +1,13 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/providers/AuthProvider";
 import type { RegisterUserRequest } from "@/contracts/authentication/requests";
 import { ROUTES } from "@/constants/routes";
 import { readAuthNextFromLocation } from "@/lib/announce-flow";
+import { invalidateAuthenticatedQueries } from "@/lib/auth/authenticatedQueries";
 import { mapLoginResponseToSession } from "@/mappers/authentication.mapper";
 import { authenticationService } from "@/services/authentication.service";
 
@@ -17,6 +18,7 @@ import { authenticationService } from "@/services/authentication.service";
 export function useRegister() {
   const { login } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (payload: RegisterUserRequest) => {
@@ -27,8 +29,9 @@ export function useRegister() {
       });
       return mapLoginResponseToSession(loginResponse);
     },
-    onSuccess: (session) => {
+    onSuccess: async (session) => {
       login(session);
+      await invalidateAuthenticatedQueries(queryClient);
       router.replace(readAuthNextFromLocation() ?? ROUTES.DASHBOARD);
     },
   });

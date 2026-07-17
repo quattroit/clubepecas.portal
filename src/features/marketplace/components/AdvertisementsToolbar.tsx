@@ -11,9 +11,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FilterSidebar } from "@/features/marketplace/components/FilterSidebar";
+import {
+  FilterSidebar,
+  type FilterOption,
+} from "@/features/marketplace/components/FilterSidebar";
 import { SearchInput } from "@/features/marketplace/components/SearchInput";
 import { cn } from "@/lib/utils";
+import type { MarketplaceListingFilters } from "@/utils/marketplace-search";
 
 const SORT_OPTIONS = [
   { value: "recent", label: "Mais recentes" },
@@ -23,12 +27,31 @@ const SORT_OPTIONS = [
 
 type AdvertisementsToolbarProps = {
   className?: string;
+  /** Valor atual de `?q=` para preencher o campo. */
+  searchQuery?: string;
+  sort?: string;
+  onSortChange?: (sort: string) => void;
+  filterValues?: MarketplaceListingFilters;
+  filterCategories?: FilterOption[];
+  filterBrands?: FilterOption[];
+  filterCities?: FilterOption[];
+  onApplyFilters?: (filters: MarketplaceListingFilters) => void;
 };
 
 /**
- * Barra superior da listagem — busca, filtros (mobile) e ordenação visual.
+ * Barra superior da listagem — busca, filtros (mobile) e ordenação.
  */
-function AdvertisementsToolbar({ className }: AdvertisementsToolbarProps) {
+function AdvertisementsToolbar({
+  className,
+  searchQuery = "",
+  sort = "recent",
+  onSortChange,
+  filterValues = {},
+  filterCategories,
+  filterBrands,
+  filterCities,
+  onApplyFilters,
+}: AdvertisementsToolbarProps) {
   const [open, setOpen] = useState(false);
   const sortId = useId();
 
@@ -40,7 +63,12 @@ function AdvertisementsToolbar({ className }: AdvertisementsToolbarProps) {
       )}
     >
       <div className="min-w-0 flex-1">
-        <SearchInput id="advertisements-search" />
+        <SearchInput
+          key={searchQuery}
+          id="advertisements-search"
+          defaultValue={searchQuery}
+          submitVariant="button"
+        />
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
@@ -70,6 +98,14 @@ function AdvertisementsToolbar({ className }: AdvertisementsToolbarProps) {
               <FilterSidebar
                 showTitle={false}
                 className="border-0 shadow-none ring-0"
+                categories={filterCategories}
+                brands={filterBrands}
+                cities={filterCities}
+                values={filterValues}
+                onApply={(next) => {
+                  setOpen(false);
+                  onApplyFilters?.(next);
+                }}
               />
             </div>
           </SheetContent>
@@ -85,7 +121,8 @@ function AdvertisementsToolbar({ className }: AdvertisementsToolbarProps) {
           <select
             id={sortId}
             name="sort"
-            defaultValue="recent"
+            value={sort}
+            onChange={(event) => onSortChange?.(event.target.value)}
             aria-label="Ordenar anúncios"
             className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-9 min-w-0 flex-1 rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3 sm:w-44 sm:flex-none"
           >

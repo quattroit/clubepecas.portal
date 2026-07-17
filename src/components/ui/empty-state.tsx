@@ -24,22 +24,24 @@ function EmptyState({
     <div
       data-slot="empty-state"
       className={cn(
-        "flex flex-col items-center justify-center gap-3 px-6 py-12 text-center",
+        "bg-muted/40 border-border flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed px-6 py-14 text-center",
         className,
       )}
     >
       {icon ? (
-        <div className="text-muted-foreground flex size-12 items-center justify-center [&_svg]:size-8">
+        <div className="bg-secondary text-muted-foreground flex size-14 items-center justify-center rounded-xl [&_svg]:size-7">
           {icon}
         </div>
       ) : null}
 
-      <div className="flex max-w-sm flex-col gap-1">
+      <div className="flex max-w-sm flex-col gap-1.5">
         <h3 className="text-h3">{title}</h3>
-        {description ? <p className="text-small">{description}</p> : null}
+        {description ? (
+          <p className="text-small text-muted-foreground">{description}</p>
+        ) : null}
       </div>
 
-      {action ? <div className="mt-2">{action}</div> : null}
+      {action ? <div className="mt-1">{action}</div> : null}
     </div>
   );
 }

@@ -18,13 +18,18 @@ type LogoProps = {
   /** Altura visual da marca (sm header compacto, md padrão, lg auth). */
   size?: LogoSize;
   priority?: boolean;
+  /**
+   * Em superfícies brand (navy): a logo já tem fundo escuro —
+   * não aplicar caixa clara.
+   */
+  onBrand?: boolean;
 };
 
 const sizeClassName: Record<LogoSize, string> = {
   sm: "h-8 w-auto",
   md: "h-10 w-auto",
   /** Escala com a viewport — adequada a login/cadastro. */
-  lg: "h-auto w-[min(88vw,22rem)] object-center sm:w-[min(70vw,26rem)] md:w-[28rem]",
+  lg: "h-auto w-[min(88vw,20rem)] object-center sm:w-[min(70vw,24rem)] md:w-[26rem]",
 };
 
 function Logo({
@@ -32,6 +37,7 @@ function Logo({
   href = ROUTES.HOME,
   size = "md",
   priority = false,
+  onBrand = false,
 }: LogoProps) {
   return (
     <Link
@@ -39,6 +45,7 @@ function Logo({
       aria-label={`${APP_NAME} — página inicial`}
       className={cn(
         "focus-visible:ring-ring inline-flex items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        onBrand && "rounded-lg",
         className,
       )}
     >
@@ -48,7 +55,12 @@ function Logo({
         width={APP_LOGO_WIDTH}
         height={APP_LOGO_HEIGHT}
         priority={priority}
-        className={cn("object-contain object-left", sizeClassName[size])}
+        className={cn(
+          "object-contain object-left",
+          sizeClassName[size],
+          /* Em fundo claro (padrão), a logo escura se destaca naturalmente */
+          !onBrand && "rounded-md",
+        )}
       />
     </Link>
   );

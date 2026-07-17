@@ -18,6 +18,13 @@ export function buildAdvertisementWhatsAppMessage(
 }
 
 /**
+ * Mensagem padrão ao contatar uma loja pelo perfil público.
+ */
+export function buildStoreWhatsAppMessage(): string {
+  return `Olá, estou entrando em contato através do site ${APP_NAME}`;
+}
+
+/**
  * URL wa.me com texto pré-preenchido.
  * Assume BR (+55) quando o número tiver 10–11 dígitos sem código do país.
  */

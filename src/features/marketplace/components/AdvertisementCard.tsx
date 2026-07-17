@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Package } from "lucide-react";
+import { MapPin, Package } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,8 +18,18 @@ function AdvertisementCard({
   advertisement,
   className,
 }: AdvertisementCardProps) {
-  const { id, slug, title, price, city, state, category, imageUrl, isNew } =
-    advertisement;
+  const {
+    id,
+    slug,
+    title,
+    price,
+    stockQuantity,
+    city,
+    state,
+    category,
+    imageUrl,
+    isNew,
+  } = advertisement;
   const location = `${city}, ${state}`;
   const href = advertisementPath(slug ?? id);
 
@@ -27,22 +37,19 @@ function AdvertisementCard({
     <Link
       href={href}
       className={cn(
-        "focus-visible:ring-ring block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        "focus-visible:ring-ring block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         className,
       )}
     >
-      <Card
-        size="sm"
-        className="h-full gap-0 py-0 shadow-xs transition-shadow hover:shadow-sm"
-      >
-        <div className="bg-muted relative aspect-[4/3] overflow-hidden">
+      <Card size="sm" className="card-interactive h-full gap-0 rounded-2xl py-0">
+        <div className="bg-muted relative aspect-[16/10] overflow-hidden">
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt={`Foto do anúncio: ${title}`}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-cover transition-transform duration-300 group-hover/card:scale-[1.03]"
             />
           ) : (
             <div
@@ -50,28 +57,37 @@ function AdvertisementCard({
               role="img"
               aria-label={`Sem foto para o anúncio: ${title}`}
             >
-              <Package className="size-10" aria-hidden />
+              <Package className="size-8" aria-hidden />
             </div>
           )}
 
-          {isNew ? (
-            <Badge className="absolute top-2 left-2" variant="success">
-              Novo
-            </Badge>
-          ) : null}
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+            {isNew ? (
+              <Badge variant="success">Novo</Badge>
+            ) : (
+              <Badge variant="secondary">Usado</Badge>
+            )}
+          </div>
         </div>
 
-        <CardContent className="flex flex-1 flex-col gap-1.5 py-3">
-          <p className="text-small text-muted-foreground truncate">
+        <CardContent className="flex flex-1 flex-col gap-1 py-2.5">
+          <p className="text-small text-category truncate text-xs font-medium">
             {category}
           </p>
-          <h3 className="text-h3 line-clamp-2 min-h-[2.7rem] leading-snug">
+          <h3 className="line-clamp-2 text-sm leading-snug font-semibold">
             {title}
           </h3>
-          <p className="text-primary text-base font-semibold">
-            {formatCurrency(price)}
+          <p className="text-price text-base">{formatCurrency(price)}</p>
+          {typeof stockQuantity === "number" ? (
+            <p className="text-muted-foreground text-xs">
+              Estoque: {stockQuantity}{" "}
+              {stockQuantity === 1 ? "unidade" : "unidades"}
+            </p>
+          ) : null}
+          <p className="text-small mt-auto flex items-center gap-1">
+            <MapPin className="text-location size-3 shrink-0" aria-hidden />
+            <span className="truncate text-xs">{location}</span>
           </p>
-          <p className="text-small mt-auto">{location}</p>
         </CardContent>
       </Card>
     </Link>

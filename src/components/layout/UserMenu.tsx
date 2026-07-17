@@ -10,7 +10,12 @@ import { buttonVariants } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
-function UserMenu() {
+type UserMenuProps = {
+  /** Visual do trigger — on-brand para header navy */
+  tone?: "default" | "on-brand";
+};
+
+function UserMenu({ tone = "default" }: UserMenuProps) {
   const { user, logout, isLoggingOut } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -46,9 +51,21 @@ function UserMenu() {
         aria-haspopup="menu"
         aria-label="Menu do usuário"
         onClick={() => setOpen((current) => !current)}
-        className="hover:bg-muted focus-visible:ring-ring inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-none focus-visible:ring-2"
+        className={cn(
+          "focus-visible:ring-ring inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-none focus-visible:ring-2",
+          tone === "on-brand"
+            ? "text-brand-foreground hover:bg-brand-foreground/10"
+            : "hover:bg-muted",
+        )}
       >
-        <span className="bg-secondary text-secondary-foreground flex size-8 items-center justify-center rounded-full">
+        <span
+          className={cn(
+            "flex size-8 items-center justify-center rounded-full",
+            tone === "on-brand"
+              ? "bg-primary text-primary-foreground"
+              : "bg-secondary text-secondary-foreground",
+          )}
+        >
           <UserRound className="size-4" aria-hidden />
         </span>
         <span className="hidden max-w-[9rem] truncate font-medium sm:inline">
@@ -110,3 +127,4 @@ function UserMenu() {
 }
 
 export { UserMenu };
+export type { UserMenuProps };

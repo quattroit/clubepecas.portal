@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -61,12 +60,13 @@ function AuthProvider({ children }: AuthProviderProps) {
     loadAuthSession,
     () => null,
   );
-  const [hasHydrated, setHasHydrated] = useState(false);
+  /** false no SSR / 1º paint; true no cliente após hidratar o store externo. */
+  const hasHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
 
   const login = useCallback((nextSession: AuthSession) => {
     saveAuthSession(nextSession);

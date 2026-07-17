@@ -1,12 +1,13 @@
 /**
  * Enums expostos pela API (valores numéricos System.Text.Json).
  * Fonte: ClubePecas.Domain.Enums
+ *
+ * Autenticação do MVP: visitante (sem conta) ou vendedor cadastrado.
  */
 
 export enum UserRole {
   Administrator = 1,
   Seller = 2,
-  Buyer = 3,
 }
 
 export enum AdvertisementCategory {
@@ -32,4 +33,14 @@ export enum AdvertisementStatus {
   Paused = 2,
   Sold = 3,
   Archived = 4,
+}
+
+/**
+ * Tipo de ícone da categoria (CRUD administrativo — Sprint 4.3.6).
+ * Hoje só Lucide é usado na UI; Svg/Url preparados para o futuro.
+ */
+export enum CategoryIconType {
+  Lucide = 1,
+  Svg = 2,
+  Url = 3,
 }

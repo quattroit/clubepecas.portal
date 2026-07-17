@@ -42,8 +42,8 @@ export function resolveAuthenticatedAnnouncePath(hasSellerProfile: boolean): str
 export function getSafeAuthNextPath(next: string | null | undefined): string | null {
   if (!next) return null;
   if (!next.startsWith("/") || next.startsWith("//")) return null;
-  if (!next.startsWith("/painel")) return null;
-  return next;
+  if (next.startsWith("/painel") || next.startsWith("/admin")) return next;
+  return null;
 }
 
 /**
@@ -54,4 +54,32 @@ export function readAuthNextFromLocation(): string | null {
   return getSafeAuthNextPath(
     new URLSearchParams(window.location.search).get("next"),
   );
+}
+
+/**
+ * Monta a URL de login preservando a rota protegida solicitada.
+ */
+export function buildLoginPathWithNext(pathWithSearch: string): string {
+  const safeNext = getSafeAuthNextPath(pathWithSearch);
+  if (!safeNext) {
+    return ROUTES.LOGIN;
+  }
+
+  if (safeNext.startsWith("/admin")) {
+    return `${ROUTES.LOGIN_ADMIN}?next=${encodeURIComponent(safeNext)}`;
+  }
+
+  return `${ROUTES.LOGIN}?next=${encodeURIComponent(safeNext)}`;
+}
+
+/**
+ * Monta a URL de login administrativo preservando a rota solicitada.
+ */
+export function buildAdminLoginPathWithNext(pathWithSearch: string): string {
+  const safeNext = getSafeAuthNextPath(pathWithSearch);
+  if (!safeNext || !safeNext.startsWith("/admin")) {
+    return ROUTES.LOGIN_ADMIN;
+  }
+
+  return `${ROUTES.LOGIN_ADMIN}?next=${encodeURIComponent(safeNext)}`;
 }

@@ -6,8 +6,10 @@ export type Seller = {
   id: string;
   slug: string;
   name: string;
+  cityId?: string;
   city: string;
   state: string;
+  citySlug?: string;
   advertisementCount: number;
   avatarUrl?: string | null;
   description?: string;
@@ -15,4 +17,5 @@ export type Seller = {
   registeredAt?: string;
   displayName?: string;
   whatsApp?: string | null;
+  instagram?: string | null;
 };

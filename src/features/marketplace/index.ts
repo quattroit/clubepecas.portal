@@ -8,13 +8,18 @@ export { AdvertisementsPageView } from "@/features/marketplace/components/Advert
 export { AdvertisementsToolbar } from "@/features/marketplace/components/AdvertisementsToolbar";
 export { CategoriesPageView } from "@/features/marketplace/components/CategoriesPageView";
 export { CategoryCard } from "@/features/marketplace/components/CategoryCard";
+export { CategoryIcon } from "@/features/marketplace/components/CategoryIcon";
 export { CategoryDetailPageView } from "@/features/marketplace/components/CategoryDetailPageView";
 export { CategoryGrid } from "@/features/marketplace/components/CategoryGrid";
 export { CategoryGridSkeleton } from "@/features/marketplace/components/CategoryGridSkeleton";
 export { FilterSidebar } from "@/features/marketplace/components/FilterSidebar";
 export { HomePageView } from "@/features/marketplace/components/HomePageView";
 export { ImageGallery } from "@/features/marketplace/components/ImageGallery";
-export { SearchInput } from "@/features/marketplace/components/SearchInput";
+export { SearchInput, SearchBar } from "@/features/marketplace/components/SearchInput";
+export type {
+  SearchInputProps,
+  SearchBarProps,
+} from "@/features/marketplace/components/SearchInput";
 export { SellerCard } from "@/features/marketplace/components/SellerCard";
 export { SellerContactCard } from "@/features/marketplace/components/SellerContactCard";
 export { SellerGrid } from "@/features/marketplace/components/SellerGrid";

@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 import { Package } from "lucide-react";
 
@@ -15,12 +16,21 @@ import { AdvertisementGridSkeleton } from "@/features/marketplace/components/Adv
 import { AdvertisementsToolbar } from "@/features/marketplace/components/AdvertisementsToolbar";
 import { FilterSidebar } from "@/features/marketplace/components/FilterSidebar";
 import { useCategory } from "@/hooks/api/useCategory";
+import { useCities } from "@/hooks/api/useCities";
+import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import { formatCityLabel } from "@/mappers/city.mapper";
+import {
+  buildAdvertisementsHref,
+  type MarketplaceListingFilters,
+} from "@/utils/marketplace-search";
 
 /**
  * Detalhe público /categorias/[slug] — mesma UI, anúncios via marketplace filtrado.
+ * Pesquisar/filtros navegam para `/anuncios` com os parâmetros.
  */
 function CategoryDetailPageView() {
+  const router = useRouter();
   const params = useParams<{ slug: string }>();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
@@ -36,6 +46,33 @@ function CategoryDetailPageView() {
     isError,
     error,
   } = useCategory(slug ?? "");
+  const citiesQuery = useCities();
+  const vehicleBrandsQuery = useVehicleBrands();
+
+  const applyFilters = useCallback(
+    (next: MarketplaceListingFilters) => {
+      router.push(
+        buildAdvertisementsHref({
+          ...next,
+          // Mantém a categoria da página se o usuário não trocou no form.
+          category: next.category ?? category?.id,
+        }),
+      );
+    },
+    [category?.id, router],
+  );
+
+  const applySort = useCallback(
+    (sort: string) => {
+      router.push(
+        buildAdvertisementsHref({
+          category: category?.id,
+          sort,
+        }),
+      );
+    },
+    [category?.id, router],
+  );
 
   if (!isLoading && !categoryExists) {
     return (
@@ -69,6 +106,26 @@ function CategoryDetailPageView() {
     })),
   ];
 
+  const filterBrands = [
+    { id: "all", label: "Todas" },
+    ...(vehicleBrandsQuery.data ?? []).map((brand) => ({
+      id: brand.slug,
+      label: brand.name,
+    })),
+  ];
+
+  const filterCities = [
+    { id: "all", label: "Todas" },
+    ...(citiesQuery.data ?? []).map((city) => ({
+      id: city.slug,
+      label: formatCityLabel(city),
+    })),
+  ];
+
+  const filterValues: MarketplaceListingFilters = {
+    ...(category?.id ? { category: category.id } : {}),
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3">
@@ -92,11 +149,24 @@ function CategoryDetailPageView() {
         </div>
       </header>
 
-      <AdvertisementsToolbar />
+      <AdvertisementsToolbar
+        filterValues={filterValues}
+        filterCategories={filterCategories}
+        filterBrands={filterBrands}
+        filterCities={filterCities}
+        onApplyFilters={applyFilters}
+        onSortChange={applySort}
+      />
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <div className="hidden w-64 shrink-0 lg:block xl:w-72">
-          <FilterSidebar categories={filterCategories} />
+          <FilterSidebar
+            categories={filterCategories}
+            brands={filterBrands}
+            cities={filterCities}
+            values={filterValues}
+            onApply={applyFilters}
+          />
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-8">

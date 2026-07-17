@@ -35,7 +35,7 @@ function PrivacidadePageView() {
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <span className="font-medium">Dados de cadastro:</span> nome,
-            sobrenome, e-mail, telefone (quando informado) e tipo de conta
+            sobrenome, e-mail e telefone (quando informado)
           </li>
           <li>
             <span className="font-medium">Dados de perfil de vendedor:</span> nome

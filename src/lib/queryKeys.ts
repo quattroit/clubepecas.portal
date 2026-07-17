@@ -17,10 +17,22 @@ export const queryKeys = {
   marketplace: {
     all: ["marketplace"] as const,
     list: (filters?: {
+      q?: string;
       title?: string;
-      category?: number;
+      categoryId?: string;
+      categorySlug?: string;
+      vehicleBrandId?: string;
+      vehicleBrandSlug?: string;
+      brand?: string;
+      vehicleModelId?: string;
+      vehicleModelSlug?: string;
+      model?: string;
       city?: string;
       state?: string;
+      priceMin?: number;
+      priceMax?: number;
+      newOnly?: boolean;
+      sort?: string;
       page?: number;
     }) => ["marketplace", "list", filters ?? {}] as const,
     detail: (slug: string) => ["marketplace", "detail", slug] as const,
@@ -30,11 +42,68 @@ export const queryKeys = {
   categories: {
     all: ["categories"] as const,
   },
+  cities: {
+    all: ["cities"] as const,
+  },
+  vehicleBrands: {
+    all: ["vehicleBrands"] as const,
+  },
+  vehicleModels: {
+    all: ["vehicleModels"] as const,
+    list: (params: Record<string, unknown>) =>
+      ["vehicleModels", "list", params] as const,
+  },
+  home: {
+    all: ["home"] as const,
+    stats: ["home", "stats"] as const,
+  },
   sellers: {
     all: ["sellers"] as const,
     bySlug: (slug: string) => ["sellers", "slug", slug] as const,
   },
   seller: {
+    all: ["seller"] as const,
     me: ["seller", "me"] as const,
+    metrics: (period: string) => ["seller", "metrics", period] as const,
+  },
+  admin: {
+    all: ["admin"] as const,
+    dashboard: (period: string) => ["admin", "dashboard", period] as const,
+    analytics: (period: string) => ["admin", "analytics", period] as const,
+    sellers: {
+      all: ["admin", "sellers"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "sellers", "list", params] as const,
+      detail: (id: string, period: string) =>
+        ["admin", "sellers", "detail", id, period] as const,
+    },
+    advertisements: {
+      all: ["admin", "advertisements"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "advertisements", "list", params] as const,
+      detail: (id: string, period: string) =>
+        ["admin", "advertisements", "detail", id, period] as const,
+    },
+    categories: {
+      all: ["admin", "categories"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "categories", "list", params] as const,
+    },
+    cities: {
+      all: ["admin", "cities"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "cities", "list", params] as const,
+    },
+    vehicleBrands: {
+      all: ["admin", "vehicleBrands"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "vehicleBrands", "list", params] as const,
+    },
+    vehicleModels: {
+      all: ["admin", "vehicleModels"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "vehicleModels", "list", params] as const,
+    },
+    settings: ["admin", "settings"] as const,
   },
 } as const;

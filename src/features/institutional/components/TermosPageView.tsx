@@ -36,7 +36,7 @@ function TermosPageView() {
         <p>
           O {APP_NAME} é um marketplace digital que permite a publicação e a
           consulta de anúncios de peças automotivas, além do contato entre
-          compradores e vendedores. A plataforma atua como ambiente de
+          visitantes e vendedores. A plataforma atua como ambiente de
           intermediação tecnológica e não é parte nas negociações, vendas,
           pagamentos, entregas ou garantias firmadas entre os usuários.
         </p>

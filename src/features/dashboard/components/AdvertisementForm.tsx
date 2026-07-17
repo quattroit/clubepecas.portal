@@ -15,6 +15,7 @@ import {
   advertisementFormSchema,
   type AdvertisementFormValues,
 } from "@/features/dashboard/schemas/advertisementFormSchema";
+import { useVehicleModels } from "@/hooks/api/useVehicleModels";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import {
@@ -22,15 +23,18 @@ import {
   listAdvertisementConditions,
 } from "@/mappers/categoryMeta";
 import type { Category } from "@/types/Category";
+import type { VehicleBrand } from "@/types/VehicleBrand";
 
 const selectClassName =
-  "border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3";
+  "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted aria-invalid:border-destructive aria-invalid:ring-3";
 
 type AdvertisementFormProps = {
   mode?: "create" | "edit";
   defaultValues?: Partial<AdvertisementFormValues>;
   categories: Category[];
   categoriesLoading?: boolean;
+  vehicleBrands: VehicleBrand[];
+  vehicleBrandsLoading?: boolean;
   isSubmitting?: boolean;
   submitError?: unknown;
   onSubmit: (values: AdvertisementFormValues) => void;
@@ -47,6 +51,8 @@ function AdvertisementForm({
   defaultValues,
   categories,
   categoriesLoading = false,
+  vehicleBrands,
+  vehicleBrandsLoading = false,
   isSubmitting = false,
   submitError,
   onSubmit,
@@ -59,6 +65,8 @@ function AdvertisementForm({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<AdvertisementFormValues>({
     resolver: zodResolver(advertisementFormSchema),
@@ -68,6 +76,14 @@ function AdvertisementForm({
       ...defaultValues,
     },
   });
+
+  const selectedBrandId = watch("vehicleBrandId");
+  const vehicleModelsQuery = useVehicleModels({
+    brandId: selectedBrandId || undefined,
+  });
+  const vehicleModels = vehicleModelsQuery.data ?? [];
+  const vehicleModelsLoading = vehicleModelsQuery.isFetching;
+  const hasBrandSelected = Boolean(selectedBrandId?.trim());
 
   useEffect(() => {
     reset({
@@ -84,7 +100,7 @@ function AdvertisementForm({
   return (
     <form
       onSubmit={submit}
-      className="flex w-full max-w-2xl flex-col gap-5"
+      className="flex w-full max-w-2xl flex-col gap-6"
       noValidate
       aria-busy={isSubmitting}
     >
@@ -148,30 +164,126 @@ function AdvertisementForm({
           <select
             id="ad-category"
             className={selectClassName}
-            aria-invalid={Boolean(errors.category)}
+            aria-invalid={Boolean(errors.categoryId)}
             aria-describedby={
-              errors.category ? "ad-category-error" : undefined
+              errors.categoryId ? "ad-category-error" : undefined
             }
             disabled={isSubmitting || categoriesLoading}
-            {...register("category")}
+            defaultValue=""
+            {...register("categoryId")}
           >
             {categoriesLoading ? (
               <option value="">Carregando…</option>
             ) : (
-              categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
+              <>
+                <option value="" disabled>
+                  Selecione uma categoria
                 </option>
-              ))
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </>
             )}
           </select>
-          {errors.category ? (
+          {errors.categoryId ? (
             <p
               id="ad-category-error"
               className="text-destructive text-xs"
               role="alert"
             >
-              {errors.category.message}
+              {errors.categoryId.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-vehicle-brand">Marca</Label>
+          <select
+            id="ad-vehicle-brand"
+            className={selectClassName}
+            aria-invalid={Boolean(errors.vehicleBrandId)}
+            aria-describedby={
+              errors.vehicleBrandId ? "ad-vehicle-brand-error" : undefined
+            }
+            disabled={isSubmitting || vehicleBrandsLoading}
+            defaultValue=""
+            {...register("vehicleBrandId", {
+              onChange: () => {
+                setValue("vehicleModelId", "", { shouldValidate: false });
+              },
+            })}
+          >
+            {vehicleBrandsLoading ? (
+              <option value="">Carregando…</option>
+            ) : (
+              <>
+                <option value="" disabled>
+                  Selecione uma marca
+                </option>
+                {vehicleBrands.map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </>
+            )}
+          </select>
+          {errors.vehicleBrandId ? (
+            <p
+              id="ad-vehicle-brand-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.vehicleBrandId.message}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-vehicle-model">Modelo</Label>
+          <select
+            id="ad-vehicle-model"
+            className={selectClassName}
+            aria-invalid={Boolean(errors.vehicleModelId)}
+            aria-describedby={
+              errors.vehicleModelId ? "ad-vehicle-model-error" : undefined
+            }
+            disabled={
+              isSubmitting || !hasBrandSelected || vehicleModelsLoading
+            }
+            defaultValue=""
+            {...register("vehicleModelId")}
+          >
+            {!hasBrandSelected ? (
+              <option value="">Selecione uma marca</option>
+            ) : vehicleModelsLoading ? (
+              <option value="">Carregando…</option>
+            ) : vehicleModels.length === 0 ? (
+              <option value="">Nenhum modelo cadastrado</option>
+            ) : (
+              <>
+                <option value="" disabled>
+                  Selecione um modelo
+                </option>
+                {vehicleModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </>
+            )}
+          </select>
+          {errors.vehicleModelId ? (
+            <p
+              id="ad-vehicle-model-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.vehicleModelId.message}
             </p>
           ) : null}
         </div>
@@ -234,27 +346,65 @@ function AdvertisementForm({
         ) : null}
       </div>
 
-      <div className="flex flex-col gap-2 sm:max-w-xs">
-        <Label htmlFor="ad-price">Preço (R$)</Label>
-        <Input
-          id="ad-price"
-          type="text"
-          inputMode="decimal"
-          placeholder="0,00"
-          aria-invalid={Boolean(errors.price)}
-          aria-describedby={errors.price ? "ad-price-error" : undefined}
-          disabled={isSubmitting}
-          {...register("price")}
-        />
-        {errors.price ? (
-          <p id="ad-price-error" className="text-destructive text-xs" role="alert">
-            {errors.price.message}
+      <div className="grid gap-4 sm:grid-cols-2 sm:max-w-md">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-price">Preço (R$)</Label>
+          <Input
+            id="ad-price"
+            type="text"
+            inputMode="decimal"
+            placeholder="0,00"
+            aria-invalid={Boolean(errors.price)}
+            aria-describedby={errors.price ? "ad-price-error" : undefined}
+            disabled={isSubmitting}
+            {...register("price")}
+          />
+          {errors.price ? (
+            <p
+              id="ad-price-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.price.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-stock">Quantidade em estoque</Label>
+          <Input
+            id="ad-stock"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            step={1}
+            placeholder="1"
+            aria-invalid={Boolean(errors.stockQuantity)}
+            aria-describedby={
+              errors.stockQuantity ? "ad-stock-error" : "ad-stock-hint"
+            }
+            disabled={isSubmitting}
+            {...register("stockQuantity")}
+          />
+          <p id="ad-stock-hint" className="text-muted-foreground text-xs">
+            Quantidade disponível para venda (mínimo 1).
           </p>
-        ) : null}
+          {errors.stockQuantity ? (
+            <p
+              id="ad-stock-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.stockQuantity.message}
+            </p>
+          ) : null}
+        </div>
       </div>
 
-      <fieldset className="flex flex-col gap-3 rounded-lg border p-4">
-        <legend className="px-1 text-sm font-medium">Fotos (opcional)</legend>
+      <fieldset className="bg-muted/30 border-border flex flex-col gap-3 rounded-xl border p-4 sm:p-5">
+        <legend className="text-foreground px-1 text-sm font-semibold">
+          Fotos (opcional)
+        </legend>
         <p id="ad-photos-hint" className="text-muted-foreground text-xs">
           Informe até 3 URLs de imagem.{" "}
           {mode === "edit"
@@ -303,7 +453,7 @@ function AdvertisementForm({
           type="submit"
           variant="primary"
           className={cn("min-w-[10rem]")}
-          disabled={isSubmitting || categoriesLoading}
+          disabled={isSubmitting || categoriesLoading || vehicleBrandsLoading}
         >
           {isSubmitting ? (
             <>

@@ -22,7 +22,7 @@ function ImageGallery({ images, alt, className }: ImageGalleryProps) {
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <div className="bg-muted ring-foreground/10 relative aspect-[4/3] overflow-hidden rounded-xl ring-1">
+      <div className="bg-muted ring-border relative aspect-[4/3] overflow-hidden rounded-xl shadow-xs ring-1">
         {activeImage ? (
           <Image
             src={activeImage}
@@ -59,8 +59,10 @@ function ImageGallery({ images, alt, className }: ImageGalleryProps) {
                   aria-label={`Ver foto ${index + 1}`}
                   aria-pressed={isActive}
                   className={cn(
-                    "bg-muted ring-foreground/10 relative aspect-[4/3] w-full overflow-hidden rounded-lg ring-1 outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
-                    isActive && "ring-2 ring-[var(--primary)]",
+                    "bg-muted relative aspect-[4/3] w-full overflow-hidden rounded-lg ring-1 outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-ring",
+                    isActive
+                      ? "ring-primary ring-2 opacity-100"
+                      : "ring-border opacity-80 hover:opacity-100 hover:ring-primary/40",
                   )}
                 >
                   <Image

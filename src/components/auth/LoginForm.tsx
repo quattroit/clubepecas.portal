@@ -5,11 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { ROUTES } from "@/constants/routes";
 import { useLogin } from "@/hooks/api/useLogin";
 import { getSafeAuthNextPath } from "@/lib/announce-flow";
@@ -53,7 +55,7 @@ function LoginForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex w-full flex-col gap-4"
+      className="flex w-full flex-col gap-5"
       noValidate
       aria-busy={isPending}
     >
@@ -92,10 +94,17 @@ function LoginForm() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="login-password">Senha</Label>
-        <Input
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="login-password">Senha</Label>
+          <Link
+            href={ROUTES.FORGOT_PASSWORD}
+            className="text-primary text-xs font-medium underline-offset-4 hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
+        <PasswordInput
           id="login-password"
-          type="password"
           autoComplete="current-password"
           aria-invalid={Boolean(errors.password)}
           aria-describedby={
@@ -120,8 +129,16 @@ function LoginForm() {
         variant="primary"
         className="w-full"
         disabled={isPending}
+        aria-busy={isPending}
       >
-        {isPending ? "Entrando…" : "Entrar"}
+        {isPending ? (
+          <>
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+            Entrando…
+          </>
+        ) : (
+          "Entrar"
+        )}
       </Button>
 
       <p className="text-small text-center">

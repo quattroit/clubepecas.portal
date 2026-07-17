@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Package, Pencil, Trash2 } from "lucide-react";
+import { MapPin, Package, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -20,6 +20,22 @@ type MyAdvertisementCardProps = {
   isDeleting?: boolean;
 };
 
+function statusBadgeVariant(
+  label?: string,
+): "success" | "warning" | "secondary" | "outline" {
+  switch (label) {
+    case "Publicado":
+      return "success";
+    case "Pausado":
+      return "warning";
+    case "Vendido":
+      return "secondary";
+    case "Arquivado":
+    default:
+      return "outline";
+  }
+}
+
 /**
  * Variante interna do card de anúncio para o painel do proprietário.
  */
@@ -33,6 +49,7 @@ function MyAdvertisementCard({
     id,
     title,
     price,
+    stockQuantity,
     city,
     state,
     category,
@@ -47,16 +64,19 @@ function MyAdvertisementCard({
   return (
     <Card
       size="sm"
-      className={cn("h-full gap-0 py-0 shadow-xs", className)}
+      className={cn(
+        "card-interactive h-full gap-0 overflow-hidden rounded-xl py-0",
+        className,
+      )}
     >
-      <div className="bg-muted relative aspect-[4/3] overflow-hidden">
+      <div className="bg-muted relative aspect-[5/3] overflow-hidden">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={`Foto do anúncio: ${title}`}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            className="object-cover transition-transform duration-300 group-hover/card:scale-[1.03]"
           />
         ) : (
           <div
@@ -64,59 +84,74 @@ function MyAdvertisementCard({
             role="img"
             aria-label={`Sem foto para o anúncio: ${title}`}
           >
-            <Package className="size-10" aria-hidden />
+            <Package className="size-6" aria-hidden />
           </div>
         )}
 
-        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+        <div className="absolute top-1.5 left-1.5 flex flex-wrap gap-1">
           {statusLabel ? (
-            <Badge variant="outline">{statusLabel}</Badge>
+            <Badge
+              variant={statusBadgeVariant(statusLabel)}
+              className="px-1.5 py-0 text-[10px]"
+            >
+              {statusLabel}
+            </Badge>
           ) : null}
-          {isNew ? <Badge variant="success">Novo</Badge> : null}
+          {isNew ? (
+            <Badge variant="success" className="px-1.5 py-0 text-[10px]">
+              Novo
+            </Badge>
+          ) : null}
         </div>
       </div>
 
-      <CardContent className="flex flex-1 flex-col gap-1.5 py-3">
-        <p className="text-small text-muted-foreground truncate">{category}</p>
-        <h3 className="text-h3 line-clamp-2 min-h-[2.7rem] leading-snug">
+      <CardContent className="flex flex-1 flex-col gap-0.5 px-2.5 py-2">
+        <p className="text-category truncate text-[10px] font-medium">
+          {category}
+        </p>
+        <h3 className="line-clamp-2 text-xs leading-snug font-semibold">
           {title}
         </h3>
-        <p className="text-primary text-base font-semibold">
-          {formatCurrency(price)}
-        </p>
-        {location ? (
-          <p className="text-small text-muted-foreground">{location}</p>
-        ) : (
-          <p className="text-small text-muted-foreground">
-            Cidade não informada
+        <p className="text-price text-sm">{formatCurrency(price)}</p>
+        {typeof stockQuantity === "number" ? (
+          <p className="text-muted-foreground text-[10px]">
+            Estoque: {stockQuantity}{" "}
+            {stockQuantity === 1 ? "unidade" : "unidades"}
           </p>
-        )}
+        ) : null}
+        {location ? (
+          <p className="text-muted-foreground flex items-center gap-0.5 text-[10px]">
+            <MapPin className="text-location size-2.5 shrink-0" aria-hidden />
+            <span className="truncate">{location}</span>
+          </p>
+        ) : null}
         {updatedAt ? (
-          <p className="text-small text-muted-foreground">
+          <p className="text-muted-foreground text-[10px]">
             Atualizado em {formatDate(updatedAt)}
           </p>
         ) : null}
 
-        <div className="mt-auto flex gap-2 pt-2">
+        <div className="mt-auto flex gap-1.5 pt-1.5">
           <Link
             href={editAdvertisementPath(id)}
             className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "flex-1",
+              buttonVariants({ variant: "outline", size: "xs" }),
+              "h-7 flex-1 gap-1 px-2 text-[11px]",
             )}
           >
-            <Pencil aria-hidden />
+            <Pencil className="size-3" aria-hidden />
             Editar
           </Link>
           <Button
             type="button"
-            variant="outline"
-            size="sm"
-            className="flex-1"
+            variant="ghost"
+            size="xs"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-7 flex-1 gap-1 px-2 text-[11px]"
             disabled={isDeleting}
+            aria-busy={isDeleting}
             onClick={() => onDeleteClick?.(advertisement)}
           >
-            <Trash2 aria-hidden />
+            <Trash2 className="size-3" aria-hidden />
             Excluir
           </Button>
         </div>

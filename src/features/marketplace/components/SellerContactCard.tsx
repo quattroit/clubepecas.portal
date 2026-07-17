@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Store } from "lucide-react";
+import { MessageCircle, Store } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { storePath } from "@/constants/routes";
+import { AnalyticsEventType } from "@/contracts/analytics/enums";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 import type { Seller } from "@/types/Seller";
 import {
@@ -16,6 +18,8 @@ import {
 type SellerContactCardProps = {
   seller: Seller;
   advertisementTitle: string;
+  /** Slug do anúncio — usado para analytics (WhatsApp click). */
+  listingSlug?: string;
   className?: string;
 };
 
@@ -25,6 +29,7 @@ type SellerContactCardProps = {
 function SellerContactCard({
   seller,
   advertisementTitle,
+  listingSlug,
   className,
 }: SellerContactCardProps) {
   const { name, city, advertisementCount, avatarUrl, slug, whatsApp } = seller;
@@ -44,19 +49,27 @@ function SellerContactCard({
       ),
     );
 
-    if (href) {
-      window.open(href, "_blank", "noopener,noreferrer");
+    if (!href) return;
+
+    // Analytics em paralelo — nunca bloqueia a abertura do WhatsApp.
+    if (listingSlug?.trim()) {
+      trackAnalyticsEvent({
+        eventType: AnalyticsEventType.ListingWhatsappClicked,
+        listingSlug: listingSlug.trim(),
+      });
     }
+
+    window.open(href, "_blank", "noopener,noreferrer");
   };
 
   return (
-    <Card className={cn("shadow-xs", className)}>
+    <Card className={cn("shadow-sm", className)}>
       <CardHeader>
-        <CardTitle>Vendedor</CardTitle>
+        <CardTitle className="text-h3">Vendedor</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+      <CardContent className="flex flex-col gap-5">
+        <div className="flex items-center gap-3.5">
+          <div className="bg-secondary text-store flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl">
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- avatar remoto do vendedor
               <img
@@ -78,7 +91,7 @@ function SellerContactCard({
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             type="button"
-            variant="primary"
+            variant="whatsapp"
             className="flex-1"
             disabled={!canContact}
             title={
@@ -88,6 +101,7 @@ function SellerContactCard({
             }
             onClick={handleContact}
           >
+            <MessageCircle aria-hidden />
             Entrar em contato
           </Button>
           <Link
@@ -97,6 +111,7 @@ function SellerContactCard({
               "flex-1 justify-center",
             )}
           >
+            <Store aria-hidden className="text-store" />
             Ver loja
           </Link>
         </div>

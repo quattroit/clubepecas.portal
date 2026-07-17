@@ -33,8 +33,8 @@ function MyAdvertisementsView() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-h1">Meus anúncios</h1>
           <p className="text-small text-muted-foreground">
@@ -44,7 +44,10 @@ function MyAdvertisementsView() {
 
         <Link
           href={ROUTES.NEW_ADVERTISEMENT}
-          className={cn(buttonVariants({ variant: "default" }), "shrink-0")}
+          className={cn(
+            buttonVariants({ variant: "default", size: "sm" }),
+            "shrink-0",
+          )}
         >
           <PackagePlus aria-hidden />
           Nova peça
@@ -77,7 +80,7 @@ function MyAdvertisementsView() {
       ) : null}
 
       {!isLoading && !isError && data && data.length > 0 ? (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {data.map((advertisement) => (
             <li key={advertisement.id}>
               <MyAdvertisementCard

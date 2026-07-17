@@ -1,5 +1,4 @@
 import type {
-  AdvertisementCategory,
   AdvertisementCondition,
   AdvertisementStatus,
 } from "@/contracts/common/enums";
@@ -9,6 +8,7 @@ export type CreateAdvertisementResponse = {
   title: string;
   slug: string;
   price: number;
+  stockQuantity: number;
   status: AdvertisementStatus;
   createdAt: string;
 };
@@ -18,9 +18,18 @@ export type AdvertisementListItemDto = {
   title: string;
   slug: string;
   price: number;
+  stockQuantity: number;
   status: AdvertisementStatus;
   condition: AdvertisementCondition;
-  category: AdvertisementCategory;
+  categoryId: string;
+  categoryName: string;
+  categorySlug: string;
+  vehicleBrandId: string;
+  vehicleBrandName: string;
+  vehicleBrandSlug: string;
+  vehicleModelId?: string | null;
+  vehicleModelName?: string | null;
+  vehicleModelSlug?: string | null;
   createdAt: string;
 };
 
@@ -33,10 +42,19 @@ export type AdvertisementDetailDto = {
   sellerId: string;
   title: string;
   description: string;
-  category: AdvertisementCategory;
+  categoryId: string;
+  categoryName: string;
+  categorySlug: string;
+  vehicleBrandId: string;
+  vehicleBrandName: string;
+  vehicleBrandSlug: string;
+  vehicleModelId?: string | null;
+  vehicleModelName?: string | null;
+  vehicleModelSlug?: string | null;
   compatibilityDescription: string;
   condition: AdvertisementCondition;
   price: number;
+  stockQuantity: number;
   status: AdvertisementStatus;
   slug: string;
   createdAt: string;
@@ -48,7 +66,8 @@ export type PublicAdvertisementSellerDto = {
   displayName: string;
   city: string;
   state: string;
-  whatsApp: string | null;
+  whatsApp: string;
+  instagram: string | null;
   slug: string;
 };
 
@@ -61,10 +80,19 @@ export type PublicAdvertisementPhotoDto = {
 export type AdvertisementBySlugResponse = {
   title: string;
   description: string;
-  category: AdvertisementCategory;
+  categoryId: string;
+  categoryName: string;
+  categorySlug: string;
+  vehicleBrandId: string;
+  vehicleBrandName: string;
+  vehicleBrandSlug: string;
+  vehicleModelId?: string | null;
+  vehicleModelName?: string | null;
+  vehicleModelSlug?: string | null;
   condition: AdvertisementCondition;
   compatibilityDescription: string;
   price: number;
+  stockQuantity: number;
   status: AdvertisementStatus;
   createdAt: string;
   slug: string;

@@ -1,31 +1,13 @@
-import {
-  Car,
-  CircleStop,
-  Cog,
-  Disc,
-  Filter,
-  Lightbulb,
-  MoveVertical,
-  Package,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Boxes } from "lucide-react";
 
-const iconMap: Record<string, LucideIcon> = {
-  Car,
-  CircleStop,
-  Cog,
-  Disc,
-  Filter,
-  Lightbulb,
-  MoveVertical,
-  Package,
-  Zap,
-};
+import { resolveCategoryIcon } from "@/features/marketplace/constants/category-icons";
 
 /**
- * Resolve um ícone Lucide pelo nome. Fallback: Package.
+ * Resolve LucideIcon pelo `iconName` da categoria.
+ * Preferir `<CategoryIcon />` em UIs novas.
  */
 export function getCategoryIcon(iconName: string): LucideIcon {
-  return iconMap[iconName] ?? Package;
+  const definition = resolveCategoryIcon(iconName);
+  return definition.type === "lucide" ? definition.icon : Boxes;
 }

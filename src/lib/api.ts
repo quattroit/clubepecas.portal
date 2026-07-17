@@ -2,6 +2,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 import { ROUTES } from "@/constants/routes";
+import { buildLoginPathWithNext } from "@/lib/announce-flow";
 import { clearAuthSession, getAccessToken } from "@/lib/auth/storage";
 import { mapAxiosError, UnauthorizedError } from "@/lib/errors";
 
@@ -41,8 +42,16 @@ api.interceptors.response.use(
       if (typeof window !== "undefined") {
         toast.error("Sua sessão expirou. Faça login novamente.");
         const path = window.location.pathname;
-        if (!path.startsWith(ROUTES.LOGIN) && !path.startsWith(ROUTES.REGISTER)) {
-          window.location.assign(ROUTES.LOGIN);
+        const isAuthPage =
+          path.startsWith(ROUTES.LOGIN) ||
+          path.startsWith(ROUTES.LOGIN_ADMIN) ||
+          path.startsWith(ROUTES.REGISTER) ||
+          path.startsWith(ROUTES.FORGOT_PASSWORD) ||
+          path.startsWith(ROUTES.RESET_PASSWORD);
+
+        if (!isAuthPage) {
+          const currentPath = `${path}${window.location.search}`;
+          window.location.assign(buildLoginPathWithNext(currentPath));
         }
       }
     }

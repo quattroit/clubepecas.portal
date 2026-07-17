@@ -11,7 +11,7 @@ function PublicLayout({ children }: PublicLayoutProps) {
       <Header />
       <main
         id="conteudo-principal"
-        className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6"
+        className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6 sm:py-14"
       >
         {children}
       </main>

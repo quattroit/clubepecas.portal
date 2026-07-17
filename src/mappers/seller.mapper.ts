@@ -20,6 +20,7 @@ export function mapPublicSellerDtoToSeller(
     state: dto.state,
     advertisementCount: 0,
     whatsApp: dto.whatsApp,
+    instagram: dto.instagram,
   };
 }
 
@@ -37,6 +38,7 @@ export function mapSellerPublicProfileToSeller(
     avatarUrl: dto.photoUrl,
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
+    instagram: dto.instagram,
   };
 }
 
@@ -46,13 +48,16 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     slug: "",
     name: dto.storeName,
     displayName: dto.displayName,
+    cityId: dto.cityId,
     city: dto.city,
     state: dto.state,
+    citySlug: dto.citySlug,
     advertisementCount: 0,
     avatarUrl: dto.photoUrl,
     description: dto.description ?? undefined,
     registeredAt: dto.createdAt,
     whatsApp: dto.whatsApp,
+    instagram: dto.instagram,
   };
 }
 

@@ -12,6 +12,7 @@ import { ROUTES } from "@/constants/routes";
 import { useAdvertisementById } from "@/hooks/api/useAdvertisementById";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useUpdateAdvertisement } from "@/hooks/api/useUpdateAdvertisement";
+import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import {
   mapAdvertisementFormToPhotoUrls,
@@ -25,6 +26,7 @@ function EditAdvertisementView() {
 
   const advertisementQuery = useAdvertisementById(id ?? "");
   const categoriesQuery = useCategories();
+  const vehicleBrandsQuery = useVehicleBrands();
   const updateMutation = useUpdateAdvertisement();
 
   const handleSubmit = (values: AdvertisementFormValues) => {
@@ -77,6 +79,8 @@ function EditAdvertisementView() {
           defaultValues={advertisementQuery.data.formValues}
           categories={categoriesQuery.data ?? []}
           categoriesLoading={categoriesQuery.isLoading}
+          vehicleBrands={vehicleBrandsQuery.data ?? []}
+          vehicleBrandsLoading={vehicleBrandsQuery.isLoading}
           isSubmitting={updateMutation.isPending}
           submitError={
             updateMutation.isError ? updateMutation.error : undefined

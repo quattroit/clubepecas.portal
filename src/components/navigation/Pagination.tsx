@@ -13,6 +13,28 @@ type PaginationProps = {
   className?: string;
 };
 
+function getVisiblePages(currentPage: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const pages: (number | "ellipsis")[] = [1];
+
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+
+  if (start > 2) pages.push("ellipsis");
+
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+
+  if (end < totalPages - 1) pages.push("ellipsis");
+
+  pages.push(totalPages);
+  return pages;
+}
+
 /**
  * Paginação visual — estrutura pronta para dados reais.
  */
@@ -22,13 +44,17 @@ function Pagination({
   onPageChange,
   className,
 }: PaginationProps) {
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  const pages = getVisiblePages(currentPage, totalPages);
 
   return (
     <nav
       aria-label="Paginação"
-      className={cn("flex items-center justify-center gap-1", className)}
+      className={cn("flex flex-wrap items-center justify-center gap-2", className)}
     >
+      <p className="text-small text-muted-foreground mr-1 hidden sm:block">
+        Página {currentPage} de {totalPages}
+      </p>
+
       <Button
         type="button"
         variant="outline"
@@ -40,7 +66,19 @@ function Pagination({
         <ChevronLeft className="size-4" />
       </Button>
 
-      {pages.map((page) => {
+      {pages.map((page, index) => {
+        if (page === "ellipsis") {
+          return (
+            <span
+              key={`ellipsis-${index}`}
+              className="text-muted-foreground px-1 text-sm"
+              aria-hidden
+            >
+              …
+            </span>
+          );
+        }
+
         const isActive = page === currentPage;
 
         return (
@@ -51,6 +89,9 @@ function Pagination({
             size="icon-sm"
             aria-label={`Página ${page}`}
             aria-current={isActive ? "page" : undefined}
+            className={cn(
+              !isActive && "hover:border-primary/30 hover:text-primary",
+            )}
             onClick={() => onPageChange?.(page)}
           >
             {page}

@@ -1,82 +1,33 @@
-import { AdvertisementCategory } from "@/contracts/common/enums";
-import { ADVERTISEMENT_CATEGORY_META } from "@/mappers/categoryMeta";
+import type { PublicCategoryListItemDto } from "@/contracts/categories/responses";
 import type { Category } from "@/types/Category";
 
 /**
- * Categorias do marketplace são o enum do backend.
- * Este mapper materializa o enum nos modelos de UI.
+ * Categorias vêm do CRUD administrativo (GET /api/v1/categories).
+ * Este mapper converte os DTOs da API para o modelo de UI.
  */
-export function mapAdvertisementCategoriesToCategories(): Category[] {
-  return Object.values(AdvertisementCategory)
-    .filter(
-      (value): value is AdvertisementCategory => typeof value === "number",
-    )
-    .map((value) => {
-      const meta = ADVERTISEMENT_CATEGORY_META[value];
-      return {
-        id: String(value),
-        slug: meta.slug,
-        name: meta.name,
-        advertisementCount: 0,
-        iconName: meta.iconName,
-        description: meta.description,
-      } satisfies Category;
-    });
-}
-
-export function mapCategoryEnumToCategory(
-  category: AdvertisementCategory,
-  advertisementCount = 0,
+export function mapCategoryItemToCategory(
+  item: PublicCategoryListItemDto,
 ): Category {
-  const meta = ADVERTISEMENT_CATEGORY_META[category];
   return {
-    id: String(category),
-    slug: meta.slug,
-    name: meta.name,
-    advertisementCount,
-    iconName: meta.iconName,
-    description: meta.description,
+    id: item.id,
+    slug: item.slug,
+    name: item.name,
+    advertisementCount: item.advertisementCount,
+    iconName: item.iconValue,
+    description: item.description ?? undefined,
   };
 }
 
-/** Resolve categoria pelo slug público (enum + meta). */
-export function getCategoryBySlug(slug: string): Category | undefined {
-  return mapAdvertisementCategoriesToCategories().find(
-    (category) => category.slug === slug,
-  );
-}
-
-/** Enum numérico a partir do slug. */
-export function getCategoryEnumBySlug(
-  slug: string,
-): AdvertisementCategory | undefined {
-  const category = getCategoryBySlug(slug);
-  if (!category) return undefined;
-  return Number(category.id) as AdvertisementCategory;
-}
-
-/** Slugs para generateStaticParams. */
-export function listCategorySlugs(): string[] {
-  return mapAdvertisementCategoriesToCategories().map(
-    (category) => category.slug,
-  );
-}
-
-/**
- * Enriquece categorias com contagem a partir de anúncios já mapeados (UI).
- */
-export function mapCategoriesWithAdvertisementCounts(
-  categories: Category[],
-  advertisementCategoryLabels: string[],
+export function mapCategoryItemsToCategories(
+  items: PublicCategoryListItemDto[],
 ): Category[] {
-  const counts = new Map<string, number>();
+  return items.map(mapCategoryItemToCategory);
+}
 
-  for (const label of advertisementCategoryLabels) {
-    counts.set(label, (counts.get(label) ?? 0) + 1);
-  }
-
-  return categories.map((category) => ({
-    ...category,
-    advertisementCount: counts.get(category.name) ?? 0,
-  }));
+/** Resolve categoria pelo slug público, dentro de uma lista já carregada. */
+export function findCategoryBySlug(
+  categories: Category[],
+  slug: string,
+): Category | undefined {
+  return categories.find((category) => category.slug === slug);
 }

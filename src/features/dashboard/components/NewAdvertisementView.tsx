@@ -7,6 +7,7 @@ import { AdvertisementForm } from "@/features/dashboard/components/Advertisement
 import { ROUTES } from "@/constants/routes";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useCreateAdvertisement } from "@/hooks/api/useCreateAdvertisement";
+import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import {
   mapAdvertisementFormToCreateRequest,
   mapAdvertisementFormToPhotoUrls,
@@ -16,6 +17,7 @@ import type { AdvertisementFormValues } from "@/features/dashboard/schemas/adver
 
 function NewAdvertisementView() {
   const categoriesQuery = useCategories();
+  const vehicleBrandsQuery = useVehicleBrands();
   const createMutation = useCreateAdvertisement();
 
   const handleSubmit = (values: AdvertisementFormValues) => {
@@ -50,6 +52,8 @@ function NewAdvertisementView() {
         mode="create"
         categories={categoriesQuery.data ?? []}
         categoriesLoading={categoriesQuery.isLoading}
+        vehicleBrands={vehicleBrandsQuery.data ?? []}
+        vehicleBrandsLoading={vehicleBrandsQuery.isLoading}
         isSubmitting={createMutation.isPending}
         submitError={createMutation.isError ? createMutation.error : undefined}
         onSubmit={handleSubmit}

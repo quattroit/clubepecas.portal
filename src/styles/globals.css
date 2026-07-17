@@ -6,10 +6,10 @@
 
 /**
  * ClubePeças — Design Tokens (fonte oficial)
- * Nenhuma cor hardcoded fora deste arquivo.
+ * Industrial Premium — ~90% neutro / ~10% destaque
+ * Primary #2563EB · Brand #0F2747 · Background #F4F7FB
  */
 @theme inline {
-  /* Cores → utilitários Tailwind */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
@@ -36,25 +36,39 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Tipografia */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-border: var(--brand-border);
+  --color-brand-accent: var(--brand-accent);
+
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
+  --color-facebook: var(--facebook);
+  --color-facebook-foreground: var(--facebook-foreground);
+  --color-instagram: var(--instagram);
+  --color-instagram-foreground: var(--instagram-foreground);
+  --color-location: var(--location);
+  --color-store: var(--store);
+  --color-category: var(--category);
+  --color-share: var(--share);
+
   --font-sans: var(--font-sans);
   --font-heading: var(--font-sans);
   --font-mono: var(--font-mono);
 
-  /* Border radius */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
 
-  /* Sombras */
   --shadow-xs: var(--elevation-xs);
   --shadow-sm: var(--elevation-sm);
   --shadow-md: var(--elevation-md);
   --shadow-lg: var(--elevation-lg);
 
-  /* Sidebar (reservado para layouts futuros) */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -66,70 +80,77 @@
 }
 
 :root {
-  /* ——— Paleta oficial ClubePeças ——— */
-  /* Background / Surface */
-  --background: oklch(0.975 0.005 240);
-  --foreground: oklch(0.28 0.025 250);
-  --surface: oklch(1 0 0);
-  --surface-foreground: oklch(0.28 0.025 250);
+  /* Paleta oficial (hex de referência do brief) */
+  --background: #f4f7fb;
+  --foreground: #14233b;
+  --surface: #ffffff;
+  --surface-foreground: #14233b;
 
-  /* Primary — aço azulado (confiança, técnica) */
-  --primary: oklch(0.42 0.07 235);
-  --primary-foreground: oklch(0.99 0.005 240);
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
 
-  /* Secondary — cinza frio */
-  --secondary: oklch(0.94 0.01 240);
-  --secondary-foreground: oklch(0.35 0.03 245);
+  --secondary: #e8eef6;
+  --secondary-foreground: #14233b;
 
-  /* Status */
-  --success: oklch(0.5 0.1 155);
-  --success-foreground: oklch(0.99 0.005 155);
-  --warning: oklch(0.68 0.14 65);
-  --warning-foreground: oklch(0.28 0.06 55);
-  --destructive: oklch(0.55 0.19 25);
-  --destructive-foreground: oklch(0.99 0.005 25);
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #14233b;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
 
-  /* UI */
-  --muted: oklch(0.95 0.008 240);
-  --muted-foreground: oklch(0.5 0.02 250);
-  --accent: oklch(0.94 0.012 235);
-  --accent-foreground: oklch(0.35 0.04 235);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.28 0.025 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.28 0.025 250);
-  --border: oklch(0.88 0.012 240);
-  --input: oklch(0.88 0.012 240);
-  --ring: oklch(0.42 0.07 235);
+  --muted: #eef2f7;
+  --muted-foreground: #64748b;
+  --accent: #e8eef6;
+  --accent-foreground: #14233b;
+  --card: #ffffff;
+  --card-foreground: #14233b;
+  --popover: #ffffff;
+  --popover-foreground: #14233b;
+  --border: #e5eaf2;
+  --input: #e5eaf2;
+  --ring: #2563eb;
 
-  /* Radius base */
-  --radius: 0.5rem;
+  /* Azul petróleo — Header / Hero / CTA / Footer */
+  --brand: #0f2747;
+  --brand-foreground: #ffffff;
+  --brand-muted: #94a3b8;
+  --brand-border: rgb(255 255 255 / 12%);
+  --brand-accent: #2563eb;
 
-  /* Mono (código — sistema) */
+  --whatsapp: #25d366;
+  --whatsapp-foreground: #ffffff;
+  --facebook: #1877f2;
+  --facebook-foreground: #ffffff;
+  --instagram: #e4405f;
+  --instagram-foreground: #ffffff;
+  --location: #e11d48;
+  --store: #ea580c;
+  --category: #2563eb;
+  --share: #64748b;
+
+  --radius: 0.75rem;
+
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 
-  /* Sombras — sutis, sem glow */
-  --elevation-xs: 0 1px 2px oklch(0.28 0.025 250 / 4%);
+  --elevation-xs: 0 1px 2px rgb(15 39 71 / 6%);
   --elevation-sm:
-    0 1px 3px oklch(0.28 0.025 250 / 6%), 0 1px 2px oklch(0.28 0.025 250 / 4%);
+    0 1px 3px rgb(15 39 71 / 8%), 0 1px 2px rgb(15 39 71 / 5%);
   --elevation-md:
-    0 4px 8px -2px oklch(0.28 0.025 250 / 8%),
-    0 2px 4px -2px oklch(0.28 0.025 250 / 5%);
+    0 8px 16px -4px rgb(15 39 71 / 12%), 0 3px 6px -2px rgb(15 39 71 / 7%);
   --elevation-lg:
-    0 12px 24px -4px oklch(0.28 0.025 250 / 10%),
-    0 4px 8px -2px oklch(0.28 0.025 250 / 5%);
+    0 18px 36px -8px rgb(15 39 71 / 16%), 0 8px 14px -4px rgb(15 39 71 / 8%);
 
-  /* Sidebar (preparado) */
-  --sidebar: oklch(0.99 0.003 240);
-  --sidebar-foreground: oklch(0.28 0.025 250);
-  --sidebar-primary: oklch(0.42 0.07 235);
-  --sidebar-primary-foreground: oklch(0.99 0.005 240);
-  --sidebar-accent: oklch(0.94 0.01 240);
-  --sidebar-accent-foreground: oklch(0.35 0.03 245);
-  --sidebar-border: oklch(0.88 0.012 240);
-  --sidebar-ring: oklch(0.42 0.07 235);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #14233b;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef2f7;
+  --sidebar-accent-foreground: #14233b;
+  --sidebar-border: #e5eaf2;
+  --sidebar-ring: #2563eb;
 }
 
 @layer base {
@@ -150,57 +171,125 @@
   }
 }
 
-/**
- * Escala tipográfica oficial
- * Uso: className="text-display" | "text-h1" | "text-h2" | "text-h3" | "text-body" | "text-small"
- */
 @layer utilities {
   .text-display {
     font-family: var(--font-heading);
-    font-size: 2.5rem;
-    line-height: 1.15;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: clamp(2.125rem, 5.5vw, 3.25rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.03em;
     color: var(--foreground);
   }
 
   .text-h1 {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: clamp(1.625rem, 3.2vw, 2.125rem);
     line-height: 1.2;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.025em;
     color: var(--foreground);
   }
 
   .text-h2 {
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: clamp(1.375rem, 2.6vw, 1.625rem);
     line-height: 1.3;
-    font-weight: 600;
-    letter-spacing: -0.015em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--foreground);
   }
 
   .text-h3 {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
-    line-height: 1.35;
-    font-weight: 500;
+    font-size: 1.125rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     color: var(--foreground);
   }
 
   .text-body {
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 1.0625rem;
+    line-height: 1.7;
     font-weight: 400;
     color: var(--foreground);
   }
 
   .text-small {
     font-size: 0.875rem;
-    line-height: 1.5;
+    line-height: 1.55;
     font-weight: 400;
     color: var(--muted-foreground);
+  }
+
+  .text-price {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--primary);
+  }
+
+  .text-price-lg {
+    font-family: var(--font-heading);
+    font-size: 1.875rem;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--primary);
+  }
+
+  /**
+   * Superfície brand (navy petróleo)
+   * Textura automotiva discreta — não compete com o conteúdo.
+   */
+  .surface-brand {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--brand);
+    color: var(--brand-foreground);
+    background-image:
+      radial-gradient(
+        ellipse 70% 80% at 100% 45%,
+        rgb(37 99 235 / 22%),
+        transparent 58%
+      ),
+      linear-gradient(
+        90deg,
+        var(--brand) 0%,
+        var(--brand) 42%,
+        rgb(15 39 71 / 55%) 72%,
+        rgb(15 39 71 / 25%) 100%
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.09' stroke-width='1.25'%3E%3Ccircle cx='40' cy='40' r='18'/%3E%3Ccircle cx='40' cy='40' r='7'/%3E%3Ccircle cx='118' cy='95' r='24'/%3E%3Ccircle cx='118' cy='95' r='10'/%3E%3Ccircle cx='70' cy='120' r='12'/%3E%3Cpath d='M40 22v5M40 53v5M22 40h5M53 40h5M118 71v5M118 114v5M94 95h5M132 95h5M70 108v5M70 132v5M58 120h5M82 120h5'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:
+      auto,
+      auto,
+      160px 160px;
+    background-position:
+      right center,
+      center,
+      right center;
+  }
+
+  .surface-brand .text-display,
+  .surface-brand .text-h1,
+  .surface-brand .text-h2,
+  .surface-brand .text-h3 {
+    color: var(--brand-foreground);
+  }
+
+  .surface-brand .text-body,
+  .surface-brand .text-small {
+    color: var(--brand-muted);
+  }
+
+  .card-interactive {
+    @apply shadow-xs ring-1 ring-border transition-[box-shadow,transform,ring-color] duration-200 ease-out;
+  }
+
+  .card-interactive:hover {
+    @apply shadow-md -translate-y-0.5 ring-primary/50;
   }
 }
