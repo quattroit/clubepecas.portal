@@ -16,12 +16,14 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
   { label: "Anúncios", href: ROUTES.ADVERTISEMENTS },
   { label: "Categorias", href: ROUTES.CATEGORIES },
   { label: "Lojas", href: ROUTES.STORES },
+  { label: "Planos", href: ROUTES.PLANS },
 ];
 
 /**
  * Links institucionais do Footer.
  */
 export const FOOTER_NAV_ITEMS: NavItem[] = [
+  { label: "Planos", href: ROUTES.PLANS },
   { label: "Sobre", href: ROUTES.ABOUT },
   { label: "Contato", href: ROUTES.CONTACT },
   { label: "Termos", href: ROUTES.TERMS },

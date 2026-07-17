@@ -16,7 +16,7 @@ type PageMetadataInput = {
 };
 
 /**
- * Metadata padrão das páginas públicas (title, description, canonical, OG).
+ * Metadata padrão das páginas públicas (title, description, canonical, OG, Twitter).
  */
 export function buildPageMetadata({
   title,
@@ -24,6 +24,7 @@ export function buildPageMetadata({
   path,
 }: PageMetadataInput): Metadata {
   const url = `${getSiteUrl()}${path}`;
+  const ogTitle = `${title} | ${APP_NAME}`;
 
   return {
     title,
@@ -32,12 +33,17 @@ export function buildPageMetadata({
       canonical: url,
     },
     openGraph: {
-      title: `${title} | ${APP_NAME}`,
+      title: ogTitle,
       description,
       url,
       siteName: APP_NAME,
       locale: "pt_BR",
       type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description,
     },
   };
 }
