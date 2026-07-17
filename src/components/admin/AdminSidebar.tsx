@@ -8,6 +8,7 @@ import {
   CarFront,
   CreditCard,
   FolderTree,
+  FolderOpen,
   LayoutDashboard,
   MapPin,
   Package,
@@ -81,6 +82,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_PLANS,
     label: "Planos",
     icon: CreditCard,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_FILES,
+    label: "Arquivos",
+    icon: FolderOpen,
     exact: false,
   },
   {

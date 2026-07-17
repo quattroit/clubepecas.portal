@@ -11,3 +11,4 @@ export { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsVi
 export { AdminSettingsView } from "@/features/admin/components/AdminSettingsView";
 export { AdminSubscriptionPlansView } from "@/features/admin/components/AdminSubscriptionPlansView";
 export { AdminAuditView } from "@/features/admin/components/AdminAuditView";
+export { AdminFilesView } from "@/features/admin/components/AdminFilesView";

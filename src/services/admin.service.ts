@@ -11,6 +11,10 @@ import type {
   AdminAuditListResponse,
 } from "@/contracts/admin/audit";
 import type {
+  FileCleanupResultDto,
+  FileIntegrityReportDto,
+} from "@/contracts/admin/files";
+import type {
   AdminCategoriesListParams,
   CreateAdminCategoryRequest,
   GetAdminCategoriesResponse,
@@ -399,6 +403,20 @@ export const adminService = {
   listAuditLogs(params: AdminAuditListParams = {}) {
     return api
       .get<AdminAuditListResponse>("/api/v1/admin/audit", { params })
+      .then((response) => response.data);
+  },
+
+  checkFileIntegrity() {
+    return api
+      .get<FileIntegrityReportDto>("/api/v1/admin/files/integrity")
+      .then((response) => response.data);
+  },
+
+  cleanupOrphanFiles(dryRun: boolean) {
+    return api
+      .post<FileCleanupResultDto>("/api/v1/admin/files/cleanup", null, {
+        params: { dryRun },
+      })
       .then((response) => response.data);
   },
 };
