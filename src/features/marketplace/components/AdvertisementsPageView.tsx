@@ -54,6 +54,8 @@ function AdvertisementsPageView() {
       filters.category ||
       filters.brand ||
       filters.model ||
+      filters.manufacturingYear ||
+      filters.modelYear ||
       filters.state ||
       filters.city ||
       filters.priceMin ||

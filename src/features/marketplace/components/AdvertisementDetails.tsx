@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Advertisement } from "@/types/Advertisement";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { formatVehicleYears } from "@/utils/vehicle-years";
 import { cn } from "@/lib/utils";
 
 type AdvertisementDetailsProps = {
@@ -32,6 +33,8 @@ function AdvertisementDetails({
     title,
     price,
     stockQuantity,
+    manufacturingYear,
+    modelYear,
     isNew,
     category,
     city,
@@ -41,6 +44,10 @@ function AdvertisementDetails({
   } = advertisement;
 
   const publishedLabel = formatPublishedAt(publishedAt);
+  const vehicleYearsLabel =
+    typeof manufacturingYear === "number" && typeof modelYear === "number"
+      ? formatVehicleYears(manufacturingYear, modelYear)
+      : null;
 
   return (
     <div className={cn("flex flex-col gap-5", className)}>
@@ -63,6 +70,12 @@ function AdvertisementDetails({
             {city}, {state}
           </dd>
         </div>
+        {vehicleYearsLabel ? (
+          <div>
+            <dt className="text-muted-foreground mb-0.5">Ano</dt>
+            <dd className="text-foreground font-medium">{vehicleYearsLabel}</dd>
+          </div>
+        ) : null}
         {typeof stockQuantity === "number" ? (
           <div>
             <dt className="text-muted-foreground mb-0.5">Estoque</dt>

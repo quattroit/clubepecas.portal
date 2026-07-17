@@ -20,6 +20,10 @@ export type GetMarketplaceRequest = {
   vehicleModelSlug?: string;
   /** Alias de `vehicleModelSlug` (querystring pública `?model=`). */
   model?: string;
+  /** Ano de fabricação do veículo. */
+  manufacturingYear?: number;
+  /** Ano/modelo do veículo. */
+  modelYear?: number;
   city?: string;
   state?: string;
   priceMin?: number;

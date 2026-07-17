@@ -8,6 +8,7 @@ import { advertisementPath } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 import type { Advertisement } from "@/types/Advertisement";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { formatVehicleYears } from "@/utils/vehicle-years";
 
 type AdvertisementCardProps = {
   advertisement: Advertisement;
@@ -24,6 +25,8 @@ function AdvertisementCard({
     title,
     price,
     stockQuantity,
+    manufacturingYear,
+    modelYear,
     city,
     state,
     category,
@@ -32,6 +35,10 @@ function AdvertisementCard({
   } = advertisement;
   const location = `${city}, ${state}`;
   const href = advertisementPath(slug ?? id);
+  const vehicleYearsLabel =
+    typeof manufacturingYear === "number" && typeof modelYear === "number"
+      ? formatVehicleYears(manufacturingYear, modelYear)
+      : null;
 
   return (
     <Link
@@ -78,6 +85,11 @@ function AdvertisementCard({
             {title}
           </h3>
           <p className="text-price text-base">{formatCurrency(price)}</p>
+          {vehicleYearsLabel ? (
+            <p className="text-muted-foreground text-xs">
+              Ano: {vehicleYearsLabel}
+            </p>
+          ) : null}
           {typeof stockQuantity === "number" ? (
             <p className="text-muted-foreground text-xs">
               Estoque: {stockQuantity}{" "}

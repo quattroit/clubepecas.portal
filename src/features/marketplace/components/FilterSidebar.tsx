@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useVehicleModels } from "@/hooks/api/useVehicleModels";
 import { cn } from "@/lib/utils";
 import type { MarketplaceListingFilters } from "@/utils/marketplace-search";
+import { listVehicleYears } from "@/utils/vehicle-years";
 
 type FilterOption = {
   id: string;
@@ -107,6 +108,7 @@ function FilterSidebar({
   });
   const models = modelsQuery.data ?? [];
   const modelsLoading = modelsQuery.isFetching;
+  const vehicleYears = listVehicleYears();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -115,6 +117,10 @@ function FilterSidebar({
     const category = String(formData.get("category") ?? "all");
     const brand = String(formData.get("brand") ?? "all");
     const model = String(formData.get("model") ?? "all");
+    const manufacturingYear = String(
+      formData.get("manufacturingYear") ?? "all",
+    );
+    const modelYear = String(formData.get("modelYear") ?? "all");
     const state = String(formData.get("state") ?? "all");
     const city = String(formData.get("city") ?? "all");
     const priceMin = String(formData.get("priceMin") ?? "").trim();
@@ -125,6 +131,10 @@ function FilterSidebar({
       ...(category && category !== "all" ? { category } : {}),
       ...(brand && brand !== "all" ? { brand } : {}),
       ...(model && model !== "all" ? { model } : {}),
+      ...(manufacturingYear && manufacturingYear !== "all"
+        ? { manufacturingYear }
+        : {}),
+      ...(modelYear && modelYear !== "all" ? { modelYear } : {}),
       ...(state && state !== "all" ? { state } : {}),
       ...(city && city !== "all" ? { city } : {}),
       ...(priceMin ? { priceMin } : {}),
@@ -138,6 +148,8 @@ function FilterSidebar({
     values.category ?? "all",
     values.brand ?? "all",
     values.model ?? "all",
+    values.manufacturingYear ?? "all",
+    values.modelYear ?? "all",
     values.state ?? "all",
     values.city ?? "all",
     values.priceMin ?? "",
@@ -225,6 +237,42 @@ function FilterSidebar({
                   ))}
                 </>
               )}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={id("manufacturing-year")}>Ano de Fabricação</Label>
+            <select
+              id={id("manufacturing-year")}
+              name="manufacturingYear"
+              defaultValue={values.manufacturingYear ?? "all"}
+              className={selectClassName}
+              aria-label="Filtrar por ano de fabricação"
+            >
+              <option value="all">Todos</option>
+              {vehicleYears.map((year) => (
+                <option key={year} value={String(year)}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={id("model-year")}>Ano/Modelo</Label>
+            <select
+              id={id("model-year")}
+              name="modelYear"
+              defaultValue={values.modelYear ?? "all"}
+              className={selectClassName}
+              aria-label="Filtrar por ano/modelo"
+            >
+              <option value="all">Todos</option>
+              {vehicleYears.map((year) => (
+                <option key={year} value={String(year)}>
+                  {year}
+                </option>
+              ))}
             </select>
           </div>
 

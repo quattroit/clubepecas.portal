@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import type { Advertisement } from "@/types/Advertisement";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+import { formatVehicleYears } from "@/utils/vehicle-years";
 
 type MyAdvertisementCardProps = {
   advertisement: Advertisement;
@@ -50,6 +51,8 @@ function MyAdvertisementCard({
     title,
     price,
     stockQuantity,
+    manufacturingYear,
+    modelYear,
     city,
     state,
     category,
@@ -60,6 +63,10 @@ function MyAdvertisementCard({
   } = advertisement;
 
   const location = [city, state].filter(Boolean).join(", ");
+  const vehicleYearsLabel =
+    typeof manufacturingYear === "number" && typeof modelYear === "number"
+      ? formatVehicleYears(manufacturingYear, modelYear)
+      : null;
 
   return (
     <Card
@@ -113,6 +120,11 @@ function MyAdvertisementCard({
           {title}
         </h3>
         <p className="text-price text-sm">{formatCurrency(price)}</p>
+        {vehicleYearsLabel ? (
+          <p className="text-muted-foreground text-[10px]">
+            Ano: {vehicleYearsLabel}
+          </p>
+        ) : null}
         {typeof stockQuantity === "number" ? (
           <p className="text-muted-foreground text-[10px]">
             Estoque: {stockQuantity}{" "}

@@ -74,6 +74,9 @@ const CODE_MESSAGES: Record<string, string> = {
   "advertisement.vehicleBrandId.invalid": "Selecione uma marca válida.",
   "advertisement.vehicleModelId.required": "Selecione o modelo do veículo.",
   "advertisement.vehicleModelId.invalid": "Selecione um modelo válido.",
+  "advertisement.manufacturing_year.invalid":
+    "Informe um ano de fabricação válido.",
+  "advertisement.model_year.invalid": "Informe um ano/modelo válido.",
   "category.not_found": "Categoria não encontrada.",
   "photo.url.required": "Informe a URL da foto.",
   "network.timeout": "A requisição demorou demais. Tente novamente.",

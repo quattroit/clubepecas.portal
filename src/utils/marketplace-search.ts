@@ -15,6 +15,10 @@ export type MarketplaceListingFilters = {
   brand?: string;
   /** Slug do modelo de veículo (`?model=`). */
   model?: string;
+  /** Ano de fabricação (`?manufacturingYear=`). */
+  manufacturingYear?: string;
+  /** Ano/modelo (`?modelYear=`). */
+  modelYear?: string;
   state?: string;
   city?: string;
   priceMin?: string;
@@ -25,6 +29,14 @@ export type MarketplaceListingFilters = {
 
 function isAll(value: string | undefined): boolean {
   return !value || value.trim() === "" || value.trim() === "all";
+}
+
+function parseOptionalYearParam(raw: string | null): string | undefined {
+  const value = raw?.trim() ?? "";
+  if (!value || value === "all") return undefined;
+  const year = Number(value);
+  if (!Number.isInteger(year)) return undefined;
+  return String(year);
 }
 
 /**
@@ -42,6 +54,10 @@ export function parseMarketplaceListingFilters(
   const category = search.get("category")?.trim() ?? "";
   const brand = search.get("brand")?.trim() ?? "";
   const model = search.get("model")?.trim() ?? "";
+  const manufacturingYear = parseOptionalYearParam(
+    search.get("manufacturingYear"),
+  );
+  const modelYear = parseOptionalYearParam(search.get("modelYear"));
   const state = search.get("state")?.trim() ?? "";
   const city = search.get("city")?.trim() ?? "";
   const priceMin = search.get("priceMin")?.trim() ?? "";
@@ -55,6 +71,8 @@ export function parseMarketplaceListingFilters(
     ...(!isAll(category) ? { category } : {}),
     ...(!isAll(brand) ? { brand } : {}),
     ...(!isAll(model) ? { model } : {}),
+    ...(manufacturingYear ? { manufacturingYear } : {}),
+    ...(modelYear ? { modelYear } : {}),
     ...(!isAll(state) ? { state } : {}),
     ...(!isAll(city) ? { city } : {}),
     ...(priceMin ? { priceMin } : {}),
@@ -87,6 +105,14 @@ export function buildAdvertisementsHref(
 
   if (!isAll(filters.model)) {
     params.set("model", filters.model!.trim());
+  }
+
+  if (filters.manufacturingYear?.trim() && !isAll(filters.manufacturingYear)) {
+    params.set("manufacturingYear", filters.manufacturingYear.trim());
+  }
+
+  if (filters.modelYear?.trim() && !isAll(filters.modelYear)) {
+    params.set("modelYear", filters.modelYear.trim());
   }
 
   if (!isAll(filters.state)) {
@@ -125,6 +151,8 @@ export function toMarketplaceApiParams(filters: MarketplaceListingFilters): {
   categoryId?: string;
   vehicleBrandSlug?: string;
   vehicleModelSlug?: string;
+  manufacturingYear?: number;
+  modelYear?: number;
   city?: string;
   state?: string;
   priceMin?: number;
@@ -132,11 +160,20 @@ export function toMarketplaceApiParams(filters: MarketplaceListingFilters): {
   newOnly?: boolean;
   sort?: string;
 } {
+  const manufacturingYear = filters.manufacturingYear
+    ? Number(filters.manufacturingYear)
+    : NaN;
+  const modelYear = filters.modelYear ? Number(filters.modelYear) : NaN;
+
   return {
     ...(filters.q ? { q: filters.q } : {}),
     ...(filters.category ? { categoryId: filters.category } : {}),
     ...(filters.brand ? { vehicleBrandSlug: filters.brand } : {}),
     ...(filters.model ? { vehicleModelSlug: filters.model } : {}),
+    ...(Number.isInteger(manufacturingYear)
+      ? { manufacturingYear }
+      : {}),
+    ...(Number.isInteger(modelYear) ? { modelYear } : {}),
     ...(filters.city && !isAll(filters.city) ? { city: filters.city } : {}),
     ...(filters.state ? { state: filters.state.toUpperCase() } : {}),
     ...(filters.priceMin && !Number.isNaN(Number(filters.priceMin))

@@ -27,6 +27,8 @@ export const queryKeys = {
       vehicleModelId?: string;
       vehicleModelSlug?: string;
       model?: string;
+      manufacturingYear?: number;
+      modelYear?: number;
       city?: string;
       state?: string;
       priceMin?: number;

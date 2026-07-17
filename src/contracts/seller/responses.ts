@@ -35,6 +35,8 @@ export type PublicSellerAdvertisementDto = {
   vehicleModelId?: string | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
+  manufacturingYear: number;
+  modelYear: number;
   condition: AdvertisementCondition;
   thumbnailUrl: string | null;
   publishedAt: string;

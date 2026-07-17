@@ -6,6 +6,8 @@ export type CreateAdvertisementRequest = {
   categoryId: string;
   vehicleBrandId: string;
   vehicleModelId: string;
+  manufacturingYear: number;
+  modelYear: number;
   compatibilityDescription: string;
   condition: AdvertisementCondition;
   price: number;
@@ -18,6 +20,8 @@ export type UpdateAdvertisementRequest = {
   categoryId: string;
   vehicleBrandId: string;
   vehicleModelId: string;
+  manufacturingYear: number;
+  modelYear: number;
   compatibilityDescription: string;
   condition: AdvertisementCondition;
   price: number;

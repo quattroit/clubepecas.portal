@@ -63,6 +63,8 @@ export type AdminAdvertisementListItemDto = {
   vehicleModelId?: string | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
+  manufacturingYear: number;
+  modelYear: number;
   city: string;
   state: string;
   stockQuantity: number;
@@ -91,6 +93,8 @@ export type AdminAdvertisementDetailResponse = {
   vehicleModelId?: string | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
+  manufacturingYear: number;
+  modelYear: number;
   condition: AdvertisementCondition;
   price: number;
   stockQuantity: number;

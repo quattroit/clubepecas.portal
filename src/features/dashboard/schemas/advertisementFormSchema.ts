@@ -2,6 +2,10 @@ import { z } from "zod";
 
 import { AdvertisementCondition } from "@/contracts/common/enums";
 import { parsePriceInput } from "@/utils/parsePriceInput";
+import {
+  getVehicleYearMax,
+  VEHICLE_YEAR_MIN,
+} from "@/utils/vehicle-years";
 
 const conditionOptions = Object.values(AdvertisementCondition)
   .filter((value): value is AdvertisementCondition => typeof value === "number")
@@ -14,6 +18,15 @@ const optionalPhotoUrl = z
     (value) => value === "" || z.url().safeParse(value).success,
     "Informe uma URL válida (https://…)",
   );
+
+function isValidVehicleYear(value: string): boolean {
+  const year = Number(value);
+  return (
+    Number.isInteger(year) &&
+    year >= VEHICLE_YEAR_MIN &&
+    year <= getVehicleYearMax()
+  );
+}
 
 /**
  * Schema compartilhado entre criar e editar anúncio.
@@ -47,6 +60,22 @@ export const advertisementFormSchema = z.object({
       (value) => z.uuid().safeParse(value).success,
       "Modelo inválido",
     ),
+  manufacturingYear: z
+    .string()
+    .trim()
+    .min(1, "Selecione o ano de fabricação")
+    .refine(
+      isValidVehicleYear,
+      `Informe um ano entre ${VEHICLE_YEAR_MIN} e ${getVehicleYearMax()}`,
+    ),
+  modelYear: z
+    .string()
+    .trim()
+    .min(1, "Selecione o ano/modelo")
+    .refine(
+      isValidVehicleYear,
+      `Informe um ano entre ${VEHICLE_YEAR_MIN} e ${getVehicleYearMax()}`,
+    ),
   compatibilityDescription: z
     .string()
     .trim()
@@ -76,12 +105,16 @@ export const advertisementFormSchema = z.object({
 
 export type AdvertisementFormValues = z.infer<typeof advertisementFormSchema>;
 
+const currentYear = String(new Date().getFullYear());
+
 export const advertisementFormDefaultValues: AdvertisementFormValues = {
   title: "",
   description: "",
   categoryId: "",
   vehicleBrandId: "",
   vehicleModelId: "",
+  manufacturingYear: currentYear,
+  modelYear: currentYear,
   compatibilityDescription: "",
   condition: String(AdvertisementCondition.Used),
   price: "",

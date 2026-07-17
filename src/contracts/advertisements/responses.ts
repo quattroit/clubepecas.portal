@@ -30,6 +30,8 @@ export type AdvertisementListItemDto = {
   vehicleModelId?: string | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
+  manufacturingYear: number;
+  modelYear: number;
   createdAt: string;
 };
 
@@ -51,6 +53,8 @@ export type AdvertisementDetailDto = {
   vehicleModelId?: string | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
+  manufacturingYear: number;
+  modelYear: number;
   compatibilityDescription: string;
   condition: AdvertisementCondition;
   price: number;
@@ -89,6 +93,8 @@ export type AdvertisementBySlugResponse = {
   vehicleModelId?: string | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
+  manufacturingYear: number;
+  modelYear: number;
   condition: AdvertisementCondition;
   compatibilityDescription: string;
   price: number;

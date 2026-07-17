@@ -24,6 +24,10 @@ export type Advertisement = {
   vehicleModel?: string;
   vehicleModelId?: string;
   vehicleModelSlug?: string;
+  /** Ano de fabricação do veículo. */
+  manufacturingYear?: number;
+  /** Ano/modelo do veículo. */
+  modelYear?: number;
   /** Imagem principal (listagens / cards) */
   imageUrl?: string | null;
   /** Galeria completa (detalhe). Se vazio, usar imageUrl. */

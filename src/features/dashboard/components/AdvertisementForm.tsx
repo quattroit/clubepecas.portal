@@ -24,6 +24,7 @@ import {
 } from "@/mappers/categoryMeta";
 import type { Category } from "@/types/Category";
 import type { VehicleBrand } from "@/types/VehicleBrand";
+import { listVehicleYears } from "@/utils/vehicle-years";
 
 const selectClassName =
   "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted aria-invalid:border-destructive aria-invalid:ring-3";
@@ -60,6 +61,7 @@ function AdvertisementForm({
   submittingLabel = mode === "edit" ? "Salvando…" : "Publicando…",
 }: AdvertisementFormProps) {
   const conditions = listAdvertisementConditions();
+  const vehicleYears = listVehicleYears();
 
   const {
     register,
@@ -313,6 +315,68 @@ function AdvertisementForm({
               role="alert"
             >
               {errors.condition.message}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-manufacturing-year">Ano de Fabricação</Label>
+          <select
+            id="ad-manufacturing-year"
+            className={selectClassName}
+            aria-invalid={Boolean(errors.manufacturingYear)}
+            aria-describedby={
+              errors.manufacturingYear
+                ? "ad-manufacturing-year-error"
+                : undefined
+            }
+            disabled={isSubmitting}
+            {...register("manufacturingYear")}
+          >
+            {vehicleYears.map((year) => (
+              <option key={year} value={String(year)}>
+                {year}
+              </option>
+            ))}
+          </select>
+          {errors.manufacturingYear ? (
+            <p
+              id="ad-manufacturing-year-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.manufacturingYear.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-model-year">Ano/Modelo</Label>
+          <select
+            id="ad-model-year"
+            className={selectClassName}
+            aria-invalid={Boolean(errors.modelYear)}
+            aria-describedby={
+              errors.modelYear ? "ad-model-year-error" : undefined
+            }
+            disabled={isSubmitting}
+            {...register("modelYear")}
+          >
+            {vehicleYears.map((year) => (
+              <option key={year} value={String(year)}>
+                {year}
+              </option>
+            ))}
+          </select>
+          {errors.modelYear ? (
+            <p
+              id="ad-model-year-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.modelYear.message}
             </p>
           ) : null}
         </div>

@@ -45,6 +45,7 @@ import {
   formatConversionRate,
   formatMetricCount,
 } from "@/utils/formatMetrics";
+import { formatVehicleYears } from "@/utils/vehicle-years";
 
 const PERIOD_OPTIONS: { value: MetricsPeriodParam; label: string }[] = [
   { value: "7d", label: "7 dias" },
@@ -313,6 +314,23 @@ function AdminAdvertisementDetailView() {
                 <div>
                   <dt className="text-muted-foreground text-xs">Categoria</dt>
                   <dd className="text-sm">{data.categoryName}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs">Marca</dt>
+                  <dd className="text-sm">{data.vehicleBrandName}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs">Modelo</dt>
+                  <dd className="text-sm">{data.vehicleModelName || "—"}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs">Ano</dt>
+                  <dd className="text-sm tabular-nums">
+                    {formatVehicleYears(
+                      data.manufacturingYear,
+                      data.modelYear,
+                    )}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground text-xs">Condição</dt>
