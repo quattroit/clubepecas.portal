@@ -151,6 +151,25 @@ function AdminSellersView() {
       ),
     },
     {
+      id: "personType",
+      header: "Tipo",
+      accessor: (row) =>
+        row.personType === 2
+          ? "PJ"
+          : row.personType === 1
+            ? "PF"
+            : "—",
+    },
+    {
+      id: "document",
+      header: "CPF/CNPJ",
+      cell: (row) => (
+        <span className="font-mono text-xs tabular-nums">
+          {row.document ?? "—"}
+        </span>
+      ),
+    },
+    {
       id: "createdAt",
       header: "Cadastro",
       accessor: (row) => formatDate(row.createdAt),

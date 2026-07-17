@@ -63,6 +63,8 @@ export type AdminSellerListItemDto = {
   state: string;
   email: string;
   whatsApp: string;
+  personType: number | null;
+  document: string | null;
   createdAt: string;
   lastAccessAt: string | null;
   advertisementCount: number;
@@ -84,6 +86,8 @@ export type AdminSellerDetailResponse = {
   state: string;
   email: string;
   whatsApp: string;
+  personType: number | null;
+  document: string | null;
   instagram: string | null;
   photoUrl: string | null;
   slug: string;

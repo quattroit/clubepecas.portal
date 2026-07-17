@@ -2,6 +2,8 @@ export type CreateSellerRequest = {
   storeName: string;
   displayName: string;
   cityId: string;
+  personType: number;
+  document: string;
   description?: string | null;
   whatsApp: string;
   instagram?: string | null;
@@ -12,6 +14,8 @@ export type UpdateSellerRequest = {
   storeName: string;
   displayName: string;
   cityId: string;
+  personType: number;
+  document: string;
   description?: string | null;
   whatsApp: string;
   instagram?: string | null;

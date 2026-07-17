@@ -81,7 +81,14 @@ function PlansPageView() {
         ) : null}
 
         {!plansQuery.isLoading && !plansQuery.isError && plans.length > 0 ? (
-          <div className="grid gap-6 pt-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            className={cn(
+              "grid items-stretch gap-6 pt-2",
+              plans.length >= 4
+                ? "sm:grid-cols-2 xl:grid-cols-4"
+                : "sm:grid-cols-2 lg:grid-cols-3",
+            )}
+          >
             {plans.map((plan, index) => (
               <PlanCard
                 key={plan.id}

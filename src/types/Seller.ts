@@ -16,6 +16,8 @@ export type Seller = {
   /** ISO date string — data de cadastro */
   registeredAt?: string;
   displayName?: string;
+  personType?: number | null;
+  document?: string | null;
   whatsApp?: string | null;
   instagram?: string | null;
 };

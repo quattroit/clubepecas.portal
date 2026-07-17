@@ -416,6 +416,22 @@ function AdminSellerDetailView() {
                   <dd className="text-sm tabular-nums">{data.whatsApp}</dd>
                 </div>
                 <div>
+                  <dt className="text-muted-foreground text-xs">Tipo de Pessoa</dt>
+                  <dd className="text-sm">
+                    {data.personType === 2
+                      ? "Pessoa Jurídica"
+                      : data.personType === 1
+                        ? "Pessoa Física"
+                        : "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs">CPF/CNPJ</dt>
+                  <dd className="text-sm font-mono tabular-nums">
+                    {data.document ?? "—"}
+                  </dd>
+                </div>
+                <div>
                   <dt className="text-muted-foreground text-xs">Instagram</dt>
                   <dd className="text-sm">
                     {data.instagram ? data.instagram : "—"}

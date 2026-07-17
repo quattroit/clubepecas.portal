@@ -2,8 +2,10 @@ import type {
   CreateSellerRequest,
   UpdateSellerRequest,
 } from "@/contracts/seller/requests";
+import { PersonType } from "@/contracts/common/enums";
 import type { SellerProfileFormValues } from "@/features/dashboard/schemas/sellerProfileFormSchema";
 import type { Seller } from "@/types/Seller";
+import { formatDocumentInput } from "@/utils/document";
 import { formatInstagramHandle } from "@/utils/instagram";
 
 /**
@@ -12,10 +14,19 @@ import { formatInstagramHandle } from "@/utils/instagram";
 export function mapSellerToProfileFormValues(
   seller: Seller,
 ): SellerProfileFormValues {
+  const personType =
+    seller.personType === PersonType.Company
+      ? PersonType.Company
+      : PersonType.Individual;
+
   return {
     storeName: seller.name,
     displayName: seller.displayName ?? "",
     cityId: seller.cityId ?? "",
+    personType,
+    document: seller.document
+      ? formatDocumentInput(seller.document, personType)
+      : "",
     description: seller.description ?? "",
     whatsApp: seller.whatsApp ?? "",
     instagram: seller.instagram
@@ -50,6 +61,8 @@ function mapSellerProfileFormToRequest(
     storeName: values.storeName.trim(),
     displayName: values.displayName.trim(),
     cityId: values.cityId.trim(),
+    personType: values.personType,
+    document: values.document.trim(),
     description: emptyToNull(values.description),
     whatsApp: values.whatsApp.trim(),
     instagram: emptyToNull(values.instagram),

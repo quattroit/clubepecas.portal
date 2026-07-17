@@ -13,8 +13,7 @@ export const subscriptionPlanFormSchema = z.object({
     .max(100, "Máximo de 100 caracteres"),
   description: z
     .string()
-    .trim()
-    .max(2000, "Máximo de 2000 caracteres"),
+    .max(1000, "Máximo de 1000 caracteres"),
   price: z
     .string()
     .trim()

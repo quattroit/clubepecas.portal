@@ -20,6 +20,9 @@ export function useCreateSellerSubscription() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscriptions,
       });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.subscriptionPlans.all,
+      });
       toast.success("Plano assinado com sucesso!");
     },
   });

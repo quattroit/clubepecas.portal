@@ -56,6 +56,8 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     avatarUrl: dto.photoUrl,
     description: dto.description ?? undefined,
     registeredAt: dto.createdAt,
+    personType: dto.personType,
+    document: dto.document,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
   };

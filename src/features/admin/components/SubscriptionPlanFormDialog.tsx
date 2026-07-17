@@ -54,12 +54,17 @@ function SubscriptionPlanFormDialog({
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm<SubscriptionPlanFormValues>({
     resolver: zodResolver(subscriptionPlanFormSchema),
     shouldFocusError: true,
     defaultValues: subscriptionPlanFormDefaultValues,
   });
+
+  const descriptionValue = watch("description") ?? "";
+  const descriptionLength = descriptionValue.length;
+  const descriptionMaxLength = 1000;
 
   useEffect(() => {
     if (!open) return;
@@ -125,16 +130,26 @@ function SubscriptionPlanFormDialog({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="subscription-plan-description">Descrição</Label>
+            <div className="flex items-end justify-between gap-3">
+              <Label htmlFor="subscription-plan-description">Descrição</Label>
+              <span
+                id="subscription-plan-description-count"
+                className="text-muted-foreground text-xs tabular-nums"
+                aria-live="polite"
+              >
+                {descriptionLength}/{descriptionMaxLength}
+              </span>
+            </div>
             <Textarea
               id="subscription-plan-description"
-              rows={3}
+              rows={4}
+              maxLength={descriptionMaxLength}
               disabled={isSubmitting}
               aria-invalid={Boolean(errors.description)}
               aria-describedby={
                 errors.description
-                  ? "subscription-plan-description-error"
-                  : undefined
+                  ? "subscription-plan-description-error subscription-plan-description-count"
+                  : "subscription-plan-description-count"
               }
               {...register("description")}
             />

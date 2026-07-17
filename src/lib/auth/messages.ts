@@ -57,6 +57,10 @@ const CODE_MESSAGES: Record<string, string> = {
     "Você atingiu o limite de anúncios permitido pelo seu plano.",
   "seller.subscription.already_active":
     "Você já possui uma assinatura ativa. Cancele a atual antes de assinar outro plano.",
+  "seller.document.already_exists":
+    "Já existe um vendedor cadastrado com este CPF ou CNPJ.",
+  "seller.document.invalid": "Informe um CPF ou CNPJ válido.",
+  "seller.document.required": "Informe o CPF ou CNPJ.",
   "seller.store_name.required": "Informe o nome da loja.",
   "seller.display_name.required": "Informe o nome de exibição.",
   "seller.city.required": "Informe a cidade.",
@@ -92,6 +96,8 @@ const CODE_MESSAGES: Record<string, string> = {
     "Já existe um plano com este nome.",
   "admin.subscription_plans.slug.duplicate":
     "Já existe um plano com este slug.",
+  "admin.subscription_plans.description.max_length":
+    "A descrição deve ter no máximo 1000 caracteres.",
   "admin.subscription_plans.price.invalid":
     "Informe um preço válido (zero ou maior).",
   "admin.subscription_plans.advertisement_limit.invalid":

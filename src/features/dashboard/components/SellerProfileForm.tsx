@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PersonType } from "@/contracts/common/enums";
 import {
   sellerProfileFormDefaultValues,
   sellerProfileFormSchema,
@@ -19,6 +20,11 @@ import { useCities } from "@/hooks/api/useCities";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { formatCityLabel } from "@/mappers/city.mapper";
+import {
+  documentLabel,
+  documentPlaceholder,
+  formatDocumentInput,
+} from "@/utils/document";
 
 const selectClassName = cn(
   "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3",
@@ -56,7 +62,9 @@ function SellerProfileForm({
   const {
     register,
     handleSubmit,
+    control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<SellerProfileFormValues>({
     resolver: zodResolver(sellerProfileFormSchema),
@@ -66,6 +74,8 @@ function SellerProfileForm({
       ...defaultValues,
     },
   });
+
+  const personType = useWatch({ control, name: "personType" });
 
   useEffect(() => {
     reset({
@@ -141,6 +151,76 @@ function SellerProfileForm({
               role="alert"
             >
               {errors.displayName.message}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-person-type">Tipo de Pessoa</Label>
+          <Controller
+            name="personType"
+            control={control}
+            render={({ field }) => (
+              <select
+                id="seller-person-type"
+                className={selectClassName}
+                disabled={isSubmitting}
+                aria-invalid={Boolean(errors.personType)}
+                value={field.value}
+                onChange={(event) => {
+                  const nextType = Number(event.target.value) as PersonType;
+                  field.onChange(nextType);
+                  setValue("document", "", { shouldValidate: false });
+                }}
+                onBlur={field.onBlur}
+              >
+                <option value={PersonType.Individual}>Pessoa Física</option>
+                <option value={PersonType.Company}>Pessoa Jurídica</option>
+              </select>
+            )}
+          />
+          {errors.personType ? (
+            <p className="text-destructive text-xs" role="alert">
+              {errors.personType.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-document">{documentLabel(personType)}</Label>
+          <Controller
+            name="document"
+            control={control}
+            render={({ field }) => (
+              <Input
+                id="seller-document"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder={documentPlaceholder(personType)}
+                disabled={isSubmitting}
+                aria-invalid={Boolean(errors.document)}
+                aria-describedby={
+                  errors.document ? "seller-document-error" : undefined
+                }
+                value={field.value}
+                onChange={(event) => {
+                  field.onChange(
+                    formatDocumentInput(event.target.value, personType),
+                  );
+                }}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+          {errors.document ? (
+            <p
+              id="seller-document-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.document.message}
             </p>
           ) : null}
         </div>

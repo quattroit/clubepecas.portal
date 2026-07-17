@@ -1,4 +1,5 @@
 import type { AdvertisementCondition } from "@/contracts/common/enums";
+import type { PersonType } from "@/contracts/common/enums";
 
 export type CreateSellerResponse = {
   id: string;
@@ -15,6 +16,8 @@ export type SellerMeDto = {
   city: string;
   state: string;
   citySlug: string;
+  personType: PersonType | null;
+  document: string | null;
   whatsApp: string;
   instagram: string | null;
   photoUrl: string | null;

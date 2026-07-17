@@ -42,6 +42,12 @@ export enum SellerSubscriptionStatus {
   Expired = 3,
 }
 
+/** Tipo de pessoa do vendedor (Sprint 5.6). */
+export enum PersonType {
+  Individual = 1,
+  Company = 2,
+}
+
 /**
  * Tipo de ícone da categoria (CRUD administrativo — Sprint 4.3.6).
  * Hoje só Lucide é usado na UI; Svg/Url preparados para o futuro.

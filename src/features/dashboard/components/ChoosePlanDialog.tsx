@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useActiveSubscriptionPlans } from "@/hooks/api/useActiveSubscriptionPlans";
 import { useCreateSellerSubscription } from "@/hooks/api/useCreateSellerSubscription";
+import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { formatCurrency } from "@/utils/formatCurrency";
 
@@ -92,9 +93,11 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
                   </p>
                 </div>
                 {plan.description ? (
-                  <p className="text-small text-muted-foreground">
-                    {plan.description}
-                  </p>
+                  <PlanDescription
+                    description={plan.description}
+                    compact
+                    className="mt-1"
+                  />
                 ) : null}
                 <p className="text-small text-muted-foreground">
                   Limite de anúncios:{" "}
