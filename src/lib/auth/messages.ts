@@ -111,6 +111,16 @@ const CODE_MESSAGES: Record<string, string> = {
   "admin.subscription_plans.in_use":
     "Este plano não pode ser excluído pois está em uso.",
   "photo.url.required": "Informe a URL da foto.",
+  "photo.file.required": "Selecione um arquivo de imagem.",
+  "photo.extension.invalid":
+    "Extensão de arquivo não permitida. Use JPG, JPEG, PNG ou WEBP.",
+  "photo.content_type.invalid":
+    "Tipo de arquivo não permitido. Envie uma imagem JPG, PNG ou WEBP.",
+  "photo.content_type.mismatch":
+    "A extensão do arquivo não corresponde ao tipo de conteúdo.",
+  "photo.file.too_large": "O arquivo excede o limite permitido.",
+  "photo.limit.reached": "Limite de fotos por anúncio atingido.",
+  "photo.upload.failed": "Não foi possível salvar o arquivo. Tente novamente.",
   "network.timeout": "A requisição demorou demais. Tente novamente.",
   "network.unavailable":
     "Não foi possível conectar ao servidor. Verifique sua conexão.",

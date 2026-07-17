@@ -465,53 +465,6 @@ function AdvertisementForm({
         </div>
       </div>
 
-      <fieldset className="bg-muted/30 border-border flex flex-col gap-3 rounded-xl border p-4 sm:p-5">
-        <legend className="text-foreground px-1 text-sm font-semibold">
-          Fotos (opcional)
-        </legend>
-        <p id="ad-photos-hint" className="text-muted-foreground text-xs">
-          Informe até 3 URLs de imagem.{" "}
-          {mode === "edit"
-            ? "Altere ou limpe um campo para atualizar ou remover a foto."
-            : "Cada URL é enviada em POST …/photos."}
-        </p>
-
-        {[0, 1, 2].map((index) => {
-          const fieldError = errors.photoUrls?.[index];
-          const errorId = `ad-photo-${index}-error`;
-
-          return (
-            <div key={index} className="flex flex-col gap-2">
-              <Label htmlFor={`ad-photo-${index}`}>Foto {index + 1}</Label>
-              <Input
-                id={`ad-photo-${index}`}
-                type="url"
-                placeholder="https://…"
-                aria-invalid={Boolean(fieldError)}
-                aria-describedby={
-                  fieldError
-                    ? errorId
-                    : index === 0
-                      ? "ad-photos-hint"
-                      : undefined
-                }
-                disabled={isSubmitting}
-                {...register(`photoUrls.${index}`)}
-              />
-              {fieldError ? (
-                <p
-                  id={errorId}
-                  className="text-destructive text-xs"
-                  role="alert"
-                >
-                  {fieldError.message}
-                </p>
-              ) : null}
-            </div>
-          );
-        })}
-      </fieldset>
-
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button
           type="submit"

@@ -8,10 +8,7 @@ import { ROUTES } from "@/constants/routes";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useCreateAdvertisement } from "@/hooks/api/useCreateAdvertisement";
 import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
-import {
-  mapAdvertisementFormToCreateRequest,
-  mapAdvertisementFormToPhotoUrls,
-} from "@/mappers/advertisement-form.mapper";
+import { mapAdvertisementFormToCreateRequest } from "@/mappers/advertisement-form.mapper";
 import { cn } from "@/lib/utils";
 import type { AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
 
@@ -23,7 +20,6 @@ function NewAdvertisementView() {
   const handleSubmit = (values: AdvertisementFormValues) => {
     createMutation.mutate({
       request: mapAdvertisementFormToCreateRequest(values),
-      photoUrls: mapAdvertisementFormToPhotoUrls(values),
     });
   };
 
@@ -33,7 +29,8 @@ function NewAdvertisementView() {
         <div className="flex flex-col gap-1">
           <h1 className="text-h1">Nova peça</h1>
           <p className="text-small text-muted-foreground">
-            Preencha os dados para publicar um anúncio no ClubePeças.
+            Preencha os dados para publicar um anúncio. Depois você poderá
+            enviar as fotos.
           </p>
         </div>
 

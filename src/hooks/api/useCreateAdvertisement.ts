@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { CreateAdvertisementRequest } from "@/contracts/advertisements/requests";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, editAdvertisementPath } from "@/constants/routes";
 import { ApiError } from "@/lib/errors";
 import { queryKeys } from "@/lib/queryKeys";
 import { advertisementService } from "@/services/advertisement.service";
 
 type CreateAdvertisementInput = {
   request: CreateAdvertisementRequest;
-  photoUrls: string[];
 };
 
 function isAdvertisementLimitError(error: unknown): boolean {
@@ -26,36 +25,25 @@ function isAdvertisementLimitError(error: unknown): boolean {
 }
 
 /**
- * Cria anúncio + fotos opcionais (POST .../photos com { url }).
- * Invalida queryKeys.advertisements.me e subscription (cota).
+ * Cria anúncio. Fotos são enviadas depois na tela de edição (multipart).
  */
 export function useCreateAdvertisement() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async ({ request, photoUrls }: CreateAdvertisementInput) => {
-      const created = await advertisementService.create(request);
-
-      if (photoUrls.length > 0) {
-        await Promise.all(
-          photoUrls.map((url) =>
-            advertisementService.createPhoto(created.id, { url }),
-          ),
-        );
-      }
-
-      return created;
+    mutationFn: async ({ request }: CreateAdvertisementInput) => {
+      return advertisementService.create(request);
     },
-    onSuccess: () => {
+    onSuccess: (created) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.advertisements.me,
       });
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscription,
       });
-      toast.success("Anúncio publicado com sucesso!");
-      router.replace(ROUTES.MY_ADVERTISEMENTS);
+      toast.success("Anúncio publicado! Agora você pode adicionar fotos.");
+      router.replace(editAdvertisementPath(created.id));
     },
     onError: (error) => {
       if (isAdvertisementLimitError(error)) {

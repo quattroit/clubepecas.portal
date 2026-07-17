@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { mapMyAdvertisementItemToAdvertisement } from "@/mappers/advertisement.mapper";
 import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
+import { resolvePhotoPublicUrl } from "@/lib/photo-url";
 import { queryKeys } from "@/lib/queryKeys";
 import { advertisementService } from "@/services/advertisement.service";
 
@@ -27,12 +28,15 @@ export function useMyAdvertisements() {
             const photosResponse = await advertisementService.getPhotos(
               item.id,
             );
-            const firstPhoto = [...photosResponse.items].sort(
-              (a, b) => a.displayOrder - b.displayOrder,
-            )[0];
+            const firstPhoto = [...photosResponse.items].sort((a, b) => {
+              if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
+              return a.displayOrder - b.displayOrder;
+            })[0];
 
             return mapMyAdvertisementItemToAdvertisement(item, {
-              imageUrl: firstPhoto?.url ?? null,
+              imageUrl: firstPhoto
+                ? resolvePhotoPublicUrl(firstPhoto)
+                : null,
             });
           } catch {
             return mapMyAdvertisementItemToAdvertisement(item);

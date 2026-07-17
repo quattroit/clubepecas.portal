@@ -23,15 +23,16 @@ export function useAdvertisementById(id: string) {
         advertisementService.getPhotos(id),
       ]);
 
-      const photos = [...photosResponse.items].sort(
-        (a, b) => a.displayOrder - b.displayOrder,
-      );
+      const photos = [...photosResponse.items].sort((a, b) => {
+        if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
+        return a.displayOrder - b.displayOrder;
+      });
 
       return {
         id: dto.id,
         title: dto.title,
-        photos: photos.map((photo) => ({ id: photo.id, url: photo.url })),
-        formValues: mapAdvertisementDetailToFormValues(dto, photos),
+        photos,
+        formValues: mapAdvertisementDetailToFormValues(dto),
       };
     },
   });

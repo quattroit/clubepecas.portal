@@ -11,14 +11,6 @@ const conditionOptions = Object.values(AdvertisementCondition)
   .filter((value): value is AdvertisementCondition => typeof value === "number")
   .map(String) as [string, ...string[]];
 
-const optionalPhotoUrl = z
-  .string()
-  .trim()
-  .refine(
-    (value) => value === "" || z.url().safeParse(value).success,
-    "Informe uma URL válida (https://…)",
-  );
-
 function isValidVehicleYear(value: string): boolean {
   const year = Number(value);
   return (
@@ -31,7 +23,7 @@ function isValidVehicleYear(value: string): boolean {
 /**
  * Schema compartilhado entre criar e editar anúncio.
  * Campos alinhados a CreateAdvertisementRequest / UpdateAdvertisementRequest.
- * photoUrls fica fora do contrato de create/update — usa endpoints …/photos.
+ * Fotos usam upload multipart em endpoint dedicado (não fazem parte deste schema).
  */
 export const advertisementFormSchema = z.object({
   title: z.string().trim().min(1, "Informe o título"),
@@ -100,7 +92,6 @@ export const advertisementFormSchema = z.object({
       (value) => Number.isInteger(Number(value)) && Number(value) >= 1,
       "A quantidade deve ser um número inteiro maior ou igual a 1",
     ),
-  photoUrls: z.array(optionalPhotoUrl).max(3),
 });
 
 export type AdvertisementFormValues = z.infer<typeof advertisementFormSchema>;
@@ -119,5 +110,4 @@ export const advertisementFormDefaultValues: AdvertisementFormValues = {
   condition: String(AdvertisementCondition.Used),
   price: "",
   stockQuantity: "1",
-  photoUrls: ["", "", ""],
 };

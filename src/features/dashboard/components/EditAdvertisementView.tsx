@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { buttonVariants } from "@/components/ui/button";
 import { AdvertisementForm } from "@/features/dashboard/components/AdvertisementForm";
+import { AdvertisementPhotosManager } from "@/features/dashboard/components/AdvertisementPhotosManager";
 import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 import type { AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
 import { ROUTES } from "@/constants/routes";
@@ -14,10 +15,7 @@ import { useCategories } from "@/hooks/api/useCategories";
 import { useUpdateAdvertisement } from "@/hooks/api/useUpdateAdvertisement";
 import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import {
-  mapAdvertisementFormToPhotoUrls,
-  mapAdvertisementFormToUpdateRequest,
-} from "@/mappers/advertisement-form.mapper";
+import { mapAdvertisementFormToUpdateRequest } from "@/mappers/advertisement-form.mapper";
 import { cn } from "@/lib/utils";
 
 function EditAdvertisementView() {
@@ -30,12 +28,10 @@ function EditAdvertisementView() {
   const updateMutation = useUpdateAdvertisement();
 
   const handleSubmit = (values: AdvertisementFormValues) => {
-    if (!id || !advertisementQuery.data) return;
+    if (!id) return;
     updateMutation.mutate({
       id,
       request: mapAdvertisementFormToUpdateRequest(values),
-      photoUrls: mapAdvertisementFormToPhotoUrls(values),
-      existingPhotos: advertisementQuery.data.photos,
     });
   };
 
@@ -72,21 +68,33 @@ function EditAdvertisementView() {
 
       {!advertisementQuery.isLoading &&
       !advertisementQuery.isError &&
-      advertisementQuery.data ? (
-        <AdvertisementForm
-          key={advertisementQuery.data.id}
-          mode="edit"
-          defaultValues={advertisementQuery.data.formValues}
-          categories={categoriesQuery.data ?? []}
-          categoriesLoading={categoriesQuery.isLoading}
-          vehicleBrands={vehicleBrandsQuery.data ?? []}
-          vehicleBrandsLoading={vehicleBrandsQuery.isLoading}
-          isSubmitting={updateMutation.isPending}
-          submitError={
-            updateMutation.isError ? updateMutation.error : undefined
-          }
-          onSubmit={handleSubmit}
-        />
+      advertisementQuery.data &&
+      id ? (
+        <>
+          <AdvertisementPhotosManager
+            advertisementId={id}
+            photos={advertisementQuery.data.photos}
+            onChanged={() => {
+              void advertisementQuery.refetch();
+            }}
+            disabled={updateMutation.isPending}
+          />
+
+          <AdvertisementForm
+            key={advertisementQuery.data.id}
+            mode="edit"
+            defaultValues={advertisementQuery.data.formValues}
+            categories={categoriesQuery.data ?? []}
+            categoriesLoading={categoriesQuery.isLoading}
+            vehicleBrands={vehicleBrandsQuery.data ?? []}
+            vehicleBrandsLoading={vehicleBrandsQuery.isLoading}
+            isSubmitting={updateMutation.isPending}
+            submitError={
+              updateMutation.isError ? updateMutation.error : undefined
+            }
+            onSubmit={handleSubmit}
+          />
+        </>
       ) : null}
     </div>
   );

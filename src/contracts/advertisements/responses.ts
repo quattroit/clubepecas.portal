@@ -113,7 +113,15 @@ export type DeleteAdvertisementResponse = {
 export type AdvertisementPhotoDto = {
   id: string;
   advertisementId: string;
-  url: string;
+  storageKey?: string | null;
+  publicUrl: string;
+  /** Compatibilidade com respostas legadas */
+  url?: string;
+  contentType?: string | null;
+  fileSize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  isPrimary: boolean;
   displayOrder: number;
   createdAt: string;
 };
@@ -133,4 +141,10 @@ export type UpdatePhotoOrderResponse = {
 
 export type DeletePhotoResponse = {
   id: string;
+};
+
+export type SetPrimaryPhotoResponse = {
+  id: string;
+  advertisementId: string;
+  isPrimary: boolean;
 };

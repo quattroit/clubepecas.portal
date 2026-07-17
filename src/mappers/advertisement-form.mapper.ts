@@ -26,11 +26,11 @@ export function mapAdvertisementFormToUpdateRequest(
 }
 
 /**
- * Detalhe da API (+ fotos) → valores do formulário (create/edit).
+ * Detalhe da API → valores do formulário (create/edit).
+ * Fotos são gerenciadas fora do formulário via upload multipart.
  */
 export function mapAdvertisementDetailToFormValues(
   dto: AdvertisementDetailDto,
-  photos: { url: string; displayOrder: number }[] = [],
 ): AdvertisementFormValues {
   return {
     title: dto.title,
@@ -44,31 +44,7 @@ export function mapAdvertisementDetailToFormValues(
     condition: String(dto.condition),
     price: dto.price.toFixed(2).replace(".", ","),
     stockQuantity: String(dto.stockQuantity),
-    photoUrls: mapPhotosToFormUrls(photos),
   };
-}
-
-/**
- * Fotos da API → até 3 slots do formulário (ordenados por displayOrder).
- */
-export function mapPhotosToFormUrls(
-  photos: { url: string; displayOrder: number }[],
-): [string, string, string] {
-  const urls = [...photos]
-    .sort((a, b) => a.displayOrder - b.displayOrder)
-    .slice(0, 3)
-    .map((photo) => photo.url);
-
-  return [urls[0] ?? "", urls[1] ?? "", urls[2] ?? ""];
-}
-
-/**
- * URLs de foto preenchidas (endpoint separado: createPhoto).
- */
-export function mapAdvertisementFormToPhotoUrls(
-  values: AdvertisementFormValues,
-): string[] {
-  return values.photoUrls.map((url) => url.trim()).filter(Boolean);
 }
 
 function mapAdvertisementFormToRequest(

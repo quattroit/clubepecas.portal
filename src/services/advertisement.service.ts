@@ -67,6 +67,18 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
+  uploadPhoto(advertisementId: string, file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api
+      .post<AdvertisementPhotoDto>(
+        `/api/v1/advertisements/${advertisementId}/photos/upload`,
+        formData,
+      )
+      .then((response) => response.data);
+  },
+
   getPhotos(advertisementId: string) {
     return api
       .get<GetPhotosResponse>(
@@ -80,6 +92,14 @@ export const advertisementService = {
       .put<UpdatePhotoOrderResponse>(
         `/api/v1/advertisements/${advertisementId}/photos/order`,
         payload,
+      )
+      .then((response) => response.data);
+  },
+
+  setPrimaryPhoto(advertisementId: string, photoId: string) {
+    return api
+      .put(
+        `/api/v1/advertisements/${advertisementId}/photos/${photoId}/primary`,
       )
       .then((response) => response.data);
   },
