@@ -23,15 +23,18 @@ export function useAdvertisementById(id: string) {
         advertisementService.getPhotos(id),
       ]);
 
-      const photos = [...photosResponse.items].sort((a, b) => {
-        if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
-        return a.displayOrder - b.displayOrder;
-      });
+      const photos = [...photosResponse.items].sort(
+        (a, b) => a.displayOrder - b.displayOrder,
+      );
 
       return {
         id: dto.id,
         title: dto.title,
         photos,
+        maxPhotos: photosResponse.maxPhotos,
+        usedCount: photosResponse.usedCount,
+        remaining: photosResponse.remaining,
+        maxFileSizeMB: photosResponse.maxFileSizeMB,
         formValues: mapAdvertisementDetailToFormValues(dto),
       };
     },

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { ROUTES } from "@/constants/routes";
 import { buildLoginPathWithNext } from "@/lib/announce-flow";
 import { clearAuthSession, getAccessToken } from "@/lib/auth/storage";
-import { mapAxiosError, UnauthorizedError } from "@/lib/errors";
+import { mapAxiosError, UnauthorizedError, isCanceledError } from "@/lib/errors";
 
 /**
  * Cliente HTTP centralizado.
@@ -41,6 +41,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (isCanceledError(error)) {
+      return Promise.reject(error);
+    }
+
     const mapped = mapAxiosError(error);
     const hadToken = Boolean(getAccessToken());
 

@@ -110,7 +110,6 @@ const CODE_MESSAGES: Record<string, string> = {
     "Informe uma ordem de exibição válida (zero ou maior).",
   "admin.subscription_plans.in_use":
     "Este plano não pode ser excluído pois está em uso.",
-  "photo.url.required": "Informe a URL da foto.",
   "photo.file.required": "Selecione um arquivo de imagem.",
   "photo.extension.invalid":
     "Extensão de arquivo não permitida. Use JPG, JPEG, PNG ou WEBP.",
@@ -118,13 +117,22 @@ const CODE_MESSAGES: Record<string, string> = {
     "Tipo de arquivo não permitido. Envie uma imagem JPG, PNG ou WEBP.",
   "photo.content_type.mismatch":
     "A extensão do arquivo não corresponde ao tipo de conteúdo.",
+  "photo.signature.invalid":
+    "O conteúdo do arquivo não é uma imagem JPG, PNG ou WEBP válida.",
+  "photo.signature.mismatch":
+    "A extensão do arquivo não corresponde ao conteúdo real da imagem.",
   "photo.file.too_large": "O arquivo excede o limite permitido.",
   "photo.limit.reached": "Limite de fotos por anúncio atingido.",
   "photo.upload.failed": "Não foi possível salvar o arquivo. Tente novamente.",
-  "network.timeout": "A requisição demorou demais. Tente novamente.",
+  "photo.order.required": "Informe a lista ordenada de fotos.",
+  "photo.order.incomplete":
+    "A lista deve conter exatamente todas as fotos do anúncio.",
+  "photo.order.duplicate": "A lista de fotos contém IDs duplicados.",
   "network.unavailable":
     "Não foi possível conectar ao servidor. Verifique sua conexão.",
-  "server.error": "Ocorreu um erro no servidor. Tente novamente em instantes.",
+  "network.timeout": "A requisição demorou demais. Tente novamente.",
+  "server.error":
+    "Ocorreu um erro no servidor. Tente novamente em instantes.",
   forbidden: "Você não tem permissão para esta ação.",
   "validation.failed": "Dados inválidos. Verifique o formulário.",
 };

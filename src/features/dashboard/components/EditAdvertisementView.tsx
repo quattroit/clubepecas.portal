@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { buttonVariants } from "@/components/ui/button";
 import { AdvertisementForm } from "@/features/dashboard/components/AdvertisementForm";
-import { AdvertisementPhotosManager } from "@/features/dashboard/components/AdvertisementPhotosManager";
+import { AdvertisementPhotosManager } from "@/features/dashboard/components/photos/AdvertisementPhotosManager";
 import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 import type { AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
 import { ROUTES } from "@/constants/routes";
@@ -74,6 +74,11 @@ function EditAdvertisementView() {
           <AdvertisementPhotosManager
             advertisementId={id}
             photos={advertisementQuery.data.photos}
+            maxPhotos={advertisementQuery.data.maxPhotos}
+            usedCount={advertisementQuery.data.usedCount}
+            remaining={advertisementQuery.data.remaining}
+            maxFileSizeMB={advertisementQuery.data.maxFileSizeMB}
+            loading={advertisementQuery.isFetching && !advertisementQuery.data}
             onChanged={() => {
               void advertisementQuery.refetch();
             }}

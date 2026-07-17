@@ -5,6 +5,10 @@ import type {
   BackendUnhandledError,
 } from "@/contracts/common/errors";
 
+export function isCanceledError(error: unknown): boolean {
+  return axios.isCancel(error) || (axios.isAxiosError(error) && error.code === "ERR_CANCELED");
+}
+
 export class ApiError extends Error {
   readonly statusCode?: number;
   readonly code?: string;

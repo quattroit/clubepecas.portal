@@ -1,6 +1,5 @@
 import type {
   CreateAdvertisementRequest,
-  CreatePhotoRequest,
   UpdateAdvertisementRequest,
   UpdatePhotoOrderRequest,
 } from "@/contracts/advertisements/requests";
@@ -17,9 +16,13 @@ import type {
 } from "@/contracts/advertisements/responses";
 import { api } from "@/lib/api";
 
+type UploadPhotoOptions = {
+  signal?: AbortSignal;
+  onProgress?: (progress: number) => void;
+};
+
 /**
  * Serviços de anúncios.
- * Listagem do painel: `getMine` via `useMyAdvertisements`.
  */
 export const advertisementService = {
   create(payload: CreateAdvertisementRequest) {
@@ -58,16 +61,11 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  createPhoto(advertisementId: string, payload: CreatePhotoRequest) {
-    return api
-      .post<AdvertisementPhotoDto>(
-        `/api/v1/advertisements/${advertisementId}/photos`,
-        payload,
-      )
-      .then((response) => response.data);
-  },
-
-  uploadPhoto(advertisementId: string, file: File) {
+  uploadPhoto(
+    advertisementId: string,
+    file: File,
+    options?: UploadPhotoOptions,
+  ) {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -75,6 +73,15 @@ export const advertisementService = {
       .post<AdvertisementPhotoDto>(
         `/api/v1/advertisements/${advertisementId}/photos/upload`,
         formData,
+        {
+          signal: options?.signal,
+          timeout: 120_000,
+          onUploadProgress: (event) => {
+            if (!options?.onProgress || !event.total) return;
+            const progress = Math.round((event.loaded / event.total) * 100);
+            options.onProgress(progress);
+          },
+        },
       )
       .then((response) => response.data);
   },

@@ -115,8 +115,6 @@ export type AdvertisementPhotoDto = {
   advertisementId: string;
   storageKey?: string | null;
   publicUrl: string;
-  /** Compatibilidade com respostas legadas */
-  url?: string;
   contentType?: string | null;
   fileSize?: number | null;
   width?: number | null;
@@ -128,11 +126,16 @@ export type AdvertisementPhotoDto = {
 
 export type GetPhotosResponse = {
   items: AdvertisementPhotoDto[];
+  maxPhotos: number;
+  usedCount: number;
+  remaining: number;
+  maxFileSizeMB: number;
 };
 
 export type UpdatePhotoOrderItemDto = {
   id: string;
   displayOrder: number;
+  isPrimary: boolean;
 };
 
 export type UpdatePhotoOrderResponse = {

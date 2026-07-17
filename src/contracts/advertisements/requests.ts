@@ -28,15 +28,6 @@ export type UpdateAdvertisementRequest = {
   stockQuantity: number;
 };
 
-export type CreatePhotoRequest = {
-  url: string;
-};
-
-export type UpdatePhotoOrderItemRequest = {
-  id: string;
-  displayOrder: number;
-};
-
 export type UpdatePhotoOrderRequest = {
-  items: UpdatePhotoOrderItemRequest[];
+  photoIds: string[];
 };
