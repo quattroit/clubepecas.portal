@@ -67,6 +67,11 @@ export const queryKeys = {
     all: ["seller"] as const,
     me: ["seller", "me"] as const,
     metrics: (period: string) => ["seller", "metrics", period] as const,
+    subscription: ["seller", "subscription"] as const,
+    subscriptions: ["seller", "subscriptions"] as const,
+  },
+  subscriptionPlans: {
+    all: ["subscriptionPlans"] as const,
   },
   admin: {
     all: ["admin"] as const,

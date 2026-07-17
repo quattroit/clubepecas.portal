@@ -35,6 +35,13 @@ export enum AdvertisementStatus {
   Archived = 4,
 }
 
+/** Status da assinatura do vendedor (Sprint 5.2). */
+export enum SellerSubscriptionStatus {
+  Active = 1,
+  Cancelled = 2,
+  Expired = 3,
+}
+
 /**
  * Tipo de ícone da categoria (CRUD administrativo — Sprint 4.3.6).
  * Hoje só Lucide é usado na UI; Svg/Url preparados para o futuro.

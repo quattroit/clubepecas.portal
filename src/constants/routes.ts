@@ -21,6 +21,7 @@ export const ROUTES = {
   MY_ADVERTISEMENTS: "/painel/anuncios",
   NEW_ADVERTISEMENT: "/painel/anuncios/novo",
   PROFILE: "/painel/perfil",
+  MY_PLAN: "/painel/meu-plano",
   ADMIN: "/admin",
   ADMIN_SELLERS: "/admin/vendedores",
   ADMIN_ADVERTISEMENTS: "/admin/anuncios",
@@ -99,6 +100,7 @@ export const PRIVATE_ROUTES = {
   MY_ADVERTISEMENTS: ROUTES.MY_ADVERTISEMENTS,
   NEW_ADVERTISEMENT: ROUTES.NEW_ADVERTISEMENT,
   PROFILE: ROUTES.PROFILE,
+  MY_PLAN: ROUTES.MY_PLAN,
 } as const;
 
 /** Páginas da área administrativa (protegidas por AdminAuthGuard). */

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Package, UserRound } from "lucide-react";
+import { CreditCard, Home, LayoutDashboard, Package, UserRound } from "lucide-react";
 
 import { Logo } from "@/components/layout/Logo";
 import { ROUTES } from "@/constants/routes";
@@ -20,6 +20,12 @@ const NAV_ITEMS = [
     label: "Meus anúncios",
     icon: Package,
     exact: false,
+  },
+  {
+    href: ROUTES.MY_PLAN,
+    label: "Meu Plano",
+    icon: CreditCard,
+    exact: true,
   },
   {
     href: ROUTES.PROFILE,

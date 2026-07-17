@@ -11,6 +11,11 @@ import type {
   SellerMeDto,
   SellerPublicProfileResponse,
 } from "@/contracts/seller/responses";
+import type {
+  CreateSellerSubscriptionRequest,
+  ListSellerSubscriptionsResponse,
+  SellerSubscriptionDto,
+} from "@/contracts/seller/subscription";
 import { api } from "@/lib/api";
 
 /**
@@ -48,6 +53,34 @@ export const sellerService = {
   getPublicBySlug(slug: string) {
     return api
       .get<SellerPublicProfileResponse>(`/api/v1/sellers/${slug}`)
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/subscription — assinatura ACTIVE (404 se não houver). */
+  getCurrentSubscription() {
+    return api
+      .get<SellerSubscriptionDto>("/api/v1/seller/subscription")
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/subscriptions — histórico. */
+  listSubscriptions() {
+    return api
+      .get<ListSellerSubscriptionsResponse>("/api/v1/seller/subscriptions")
+      .then((response) => response.data);
+  },
+
+  /** POST /api/v1/seller/subscription */
+  createSubscription(payload: CreateSellerSubscriptionRequest) {
+    return api
+      .post<SellerSubscriptionDto>("/api/v1/seller/subscription", payload)
+      .then((response) => response.data);
+  },
+
+  /** DELETE /api/v1/seller/subscription — cancela ACTIVE. */
+  cancelSubscription() {
+    return api
+      .delete<SellerSubscriptionDto>("/api/v1/seller/subscription")
       .then((response) => response.data);
   },
 };
