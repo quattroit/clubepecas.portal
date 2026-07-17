@@ -8,6 +8,8 @@ export type SellerSubscriptionDto = {
   planDescription?: string | null;
   price: number;
   advertisementLimit: number;
+  advertisementsUsed: number;
+  advertisementsRemaining: number;
   status: SellerSubscriptionStatus;
   startDate: string;
   endDate?: string | null;

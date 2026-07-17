@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
 import { SellerMetricsSection } from "@/features/dashboard/components/metrics/SellerMetricsSection";
+import { SellerPlanUsageCard } from "@/features/dashboard/components/SellerPlanUsageCard";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -47,6 +48,8 @@ export default function DashboardPage() {
       </div>
 
       <SellerMetricsSection />
+
+      <SellerPlanUsageCard />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {QUICK_LINKS.map(({ href, title, description, icon: Icon }) => (

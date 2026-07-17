@@ -49,6 +49,14 @@ const CODE_MESSAGES: Record<string, string> = {
   "seller.not_found":
     "É necessário um perfil de vendedor para publicar anúncios.",
   "seller.already_exists": "Você já possui um perfil de vendedor.",
+  "advertisement.subscription.required":
+    "Você precisa contratar um plano para publicar anúncios.",
+  "advertisement.subscription.plan_inactive":
+    "O plano associado à sua assinatura está indisponível.",
+  "advertisement.limit.reached":
+    "Você atingiu o limite de anúncios permitido pelo seu plano.",
+  "seller.subscription.already_active":
+    "Você já possui uma assinatura ativa. Cancele a atual antes de assinar outro plano.",
   "seller.store_name.required": "Informe o nome da loja.",
   "seller.display_name.required": "Informe o nome de exibição.",
   "seller.city.required": "Informe a cidade.",

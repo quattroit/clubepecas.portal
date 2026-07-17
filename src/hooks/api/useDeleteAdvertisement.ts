@@ -19,6 +19,9 @@ export function useDeleteAdvertisement() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.advertisements.me,
       });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.seller.subscription,
+      });
       toast.success("Anúncio excluído com sucesso!");
     },
     onError: (error) => {
