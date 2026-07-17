@@ -61,6 +61,12 @@ import type {
   PlatformSettingsResponse,
   UpdatePlatformSettingsRequest,
 } from "@/contracts/admin/settings";
+import type {
+  AdminSubscriptionPlanDetailDto,
+  CreateAdminSubscriptionPlanRequest,
+  GetAdminSubscriptionPlansResponse,
+  UpdateAdminSubscriptionPlanRequest,
+} from "@/contracts/admin/subscription-plans";
 import { api } from "@/lib/api";
 
 /**
@@ -340,6 +346,49 @@ export const adminService = {
         "/api/v1/admin/vehicle-models/reorder",
         payload,
       )
+      .then((response) => response.data);
+  },
+
+  listSubscriptionPlans() {
+    return api
+      .get<GetAdminSubscriptionPlansResponse>(
+        "/api/v1/admin/subscription-plans",
+      )
+      .then((response) => response.data);
+  },
+
+  getSubscriptionPlan(id: string) {
+    return api
+      .get<AdminSubscriptionPlanDetailDto>(
+        `/api/v1/admin/subscription-plans/${id}`,
+      )
+      .then((response) => response.data);
+  },
+
+  createSubscriptionPlan(payload: CreateAdminSubscriptionPlanRequest) {
+    return api
+      .post<AdminSubscriptionPlanDetailDto>(
+        "/api/v1/admin/subscription-plans",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  updateSubscriptionPlan(
+    id: string,
+    payload: UpdateAdminSubscriptionPlanRequest,
+  ) {
+    return api
+      .put<AdminSubscriptionPlanDetailDto>(
+        `/api/v1/admin/subscription-plans/${id}`,
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  deleteSubscriptionPlan(id: string) {
+    return api
+      .delete(`/api/v1/admin/subscription-plans/${id}`)
       .then((response) => response.data);
   },
 };

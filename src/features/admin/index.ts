@@ -9,3 +9,4 @@ export { AdminVehicleBrandsView } from "@/features/admin/components/AdminVehicle
 export { AdminVehicleModelsView } from "@/features/admin/components/AdminVehicleModelsView";
 export { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsView";
 export { AdminSettingsView } from "@/features/admin/components/AdminSettingsView";
+export { AdminSubscriptionPlansView } from "@/features/admin/components/AdminSubscriptionPlansView";

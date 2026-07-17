@@ -78,6 +78,20 @@ const CODE_MESSAGES: Record<string, string> = {
     "Informe um ano de fabricação válido.",
   "advertisement.model_year.invalid": "Informe um ano/modelo válido.",
   "category.not_found": "Categoria não encontrada.",
+  "admin.subscription_plans.not_found": "Plano não encontrado.",
+  "admin.subscription_plans.name.required": "Informe o nome do plano.",
+  "admin.subscription_plans.name.duplicate":
+    "Já existe um plano com este nome.",
+  "admin.subscription_plans.slug.duplicate":
+    "Já existe um plano com este slug.",
+  "admin.subscription_plans.price.invalid":
+    "Informe um preço válido (zero ou maior).",
+  "admin.subscription_plans.advertisement_limit.invalid":
+    "Informe um limite de anúncios válido (zero ou maior).",
+  "admin.subscription_plans.display_order.invalid":
+    "Informe uma ordem de exibição válida (zero ou maior).",
+  "admin.subscription_plans.in_use":
+    "Este plano não pode ser excluído pois está em uso.",
   "photo.url.required": "Informe a URL da foto.",
   "network.timeout": "A requisição demorou demais. Tente novamente.",
   "network.unavailable":

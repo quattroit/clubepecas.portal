@@ -1,31 +1,43 @@
 import type { Metadata } from "next";
-import { CreditCard } from "lucide-react";
+import { Suspense } from "react";
 
-import { AdminEmptyState, AdminPage, AdminSection } from "@/components/admin";
+import {
+  AdminFilterBar,
+  AdminPage,
+  AdminSection,
+  AdminTableSkeleton,
+} from "@/components/admin";
 import { ROUTES } from "@/constants/routes";
+import { AdminSubscriptionPlansView } from "@/features/admin/components/AdminSubscriptionPlansView";
 
 export const metadata: Metadata = {
   title: "Planos",
+  description: "Gestão administrativa de planos de assinatura do ClubePeças.",
   robots: { index: false, follow: false },
 };
 
-export default function AdminPlansPage() {
+function PlansPageFallback() {
   return (
     <AdminPage
       title="Planos"
-      description="Gestão de planos — disponível na Sprint 4.3.5."
+      description="Gerencie os planos de assinatura disponíveis na plataforma."
       breadcrumb={[
         { label: "Admin", href: ROUTES.ADMIN },
         { label: "Planos" },
       ]}
     >
-      <AdminSection title="Catálogo">
-        <AdminEmptyState
-          title="Sem planos"
-          description="O catálogo de planos será implementado na Sprint 4.3.5."
-          icon={<CreditCard aria-hidden />}
-        />
+      <AdminFilterBar />
+      <AdminSection title="Listagem">
+        <AdminTableSkeleton columns={6} rows={8} />
       </AdminSection>
     </AdminPage>
+  );
+}
+
+export default function AdminPlansPage() {
+  return (
+    <Suspense fallback={<PlansPageFallback />}>
+      <AdminSubscriptionPlansView />
+    </Suspense>
   );
 }
