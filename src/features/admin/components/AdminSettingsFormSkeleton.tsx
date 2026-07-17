@@ -18,7 +18,7 @@ function AdminSettingsFormSkeleton({
       aria-label="Carregando configurações"
       className={cn("flex flex-col gap-6", className)}
     >
-      {Array.from({ length: 4 }).map((_, sectionIndex) => (
+      {Array.from({ length: 8 }).map((_, sectionIndex) => (
         <div
           key={sectionIndex}
           className="border-border bg-card flex flex-col gap-4 rounded-2xl border p-5 shadow-xs"

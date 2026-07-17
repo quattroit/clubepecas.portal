@@ -16,8 +16,8 @@ import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { PersonType } from "@/contracts/common/enums";
 import { ROUTES } from "@/constants/routes";
 import { AdminSettingsFormSkeleton } from "@/features/admin/components/AdminSettingsFormSkeleton";
 import {
@@ -32,59 +32,7 @@ import {
   mapPlatformSettingsFormToRequest,
   mapPlatformSettingsToForm,
 } from "@/mappers/platform-settings-form.mapper";
-
-type FeatureToggle = {
-  name: keyof Pick<
-    PlatformSettingsFormValues,
-    | "marketplaceEnabled"
-    | "sellerRegistrationEnabled"
-    | "advertisementCreationEnabled"
-    | "analyticsEnabled"
-    | "shareEnabled"
-    | "whatsAppEnabled"
-    | "instagramEnabled"
-  >;
-  label: string;
-  description: string;
-};
-
-const FEATURE_TOGGLES: FeatureToggle[] = [
-  {
-    name: "marketplaceEnabled",
-    label: "Marketplace ativo",
-    description: "Exibe o marketplace publicamente.",
-  },
-  {
-    name: "sellerRegistrationEnabled",
-    label: "Cadastro de vendedores",
-    description: "Permite novos cadastros de vendedores.",
-  },
-  {
-    name: "advertisementCreationEnabled",
-    label: "Publicação de anúncios",
-    description: "Permite criar e publicar anúncios.",
-  },
-  {
-    name: "analyticsEnabled",
-    label: "Analytics",
-    description: "Coleta e exibe métricas da plataforma.",
-  },
-  {
-    name: "shareEnabled",
-    label: "Compartilhamento",
-    description: "Habilita ações de compartilhamento.",
-  },
-  {
-    name: "whatsAppEnabled",
-    label: "WhatsApp",
-    description: "Exibe contato via WhatsApp nos anúncios.",
-  },
-  {
-    name: "instagramEnabled",
-    label: "Instagram",
-    description: "Exibe links e ações do Instagram.",
-  },
-];
+import { formatDocumentInput } from "@/utils/document";
 
 /**
  * Painel de configurações globais da plataforma.
@@ -263,66 +211,57 @@ function AdminSettingsView() {
 
         <AdminSection
           title="Informações institucionais"
-          description="Dados de contato e presença digital da plataforma."
+          description="Nome e apresentação pública da plataforma."
         >
           <AdminCard>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
-                id="marketplace-name"
+                id="platform-name"
                 label="Nome da plataforma"
-                error={errors.marketplaceName?.message}
+                error={errors.platformName?.message}
               >
                 <Input
-                  id="marketplace-name"
+                  id="platform-name"
                   disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.marketplaceName)}
-                  {...register("marketplaceName")}
+                  aria-invalid={Boolean(errors.platformName)}
+                  {...register("platformName")}
                 />
               </Field>
-
-              <Field
-                id="contact-email"
-                label="E-mail"
-                error={errors.contactEmail?.message}
-              >
-                <Input
-                  id="contact-email"
-                  type="email"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.contactEmail)}
-                  {...register("contactEmail")}
-                />
-              </Field>
-
               <div className="sm:col-span-2">
                 <Field
-                  id="marketplace-description"
+                  id="platform-description"
                   label="Descrição"
-                  error={errors.marketplaceDescription?.message}
+                  error={errors.platformDescription?.message}
                 >
                   <Textarea
-                    id="marketplace-description"
+                    id="platform-description"
                     rows={3}
                     disabled={isSubmitting}
-                    aria-invalid={Boolean(errors.marketplaceDescription)}
-                    {...register("marketplaceDescription")}
+                    aria-invalid={Boolean(errors.platformDescription)}
+                    {...register("platformDescription")}
                   />
                 </Field>
               </div>
+            </div>
+          </AdminCard>
+        </AdminSection>
 
+        <AdminSection title="Contato" description="Canais oficiais de atendimento.">
+          <AdminCard>
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field
-                id="contact-phone"
-                label="Telefone"
-                error={errors.contactPhone?.message}
+                id="support-email"
+                label="E-mail de suporte"
+                error={errors.supportEmail?.message}
               >
                 <Input
-                  id="contact-phone"
+                  id="support-email"
+                  type="email"
                   disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.contactPhone)}
-                  {...register("contactPhone")}
+                  aria-invalid={Boolean(errors.supportEmail)}
+                  {...register("supportEmail")}
                 />
               </Field>
-
               <Field
                 id="whatsapp"
                 label="WhatsApp"
@@ -335,238 +274,178 @@ function AdminSettingsView() {
                   {...register("whatsApp")}
                 />
               </Field>
-
               <Field
-                id="instagram"
-                label="Instagram"
-                error={errors.instagram?.message}
+                id="support-phone"
+                label="Telefone"
+                error={errors.supportPhone?.message}
               >
                 <Input
-                  id="instagram"
+                  id="support-phone"
+                  type="tel"
                   disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.instagram)}
-                  {...register("instagram")}
-                />
-              </Field>
-
-              <Field
-                id="facebook"
-                label="Facebook"
-                error={errors.facebook?.message}
-              >
-                <Input
-                  id="facebook"
-                  type="url"
-                  placeholder="https://"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.facebook)}
-                  {...register("facebook")}
-                />
-              </Field>
-
-              <Field
-                id="youtube"
-                label="YouTube"
-                error={errors.youTube?.message}
-              >
-                <Input
-                  id="youtube"
-                  type="url"
-                  placeholder="https://"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.youTube)}
-                  {...register("youTube")}
-                />
-              </Field>
-
-              <Field
-                id="website"
-                label="Website"
-                error={errors.website?.message}
-              >
-                <Input
-                  id="website"
-                  type="url"
-                  placeholder="https://"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.website)}
-                  {...register("website")}
+                  aria-invalid={Boolean(errors.supportPhone)}
+                  {...register("supportPhone")}
                 />
               </Field>
             </div>
           </AdminCard>
         </AdminSection>
 
-        <AdminSection
-          title="Funcionalidades"
-          description="Ative ou desative recursos globais da plataforma."
-        >
+        <AdminSection title="Endereço" description="Endereço institucional da empresa.">
           <AdminCard>
-            <ul className="flex flex-col gap-4">
-              {FEATURE_TOGGLES.map((feature) => (
-                <li
-                  key={feature.name}
-                  className="border-border flex items-start justify-between gap-4 border-b pb-4 last:border-b-0 last:pb-0"
-                >
-                  <div className="min-w-0 flex-1">
-                    <Label
-                      htmlFor={`feature-${feature.name}`}
-                      className="text-sm font-medium"
-                    >
-                      {feature.label}
-                    </Label>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                      {feature.description}
-                    </p>
-                  </div>
-                  <Controller
-                    name={feature.name}
-                    control={control}
-                    render={({ field }) => (
-                      <Switch
-                        id={`feature-${feature.name}`}
-                        checked={field.value}
-                        disabled={isSubmitting}
-                        onCheckedChange={field.onChange}
-                        onBlur={field.onBlur}
-                      />
-                    )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="company-name" label="Razão social" error={errors.companyName?.message}>
+                <Input id="company-name" disabled={isSubmitting} {...register("companyName")} />
+              </Field>
+              <Field id="street" label="Logradouro" error={errors.street?.message}>
+                <Input id="street" disabled={isSubmitting} {...register("street")} />
+              </Field>
+              <Field id="number" label="Número" error={errors.number?.message}>
+                <Input id="number" disabled={isSubmitting} {...register("number")} />
+              </Field>
+              <Field id="complement" label="Complemento" error={errors.complement?.message}>
+                <Input id="complement" disabled={isSubmitting} {...register("complement")} />
+              </Field>
+              <Field id="neighborhood" label="Bairro" error={errors.neighborhood?.message}>
+                <Input id="neighborhood" disabled={isSubmitting} {...register("neighborhood")} />
+              </Field>
+              <Field id="city" label="Cidade" error={errors.city?.message}>
+                <Input id="city" disabled={isSubmitting} {...register("city")} />
+              </Field>
+              <Field id="state" label="Estado" error={errors.state?.message}>
+                <Input id="state" disabled={isSubmitting} {...register("state")} />
+              </Field>
+              <Field id="zip-code" label="CEP" error={errors.zipCode?.message}>
+                <Input id="zip-code" disabled={isSubmitting} {...register("zipCode")} />
+              </Field>
+              <Field id="country" label="País" error={errors.country?.message}>
+                <Input id="country" disabled={isSubmitting} {...register("country")} />
+              </Field>
+            </div>
+          </AdminCard>
+        </AdminSection>
+
+        <AdminSection title="Documento" description="Dados cadastrais da empresa.">
+          <AdminCard>
+            <Field id="company-document" label="CNPJ" error={errors.companyDocument?.message}>
+              <Controller
+                name="companyDocument"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="company-document"
+                    inputMode="numeric"
+                    placeholder="00.000.000/0000-00"
+                    disabled={isSubmitting}
+                    aria-invalid={Boolean(errors.companyDocument)}
+                    onChange={(event) =>
+                      field.onChange(
+                        formatDocumentInput(event.target.value, PersonType.Company),
+                      )
+                    }
                   />
-                </li>
-              ))}
-            </ul>
+                )}
+              />
+            </Field>
           </AdminCard>
         </AdminSection>
 
-        <AdminSection
-          title="Limites"
-          description="Limites padrão da plataforma. Planos poderão sobrescrevê-los no futuro."
-        >
+        <AdminSection title="SEO" description="Metadados padrão para buscadores e compartilhamentos.">
           <AdminCard>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
-                id="default-advertisement-limit"
-                label="Limite padrão de anúncios"
-                error={errors.defaultAdvertisementLimit?.message}
+                id="default-title"
+                label="Título padrão"
+                error={errors.defaultTitle?.message}
               >
                 <Input
-                  id="default-advertisement-limit"
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
+                  id="default-title"
                   disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.defaultAdvertisementLimit)}
-                  {...register("defaultAdvertisementLimit", {
-                    valueAsNumber: true,
-                  })}
+                  aria-invalid={Boolean(errors.defaultTitle)}
+                  {...register("defaultTitle")}
                 />
               </Field>
-
-              <Field
-                id="default-images-per-advertisement"
-                label="Máximo de imagens"
-                error={errors.defaultImagesPerAdvertisement?.message}
-              >
-                <Input
-                  id="default-images-per-advertisement"
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.defaultImagesPerAdvertisement)}
-                  {...register("defaultImagesPerAdvertisement", {
-                    valueAsNumber: true,
-                  })}
-                />
-              </Field>
-
-              <Field
-                id="max-image-size-mb"
-                label="Tamanho máximo das imagens (MB)"
-                error={errors.maxImageSizeMb?.message}
-              >
-                <Input
-                  id="max-image-size-mb"
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.maxImageSizeMb)}
-                  {...register("maxImageSizeMb", { valueAsNumber: true })}
-                />
-              </Field>
-
-              <Field
-                id="online-timeout-minutes"
-                label="Tempo considerado online (minutos)"
-                error={errors.onlineTimeoutMinutes?.message}
-              >
-                <Input
-                  id="online-timeout-minutes"
-                  type="number"
-                  min={1}
-                  inputMode="numeric"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.onlineTimeoutMinutes)}
-                  {...register("onlineTimeoutMinutes", {
-                    valueAsNumber: true,
-                  })}
-                />
-              </Field>
-            </div>
-          </AdminCard>
-        </AdminSection>
-
-        <AdminSection
-          title="SEO (preparação)"
-          description="Metadados globais persistidos para uso futuro — ainda não consumidos pela aplicação."
-        >
-          <AdminCard>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field
-                id="default-meta-title"
-                label="Meta Title padrão"
-                error={errors.defaultMetaTitle?.message}
-              >
-                <Input
-                  id="default-meta-title"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.defaultMetaTitle)}
-                  {...register("defaultMetaTitle")}
-                />
-              </Field>
-
-              <Field
-                id="default-og-image"
-                label="Open Graph padrão"
-                error={errors.defaultOgImage?.message}
-              >
-                <Input
-                  id="default-og-image"
-                  type="url"
-                  placeholder="https://"
-                  disabled={isSubmitting}
-                  aria-invalid={Boolean(errors.defaultOgImage)}
-                  {...register("defaultOgImage")}
-                />
-              </Field>
-
               <div className="sm:col-span-2">
                 <Field
-                  id="default-meta-description"
-                  label="Meta Description padrão"
-                  error={errors.defaultMetaDescription?.message}
+                  id="default-description"
+                  label="Descrição padrão"
+                  error={errors.defaultDescription?.message}
                 >
                   <Textarea
-                    id="default-meta-description"
+                    id="default-description"
                     rows={3}
                     disabled={isSubmitting}
-                    aria-invalid={Boolean(errors.defaultMetaDescription)}
-                    {...register("defaultMetaDescription")}
+                    aria-invalid={Boolean(errors.defaultDescription)}
+                    {...register("defaultDescription")}
+                  />
+                </Field>
+              </div>
+              <div className="sm:col-span-2">
+                <Field id="default-keywords" label="Palavras-chave" error={errors.defaultKeywords?.message}>
+                  <Textarea id="default-keywords" rows={2} disabled={isSubmitting} {...register("defaultKeywords")} />
+                </Field>
+              </div>
+              <div className="sm:col-span-2">
+                <Field
+                  id="default-og-image"
+                  label="Imagem Open Graph (URL)"
+                  error={errors.defaultOgImage?.message}
+                >
+                  <Input
+                    id="default-og-image"
+                    type="url"
+                    placeholder="https://… ou /images/…"
+                    disabled={isSubmitting}
+                    {...register("defaultOgImage")}
                   />
                 </Field>
               </div>
             </div>
+          </AdminCard>
+        </AdminSection>
+
+        <AdminSection title="Redes sociais" description="Links públicos da plataforma.">
+          <AdminCard>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {([
+                ["instagram", "Instagram"],
+                ["facebook", "Facebook"],
+                ["youTube", "YouTube"],
+                ["tikTok", "TikTok"],
+                ["linkedIn", "LinkedIn"],
+                ["x", "X"],
+                ["website", "Website"],
+              ] as const).map(([name, label]) => (
+                <Field key={name} id={name} label={label} error={errors[name]?.message}>
+                  <Input id={name} placeholder="https://" disabled={isSubmitting} {...register(name)} />
+                </Field>
+              ))}
+            </div>
+          </AdminCard>
+        </AdminSection>
+
+        <AdminSection title="Identidade visual" description="URLs das imagens públicas da marca.">
+          <AdminCard>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="logo-url" label="Logo" error={errors.logoUrl?.message}>
+                <Input id="logo-url" type="url" placeholder="/images/logo.png ou https://" disabled={isSubmitting} {...register("logoUrl")} />
+              </Field>
+              <Field id="logo-dark-url" label="Logo para fundo escuro" error={errors.logoDarkUrl?.message}>
+                <Input id="logo-dark-url" type="url" placeholder="/images/logo-dark.png ou https://" disabled={isSubmitting} {...register("logoDarkUrl")} />
+              </Field>
+              <Field id="favicon-url" label="Favicon" error={errors.faviconUrl?.message}>
+                <Input id="favicon-url" type="url" placeholder="/favicon.ico ou https://" disabled={isSubmitting} {...register("faviconUrl")} />
+              </Field>
+            </div>
+          </AdminCard>
+        </AdminSection>
+
+        <AdminSection title="Footer" description="Texto exibido no rodapé público.">
+          <AdminCard>
+            <Field id="footer-copyright" label="Copyright" error={errors.footerCopyright?.message}>
+              <Input id="footer-copyright" placeholder="© {year} Minha empresa. Todos os direitos reservados." disabled={isSubmitting} {...register("footerCopyright")} />
+            </Field>
           </AdminCard>
         </AdminSection>
 

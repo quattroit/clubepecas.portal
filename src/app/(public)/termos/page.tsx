@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ROUTES } from "@/constants/routes";
 import { TermosPageView } from "@/features/institutional";
+import { getPublicPlatformSettings } from "@/lib/platform-settings";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -11,6 +12,7 @@ export const metadata: Metadata = buildPageMetadata({
   path: ROUTES.TERMS,
 });
 
-export default function TermosPage() {
-  return <TermosPageView />;
+export default async function TermosPage() {
+  const settings = await getPublicPlatformSettings();
+  return <TermosPageView email={settings.supportEmail ?? undefined} />;
 }

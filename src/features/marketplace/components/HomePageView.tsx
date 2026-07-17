@@ -31,6 +31,7 @@ import { HeroStats } from "@/features/marketplace/components/HeroStats";
 import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
 import { useStores } from "@/hooks/api/useStores";
+import { usePlatformSettings } from "@/hooks/api/usePlatformSettings";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 
@@ -106,6 +107,9 @@ function HomePageView() {
   const categoriesQuery = useCategories();
   const advertisementsQuery = useAdvertisements({ page: 1 });
   const storesQuery = useStores();
+  const platformSettingsQuery = usePlatformSettings();
+  const platformDescription =
+    platformSettingsQuery.data?.platformDescription ?? APP_DESCRIPTION;
 
   const marketplaceItems = advertisementsQuery.data?.items;
   const categories = categoriesQuery.data ?? [];
@@ -150,7 +154,7 @@ function HomePageView() {
                 <br />
                 com <span className="text-primary">confiança</span>
               </h1>
-              <p className="text-body max-w-md">{APP_DESCRIPTION}</p>
+              <p className="text-body max-w-md">{platformDescription}</p>
             </div>
 
             <div className="relative z-20 w-full max-w-lg">

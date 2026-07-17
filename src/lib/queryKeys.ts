@@ -59,6 +59,7 @@ export const queryKeys = {
     all: ["home"] as const,
     stats: ["home", "stats"] as const,
   },
+  platformSettings: ["platform-settings"] as const,
   sellers: {
     all: ["sellers"] as const,
     bySlug: (slug: string) => ["sellers", "slug", slug] as const,

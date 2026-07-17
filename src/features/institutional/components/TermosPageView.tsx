@@ -19,7 +19,7 @@ const TOC = [
   { id: "legislacao", label: "Legislação aplicável" },
 ] as const;
 
-function TermosPageView() {
+function TermosPageView({ email = CONTACT_EMAIL }: { email?: string }) {
   return (
     <InstitutionalPageShell
       breadcrumbLabel="Termos"
@@ -184,10 +184,10 @@ function TermosPageView() {
         <p>
           Dúvidas sobre estes Termos podem ser enviadas para{" "}
           <a
-            href={`mailto:${CONTACT_EMAIL}`}
+            href={`mailto:${email}`}
             className="text-primary font-medium underline-offset-4 hover:underline"
           >
-            {CONTACT_EMAIL}
+            {email}
           </a>
           .
         </p>

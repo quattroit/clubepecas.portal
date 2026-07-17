@@ -9,6 +9,7 @@ import {
   APP_LOGO_WIDTH,
   APP_NAME,
 } from "@/constants/app";
+import { getPublicPlatformSettings } from "@/lib/platform-settings";
 import "@/styles/globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -18,33 +19,26 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
-  title: {
-    default: APP_NAME,
-    template: `%s | ${APP_NAME}`,
-  },
-  description: APP_DESCRIPTION,
-  icons: {
-    icon: APP_LOGO_SRC,
-    apple: APP_LOGO_SRC,
-  },
-  openGraph: {
-    siteName: APP_NAME,
-    locale: "pt_BR",
-    type: "website",
-    images: [
-      {
-        url: APP_LOGO_SRC,
-        width: APP_LOGO_WIDTH,
-        height: APP_LOGO_HEIGHT,
-        alt: APP_NAME,
-      },
-    ],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublicPlatformSettings();
+  const name = settings.platformName ?? APP_NAME;
+  const description = settings.defaultDescription ?? settings.platformDescription ?? APP_DESCRIPTION;
+  const logo = settings.logoUrl ?? APP_LOGO_SRC;
+
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+    title: { default: settings.defaultTitle ?? name, template: `%s | ${name}` },
+    description,
+    keywords: settings.defaultKeywords ?? undefined,
+    icons: { icon: settings.faviconUrl ?? APP_LOGO_SRC, apple: settings.faviconUrl ?? APP_LOGO_SRC },
+    openGraph: {
+      siteName: name,
+      locale: "pt_BR",
+      type: "website",
+      images: [{ url: logo, width: APP_LOGO_WIDTH, height: APP_LOGO_HEIGHT, alt: name }],
+    },
+  };
+}
 
 export default function RootLayout({
   children,

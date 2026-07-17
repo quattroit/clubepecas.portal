@@ -15,6 +15,8 @@ type LogoSize = "sm" | "md" | "lg";
 type LogoProps = {
   className?: string;
   href?: string;
+  src?: string;
+  alt?: string;
   /** Altura visual da marca (sm header compacto, md padrão, lg auth). */
   size?: LogoSize;
   priority?: boolean;
@@ -35,6 +37,8 @@ const sizeClassName: Record<LogoSize, string> = {
 function Logo({
   className,
   href = ROUTES.HOME,
+  src = APP_LOGO_SRC,
+  alt = APP_NAME,
   size = "md",
   priority = false,
   onBrand = false,
@@ -42,7 +46,7 @@ function Logo({
   return (
     <Link
       href={href}
-      aria-label={`${APP_NAME} — página inicial`}
+      aria-label={`${alt} — página inicial`}
       className={cn(
         "focus-visible:ring-ring inline-flex items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         onBrand && "rounded-lg",
@@ -50,8 +54,8 @@ function Logo({
       )}
     >
       <Image
-        src={APP_LOGO_SRC}
-        alt={APP_NAME}
+        src={src}
+        alt={alt}
         width={APP_LOGO_WIDTH}
         height={APP_LOGO_HEIGHT}
         priority={priority}

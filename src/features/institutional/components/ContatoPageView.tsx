@@ -5,12 +5,24 @@ import {
   InstitutionalSection,
 } from "@/features/institutional/components/InstitutionalPageShell";
 
-function ContatoPageView() {
+type ContatoPageViewProps = {
+  email?: string;
+  phone?: string;
+  whatsApp?: string;
+  platformName?: string;
+};
+
+function ContatoPageView({
+  email = CONTACT_EMAIL,
+  phone,
+  whatsApp,
+  platformName = APP_NAME,
+}: ContatoPageViewProps) {
   return (
     <InstitutionalPageShell
       breadcrumbLabel="Contato"
       title="Contato"
-      description={`Fale com a equipe do ${APP_NAME}. Estamos disponíveis para dúvidas sobre a plataforma, suporte e assuntos comerciais.`}
+      description={`Fale com a equipe do ${platformName}. Estamos disponíveis para dúvidas sobre a plataforma, suporte e assuntos comerciais.`}
     >
       <InstitutionalSection id="canais" title="Canais de atendimento">
         <p>
@@ -23,10 +35,10 @@ function ContatoPageView() {
             <dt className="text-small font-medium">E-mail</dt>
             <dd>
               <a
-                href={`mailto:${CONTACT_EMAIL}`}
+                href={`mailto:${email}`}
                 className="text-primary focus-visible:ring-ring rounded-sm font-medium underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:outline-none"
               >
-                {CONTACT_EMAIL}
+                {email}
               </a>
             </dd>
           </div>
@@ -34,6 +46,8 @@ function ContatoPageView() {
             <dt className="text-small font-medium">Horário de atendimento</dt>
             <dd className="text-body">{CONTACT_HOURS}</dd>
           </div>
+          {phone ? <div className="flex flex-col gap-1"><dt className="text-small font-medium">Telefone</dt><dd>{phone}</dd></div> : null}
+          {whatsApp ? <div className="flex flex-col gap-1"><dt className="text-small font-medium">WhatsApp</dt><dd>{whatsApp}</dd></div> : null}
         </dl>
       </InstitutionalSection>
 
@@ -62,10 +76,10 @@ function ContatoPageView() {
           Em breve você poderá enviar mensagens diretamente por esta página. Até
           lá, utilize o e-mail{" "}
           <a
-            href={`mailto:${CONTACT_EMAIL}`}
+            href={`mailto:${email}`}
             className="text-primary font-medium underline-offset-4 hover:underline"
           >
-            {CONTACT_EMAIL}
+            {email}
           </a>{" "}
           para suporte e assuntos comerciais.
         </p>

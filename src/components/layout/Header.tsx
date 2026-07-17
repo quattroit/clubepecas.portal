@@ -21,6 +21,8 @@ import { getVisibleNavItems, MAIN_NAV_ITEMS } from "@/constants/navigation";
 import { ROUTES } from "@/constants/routes";
 import { SearchInput } from "@/features/marketplace";
 import { cn } from "@/lib/utils";
+import { usePlatformSettings } from "@/hooks/api/usePlatformSettings";
+import { APP_NAME, APP_LOGO_SRC } from "@/constants/app";
 import { normalizeSearchQuery } from "@/utils/marketplace-search";
 
 function HeaderSearchField({
@@ -137,6 +139,12 @@ function Header() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { isAuthenticated, isLoading, user, logout, isLoggingOut } = useAuth();
+  const platformSettingsQuery = usePlatformSettings();
+  const platformName = platformSettingsQuery.data?.platformName ?? APP_NAME;
+  const logoUrl =
+    platformSettingsQuery.data?.logoDarkUrl ??
+    platformSettingsQuery.data?.logoUrl ??
+    APP_LOGO_SRC;
   const navItems = getVisibleNavItems(MAIN_NAV_ITEMS);
   const closeMenu = () => setOpen(false);
 
@@ -144,7 +152,14 @@ function Header() {
     <header className="surface-brand border-brand-border sticky top-0 z-40 border-b">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3.5 sm:px-6">
         <div className="flex items-center gap-3">
-          <Logo className="shrink-0" size="sm" priority onBrand />
+          <Logo
+            className="shrink-0"
+            size="sm"
+            priority
+            onBrand
+            src={logoUrl}
+            alt={platformName}
+          />
 
           <HeaderSearch
             id="header-search-desktop"

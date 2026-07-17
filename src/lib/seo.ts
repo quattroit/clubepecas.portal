@@ -13,6 +13,7 @@ type PageMetadataInput = {
   title: string;
   description: string;
   path: string;
+  siteName?: string;
 };
 
 /**
@@ -22,9 +23,10 @@ export function buildPageMetadata({
   title,
   description,
   path,
+  siteName = APP_NAME,
 }: PageMetadataInput): Metadata {
   const url = `${getSiteUrl()}${path}`;
-  const ogTitle = `${title} | ${APP_NAME}`;
+  const ogTitle = `${title} | ${siteName}`;
 
   return {
     title,
@@ -36,7 +38,7 @@ export function buildPageMetadata({
       title: ogTitle,
       description,
       url,
-      siteName: APP_NAME,
+      siteName,
       locale: "pt_BR",
       type: "website",
     },

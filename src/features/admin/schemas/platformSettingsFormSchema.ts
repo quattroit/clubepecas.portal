@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isValidCnpj } from "@/utils/document";
+
 const optionalText = z.string();
 
 const optionalEmail = z
@@ -10,34 +12,79 @@ const optionalEmail = z
     "Informe um e-mail válido",
   );
 
+const optionalSocial = z
+  .string()
+  .trim()
+  .refine(
+    (value) =>
+      value === "" ||
+      value.startsWith("/") ||
+      value.startsWith("@") ||
+      z.url().safeParse(value).success ||
+      !/\s/.test(value),
+    "Informe uma URL ou handle válido",
+  );
+
 const optionalUrl = z
   .string()
   .trim()
   .refine(
-    (value) => value === "" || z.url().safeParse(value).success,
-    "Informe uma URL válida (https://…)",
+    (value) =>
+      value === "" ||
+      value.startsWith("/") ||
+      z.url().safeParse(value).success,
+    "Informe uma URL válida ou um caminho iniciado por /",
   );
 
 /**
  * Schema do formulário de configurações da plataforma.
  */
 export const platformSettingsFormSchema = z.object({
-  marketplaceName: z
+  platformName: z
     .string()
     .trim()
     .min(1, "Informe o nome da plataforma")
     .max(150, "Máximo de 150 caracteres"),
-  marketplaceDescription: optionalText.max(
+  platformDescription: optionalText.max(
     2000,
     "Máximo de 2000 caracteres",
   ),
-  contactEmail: optionalEmail,
-  contactPhone: optionalText.max(30, "Máximo de 30 caracteres"),
+  supportEmail: optionalEmail,
+  supportPhone: optionalText.max(30, "Máximo de 30 caracteres"),
   whatsApp: optionalText.max(30, "Máximo de 30 caracteres"),
-  instagram: optionalText.max(200, "Máximo de 200 caracteres"),
+  companyName: optionalText.max(200, "Máximo de 200 caracteres"),
+  companyDocument: optionalText.refine(
+    (value) => value.trim() === "" || isValidCnpj(value),
+    "Informe um CNPJ válido",
+  ),
+  street: optionalText.max(200, "Máximo de 200 caracteres"),
+  number: optionalText.max(30, "Máximo de 30 caracteres"),
+  complement: optionalText.max(100, "Máximo de 100 caracteres"),
+  neighborhood: optionalText.max(100, "Máximo de 100 caracteres"),
+  city: optionalText.max(100, "Máximo de 100 caracteres"),
+  state: optionalText
+    .trim()
+    .refine(
+      (value) => value === "" || value.length === 2,
+      "Informe a UF com 2 caracteres",
+    ),
+  zipCode: optionalText.max(20, "Máximo de 20 caracteres"),
+  country: optionalText.max(100, "Máximo de 100 caracteres"),
+  instagram: optionalSocial.max(500, "Máximo de 500 caracteres"),
   facebook: optionalUrl.max(500, "Máximo de 500 caracteres"),
   youTube: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  tikTok: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  linkedIn: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  x: optionalSocial.max(500, "Máximo de 500 caracteres"),
   website: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  logoUrl: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  logoDarkUrl: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  faviconUrl: optionalUrl.max(500, "Máximo de 500 caracteres"),
+  footerCopyright: optionalText.max(500, "Máximo de 500 caracteres"),
+  defaultTitle: optionalText.max(200, "Máximo de 200 caracteres"),
+  defaultDescription: optionalText.max(500, "Máximo de 500 caracteres"),
+  defaultKeywords: optionalText.max(500, "Máximo de 500 caracteres"),
+  defaultOgImage: optionalUrl.max(500, "Máximo de 500 caracteres"),
   marketplaceEnabled: z.boolean(),
   sellerRegistrationEnabled: z.boolean(),
   advertisementCreationEnabled: z.boolean(),
@@ -61,9 +108,6 @@ export const platformSettingsFormSchema = z.object({
     .number({ error: "Informe um número válido" })
     .int("Informe um número inteiro")
     .min(1, "Deve ser pelo menos 1"),
-  defaultMetaTitle: optionalText.max(200, "Máximo de 200 caracteres"),
-  defaultMetaDescription: optionalText.max(500, "Máximo de 500 caracteres"),
-  defaultOgImage: optionalUrl.max(500, "Máximo de 500 caracteres"),
 });
 
 export type PlatformSettingsFormValues = z.infer<
@@ -71,15 +115,36 @@ export type PlatformSettingsFormValues = z.infer<
 >;
 
 export const platformSettingsFormDefaultValues: PlatformSettingsFormValues = {
-  marketplaceName: "",
-  marketplaceDescription: "",
-  contactEmail: "",
-  contactPhone: "",
+  platformName: "",
+  platformDescription: "",
+  supportEmail: "",
+  supportPhone: "",
   whatsApp: "",
+  companyName: "",
+  companyDocument: "",
+  street: "",
+  number: "",
+  complement: "",
+  neighborhood: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "",
   instagram: "",
   facebook: "",
   youTube: "",
+  tikTok: "",
+  linkedIn: "",
+  x: "",
   website: "",
+  logoUrl: "",
+  logoDarkUrl: "",
+  faviconUrl: "",
+  footerCopyright: "",
+  defaultTitle: "",
+  defaultDescription: "",
+  defaultKeywords: "",
+  defaultOgImage: "",
   marketplaceEnabled: true,
   sellerRegistrationEnabled: true,
   advertisementCreationEnabled: true,
@@ -91,7 +156,4 @@ export const platformSettingsFormDefaultValues: PlatformSettingsFormValues = {
   defaultImagesPerAdvertisement: 10,
   maxImageSizeMb: 5,
   onlineTimeoutMinutes: 15,
-  defaultMetaTitle: "",
-  defaultMetaDescription: "",
-  defaultOgImage: "",
 };

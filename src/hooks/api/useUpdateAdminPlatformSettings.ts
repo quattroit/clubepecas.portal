@@ -18,6 +18,7 @@ export function useUpdateAdminPlatformSettings() {
       adminService.updatePlatformSettings(payload),
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.admin.settings, data);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.platformSettings });
       toast.success("Configurações salvas com sucesso!");
     },
   });

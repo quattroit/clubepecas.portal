@@ -17,7 +17,7 @@ const TOC = [
   { id: "alteracoes", label: "Alterações da política" },
 ] as const;
 
-function PrivacidadePageView() {
+function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
   return (
     <InstitutionalPageShell
       breadcrumbLabel="Privacidade"
@@ -171,10 +171,10 @@ function PrivacidadePageView() {
         </p>
         <p>
           <a
-            href={`mailto:${CONTACT_EMAIL}`}
+            href={`mailto:${email}`}
             className="text-primary font-medium underline-offset-4 hover:underline"
           >
-            {CONTACT_EMAIL}
+            {email}
           </a>
         </p>
         <p className="text-small text-muted-foreground">
