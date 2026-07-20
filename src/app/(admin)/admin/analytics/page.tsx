@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
 import {
@@ -10,13 +11,20 @@ import {
   AdminTableSkeleton,
 } from "@/components/admin";
 import { ROUTES } from "@/constants/routes";
-import { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsView";
 
 export const metadata: Metadata = {
   title: "Analytics",
   description: "Analytics administrativo do marketplace ClubePeças.",
   robots: { index: false, follow: false },
 };
+
+const AdminAnalyticsView = dynamic(
+  () =>
+    import("@/features/admin/components/AdminAnalyticsView").then((mod) => ({
+      default: mod.AdminAnalyticsView,
+    })),
+  { loading: () => <AnalyticsPageFallback /> },
+);
 
 function AnalyticsPageFallback() {
   return (

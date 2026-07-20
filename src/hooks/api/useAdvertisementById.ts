@@ -16,7 +16,6 @@ export function useAdvertisementById(id: string) {
   return useQuery({
     queryKey: queryKeys.advertisements.detail(id),
     enabled: authReady && Boolean(id),
-    refetchOnMount: "always",
     queryFn: async () => {
       const [dto, photosResponse] = await Promise.all([
         advertisementService.getById(id),

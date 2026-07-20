@@ -18,6 +18,5 @@ export function useSellerMetrics(period: MetricsPeriodParam = "all") {
     queryFn: () => sellerService.getMyMetrics(period),
     enabled: authReady,
     retry: false,
-    refetchOnMount: "always",
   });
 }

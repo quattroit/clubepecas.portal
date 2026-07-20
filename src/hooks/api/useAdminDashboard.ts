@@ -18,6 +18,5 @@ export function useAdminDashboard(period: MetricsPeriodParam = "all") {
     queryFn: () => adminService.getDashboard(period),
     enabled: authReady,
     retry: false,
-    refetchOnMount: "always",
   });
 }

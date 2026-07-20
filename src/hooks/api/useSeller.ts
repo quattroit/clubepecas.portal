@@ -26,7 +26,6 @@ export function useSeller() {
   return useQuery({
     queryKey: queryKeys.seller.me,
     enabled: authReady,
-    refetchOnMount: "always",
     queryFn: async () => {
       try {
         const dto = await sellerService.getMe();

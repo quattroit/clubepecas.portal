@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { getVisibleNavItems, MAIN_NAV_ITEMS } from "@/constants/navigation";
 import { ROUTES } from "@/constants/routes";
-import { SearchInput } from "@/features/marketplace";
+import { SearchInput } from "@/features/marketplace/components/SearchInput";
 import { cn } from "@/lib/utils";
 import { usePlatformSettings } from "@/hooks/api/usePlatformSettings";
 import { APP_NAME, APP_LOGO_SRC } from "@/constants/app";

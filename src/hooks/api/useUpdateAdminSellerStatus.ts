@@ -23,7 +23,7 @@ export function useUpdateAdminSellerStatus() {
         queryKey: queryKeys.admin.sellers.all,
       });
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.admin.dashboard("all"),
+        queryKey: ["admin", "dashboard"],
       });
       void queryClient.invalidateQueries({
         queryKey: ["admin", "sellers", "detail", variables.id],

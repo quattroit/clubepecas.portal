@@ -17,6 +17,5 @@ export function useAdminPlatformSettings() {
     queryFn: () => adminService.getPlatformSettings(),
     enabled: authReady,
     retry: false,
-    refetchOnMount: "always",
   });
 }

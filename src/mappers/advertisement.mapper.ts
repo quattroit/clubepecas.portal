@@ -50,6 +50,11 @@ export function mapAdvertisementBySlugToAdvertisement(
   const images = photos
     .map((photo) => resolveMediaUrl(photo.url))
     .filter(Boolean);
+  const thumbnails = photos
+    .map((photo) =>
+      resolveMediaUrl(photo.thumbnailUrl || photo.url),
+    )
+    .filter(Boolean);
 
   return {
     id: dto.slug,
@@ -72,6 +77,7 @@ export function mapAdvertisementBySlugToAdvertisement(
     modelYear: dto.modelYear,
     imageUrl: images[0] ?? null,
     images,
+    thumbnails,
     isNew: isNewCondition(dto.condition),
     description: dto.description,
     publishedAt: dto.createdAt,

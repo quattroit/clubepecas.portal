@@ -13,19 +13,19 @@ import { categoryService } from "@/services/category.service";
 
 /**
  * Detalhe público do anúncio por slug.
- *
- * Fluxo: getBySlug → DTO → mappers → model
- * Relacionados: marketplace menos o atual (até 4).
+ * Detalhe e relacionados em paralelo (marketplace temporário até endpoint dedicado).
  */
 export function useAdvertisement(slug: string) {
   return useQuery({
     queryKey: queryKeys.marketplace.detail(slug),
     queryFn: async () => {
-      const dto = await advertisementService.getBySlug(slug);
+      const [dto, marketplace] = await Promise.all([
+        advertisementService.getBySlug(slug),
+        categoryService.getMarketplace(),
+      ]);
+
       const advertisement = mapAdvertisementBySlugToAdvertisement(dto);
       const seller = mapAdvertisementBySlugSeller(dto);
-
-      const marketplace = await categoryService.getMarketplace();
       const related = mapRelatedMarketplaceItems(marketplace.items, slug, 4);
 
       return {
@@ -33,6 +33,7 @@ export function useAdvertisement(slug: string) {
         seller,
         related,
         images: advertisement.images ?? [],
+        thumbnails: advertisement.thumbnails ?? advertisement.images ?? [],
       };
     },
     enabled: Boolean(slug),

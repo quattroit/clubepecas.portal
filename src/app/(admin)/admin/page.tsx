@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminDashboardView } from "@/features/admin";
+import { AdminDashboardView } from "@/features/admin/components/AdminDashboardView";
 
 export const metadata: Metadata = {
   title: "Painel Administrativo",

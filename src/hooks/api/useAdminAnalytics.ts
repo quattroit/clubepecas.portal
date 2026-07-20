@@ -18,6 +18,5 @@ export function useAdminAnalytics(period: MetricsPeriodParam = "all") {
     queryFn: () => adminService.getAnalytics(period),
     enabled: authReady,
     retry: false,
-    refetchOnMount: "always",
   });
 }

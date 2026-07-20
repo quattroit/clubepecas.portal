@@ -27,7 +27,6 @@ export function useCurrentSellerSubscription() {
   return useQuery({
     queryKey: queryKeys.seller.subscription,
     enabled: authReady,
-    refetchOnMount: "always",
     queryFn: async () => {
       try {
         return await sellerService.getCurrentSubscription();

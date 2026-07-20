@@ -33,6 +33,7 @@ export type AdvertisementListItemDto = {
   manufacturingYear: number;
   modelYear: number;
   createdAt: string;
+  thumbnailUrl?: string | null;
 };
 
 export type GetMyAdvertisementsResponse = {
@@ -77,6 +78,7 @@ export type PublicAdvertisementSellerDto = {
 
 export type PublicAdvertisementPhotoDto = {
   url: string;
+  thumbnailUrl?: string | null;
   displayOrder: number;
 };
 

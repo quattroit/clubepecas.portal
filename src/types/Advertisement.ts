@@ -32,6 +32,8 @@ export type Advertisement = {
   imageUrl?: string | null;
   /** Galeria completa (detalhe). Se vazio, usar imageUrl. */
   images?: string[];
+  /** Miniaturas da galeria (detalhe) — fallback para images. */
+  thumbnails?: string[];
   isNew: boolean;
   description?: string;
   /** Quantidade em estoque (painel do vendedor). */

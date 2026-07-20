@@ -64,7 +64,8 @@ function AdvertisementDetailPageView() {
     );
   }
 
-  const { advertisement, seller, related, images } = detailQuery.data;
+  const { advertisement, seller, related, images, thumbnails } =
+    detailQuery.data;
 
   return (
     <div className="flex flex-col gap-8 md:gap-10">
@@ -77,7 +78,11 @@ function AdvertisementDetailPageView() {
       />
 
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
-        <ImageGallery images={images} alt={advertisement.title} />
+        <ImageGallery
+          images={images}
+          thumbnails={thumbnails}
+          alt={advertisement.title}
+        />
 
         <div className="flex flex-col gap-6">
           <AdvertisementDetails advertisement={advertisement} />

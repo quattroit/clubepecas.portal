@@ -23,7 +23,7 @@ export function useUpdateAdminAdvertisementStatus() {
         queryKey: queryKeys.admin.advertisements.all,
       });
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.admin.dashboard("all"),
+        queryKey: ["admin", "dashboard"],
       });
       void queryClient.invalidateQueries({
         queryKey: ["admin", "advertisements", "detail", variables.id],

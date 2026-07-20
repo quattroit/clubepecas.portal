@@ -32,9 +32,6 @@ export function useUpdateAdvertisement() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.advertisements.detail(variables.id),
       });
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.advertisements.photos(variables.id),
-      });
       toast.success("Anúncio atualizado com sucesso!");
       router.replace(ROUTES.MY_ADVERTISEMENTS);
     },

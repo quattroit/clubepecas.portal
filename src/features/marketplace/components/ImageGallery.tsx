@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 
 type ImageGalleryProps = {
   images: string[];
+  /** Miniaturas para a faixa; se omitido, usa images. */
+  thumbnails?: string[];
   alt: string;
   className?: string;
 };
@@ -15,10 +17,11 @@ type ImageGalleryProps = {
 /**
  * Galeria simples — troca a imagem principal ao clicar na miniatura.
  */
-function ImageGallery({ images, alt, className }: ImageGalleryProps) {
+function ImageGallery({ images, thumbnails, alt, className }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const hasImages = images.length > 0;
   const activeImage = hasImages ? images[activeIndex] : null;
+  const strip = thumbnails?.length ? thumbnails : images;
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
@@ -48,7 +51,7 @@ function ImageGallery({ images, alt, className }: ImageGalleryProps) {
           className="grid grid-cols-4 gap-2 sm:grid-cols-5"
           aria-label="Miniaturas da galeria"
         >
-          {images.map((image, index) => {
+          {strip.map((image, index) => {
             const isActive = index === activeIndex;
 
             return (
