@@ -4,7 +4,8 @@ Documento de referência do domínio financeiro do ClubePeças.
 
 **Sprint 8.1:** domínio local + `NullPaymentProvider`.  
 **Sprint 8.2:** integração Asaas (Hosted Checkout, Sandbox) via `IPaymentProvider`.  
-**Sprint 8.3:** webhooks Asaas, ativação automática, grace period e reconciliação manual.
+**Sprint 8.3:** webhooks Asaas, ativação automática, grace period e reconciliação manual.  
+**Sprint 8.3.1:** modelo comercial com múltiplas recorrências (`SubscriptionPlanPrice` + `BillingCycle`).
 
 ---
 
@@ -12,20 +13,68 @@ Documento de referência do domínio financeiro do ClubePeças.
 
 | Conceito | Responsabilidade |
 |----------|------------------|
-| **Payment** | Registro financeiro oficial da plataforma (qualquer movimentação) |
-| **SellerSubscription** | Ciclo de vida da assinatura (ativo, pendente, cancelado, expirado, renovação) |
-| **SubscriptionPlan** | Catálogo de planos (preço, limites) |
+| **Payment** | Registro financeiro oficial (+ `BillingCycle` da cobrança) |
+| **SellerSubscription** | Ciclo de vida da assinatura (+ `BillingCycle` contratado) |
+| **SubscriptionPlan** | Produto comercial (nome, limites, recursos) — **sem preço** |
+| **SubscriptionPlanPrice** | Opções comerciais do plano (preço + recorrência + Money) |
 | **WebhookEvent** | Envelope bruto do provedor + idempotência (`ExternalId` único) |
 | **Money** | Value object monetário (`Amount` + `Currency`) |
+| **BillingCycle** | `Monthly`, `Quarterly`, `Yearly` (extensível) |
+
+---
+
+## 1.1 Modelo comercial (Sprint 8.3.1)
+
+```
+SubscriptionPlan
+ └── SubscriptionPlanPrices[]
+       ├── BillingCycle (Monthly | Quarterly | Yearly)
+       ├── Money (Price + Currency)
+       ├── DisplayName / Description
+       ├── IsActive / DisplayOrder
+```
+
+- Um plano pode ter várias recorrências; **não há duplicidade** do mesmo `BillingCycle` no mesmo plano.
+- Plano sem recorrência ativa **não pode** ser contratado.
+- Descontos **não** são armazenados: a API calcula economia dinamicamente vs. mensal (`PlanPricingCalculator`).
+- Frontend **nunca** calcula preço/desconto — consome `prices[]` da API.
+
+### Fluxo de contratação
+
+```
+Plano → Recorrência → POST /seller/subscription/checkout { planId, billingCycle }
+→ Resolve SubscriptionPlanPrice
+→ Payment + SellerSubscription (com BillingCycle)
+→ Asaas Cycle = MONTHLY | QUARTERLY | YEARLY
+→ Hosted Checkout
+```
+
+### Fluxo de renovação
+
+```
+PrepareRenewalAsync
+→ usa SellerSubscription.BillingCycle
+→ busca SubscriptionPlanPrice ativa daquele ciclo
+→ cria Payment (Renewal) com o mesmo BillingCycle
+```
+
+### Economia (API)
+
+Comparando com o preço mensal do mesmo plano:
+
+- `equivalentMonthlyPrice = price / months`
+- `savingsAmount = (monthly * months) - price` (se > 0)
+- `savingsPercent` arredondado
+- `isRecommended = true` na recorrência **Yearly** quando existir
 
 ---
 
 ## 2. Fluxo Hosted Checkout (Sprint 8.2)
 
 ```
-Vendedor escolhe plano → POST /seller/subscription/checkout
-→ Customer + Subscription Pending + Payment Pending
-→ Redirect Asaas Hosted Checkout
+Vendedor escolhe plano + recorrência → POST /seller/subscription/checkout
+→ Customer + Subscription Pending + Payment Pending (BillingCycle)
+→ Redirect Asaas Hosted Checkout (Cycle conforme BillingCycle)
 ```
 
 Plano **R$ 0**: ativação local sem Asaas (`ActivatedWithoutCheckout`).
@@ -178,8 +227,11 @@ Logs: evento, tempo, IDs internos — **sem** API Key, PII ou payload completo s
 
 ## 11. Frontend
 
-- **Meu Plano:** badges Pending / Active / Grace Period / Expired / Cancelled; refetch a cada 15s se Pending  
-- **Admin / Pagamentos:** listagem + botão **Sincronizar com Asaas** + último webhook  
+- **/planos:** opções Mensal / Trimestral / Anual com economia e selo “Melhor custo-benefício” (dados da API)
+- **Meu Plano:** recorrência, valor, equivalente mensal, próxima renovação; badges Pending / Active / Grace / Expired / Cancelled
+- **Checkout (Meu Plano):** plano → recorrência → checkout com `billingCycle`
+- **Admin / Planos:** CRUD de recorrências e preços
+- **Admin / Pagamentos:** listagem + sync Asaas
 
 ---
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
+import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -21,14 +22,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { BillingCycle } from "@/contracts/common/enums";
 import type { SubscriptionPlanCatalogItemDto } from "@/contracts/seller/subscription";
+import { BillingCycleTabs } from "@/features/plans/components/BillingCycleTabs";
+import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import { usePlanCtaHref } from "@/features/plans/hooks/usePlanCtaHref";
 import {
   formatPlanAdvertisementLimit,
   formatPlanPrice,
+  getDefaultPlanPrice,
+  sortPlanPrices,
 } from "@/features/plans/utils/plan-display";
-import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 /** Acima disso, o card resume e oferece diálogo com o texto completo. */
 const DESCRIPTION_PREVIEW_THRESHOLD = 160;
@@ -42,9 +48,31 @@ function PlanCard({ plan, featured = false }: PlanCardProps) {
   const ctaHref = usePlanCtaHref();
   const [detailsOpen, setDetailsOpen] = useState(false);
 
+  const prices = sortPlanPrices(plan.prices);
+  const defaultPrice = getDefaultPlanPrice(plan.prices);
+  const [selectedCycle, setSelectedCycle] = useState<BillingCycle>(
+    defaultPrice?.billingCycle ?? BillingCycle.Monthly,
+  );
+
+  const selectedPrice =
+    prices.find((price) => price.billingCycle === selectedCycle) ??
+    defaultPrice ??
+    null;
+
   const description = plan.description?.trim() ?? "";
   const hasDescription = description.length > 0;
   const isLongDescription = description.length > DESCRIPTION_PREVIEW_THRESHOLD;
+
+  const showEquivalentMonthly =
+    selectedPrice != null && selectedPrice.billingCycle !== BillingCycle.Monthly;
+  const hasSavings =
+    selectedPrice != null &&
+    selectedPrice.billingCycle !== BillingCycle.Monthly &&
+    (selectedPrice.savingsPercent ?? 0) > 0;
+
+  const priceLabel = selectedPrice
+    ? formatPlanPrice(selectedPrice.price, selectedPrice.billingCycle)
+    : formatPlanPrice(plan.startingPrice);
 
   return (
     <div className={cn("relative flex h-full", featured && "pt-3")}>
@@ -62,9 +90,40 @@ function PlanCard({ plan, featured = false }: PlanCardProps) {
       >
         <CardHeader className={cn("shrink-0", featured && "pt-5")}>
           <CardTitle className="text-h3">{plan.name}</CardTitle>
-          <p className="text-h2 text-primary mt-2">
-            {formatPlanPrice(plan.price)}
-          </p>
+
+          {prices.length > 1 ? (
+            <BillingCycleTabs
+              prices={plan.prices}
+              selectedCycle={selectedCycle}
+              onSelect={setSelectedCycle}
+              className="mt-3"
+              aria-label={`Ciclo de cobrança do plano ${plan.name}`}
+            />
+          ) : null}
+
+          <div className="mt-3 flex flex-wrap items-baseline gap-2">
+            <p className="text-h2 text-primary">{priceLabel}</p>
+            {selectedPrice?.isRecommended ? (
+              <Badge variant="success">Melhor custo-benefício</Badge>
+            ) : null}
+          </div>
+
+          {showEquivalentMonthly ? (
+            <p className="text-small text-muted-foreground">
+              Equivale a{" "}
+              {formatCurrency(selectedPrice.equivalentMonthlyPrice)} / mês
+            </p>
+          ) : null}
+
+          {hasSavings ? (
+            <p className="text-success text-small font-medium">
+              Economize {selectedPrice.savingsPercent}%
+              {selectedPrice.savingsAmount != null
+                ? ` (${formatCurrency(selectedPrice.savingsAmount)})`
+                : ""}{" "}
+              em relação ao mensal
+            </p>
+          ) : null}
         </CardHeader>
 
         <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
@@ -119,7 +178,7 @@ function PlanCard({ plan, featured = false }: PlanCardProps) {
             <DialogHeader>
               <DialogTitle>{plan.name}</DialogTitle>
               <DialogDescription className="text-primary text-base font-semibold">
-                {formatPlanPrice(plan.price)}
+                {priceLabel}
               </DialogDescription>
             </DialogHeader>
 

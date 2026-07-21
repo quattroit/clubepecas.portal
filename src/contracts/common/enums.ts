@@ -97,3 +97,10 @@ export enum CategoryIconType {
   Svg = 2,
   Url = 3,
 }
+
+/** Ciclo de cobrança dos planos de assinatura (Sprint 8.3.1 — múltiplos ciclos). */
+export enum BillingCycle {
+  Monthly = 1,
+  Quarterly = 2,
+  Yearly = 3,
+}

@@ -54,7 +54,7 @@ function PlanComparison({ plans, className }: PlanComparisonProps) {
               </th>
               {plans.map((plan) => (
                 <td key={plan.id} className="px-4 py-3 font-medium">
-                  {formatPlanPrice(plan.price)}
+                  A partir de {formatPlanPrice(plan.startingPrice)}
                 </td>
               ))}
             </tr>

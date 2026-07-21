@@ -14,6 +14,7 @@ import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import {
   formatPlanAdvertisementLimit,
   formatPlanPrice,
+  sortPlanPrices,
 } from "@/features/plans/utils/plan-display";
 
 type AvailablePlansCardProps = {
@@ -43,6 +44,8 @@ function AvailablePlansCard({
         ) : (
           plans.map((plan) => {
             const isCurrent = currentPlanId === plan.id;
+            const prices = sortPlanPrices(plan.prices);
+            const cycleLabels = prices.map((price) => price.billingCycleLabel);
 
             return (
               <article
@@ -56,8 +59,15 @@ function AvailablePlansCard({
                   ) : null}
                 </div>
                 <p className="text-primary text-sm font-semibold">
-                  {formatPlanPrice(plan.price)}
+                  {plan.startingPrice === 0 && prices.length === 1
+                    ? "Grátis"
+                    : `A partir de ${formatPlanPrice(plan.startingPrice)}`}
                 </p>
+                {cycleLabels.length > 1 ? (
+                  <p className="text-small text-muted-foreground">
+                    Ciclos: {cycleLabels.join(" · ")}
+                  </p>
+                ) : null}
                 <p className="text-small text-muted-foreground">
                   {formatPlanAdvertisementLimit(plan.advertisementLimit)}
                 </p>

@@ -1,9 +1,13 @@
 import type {
   AdminSubscriptionPlanListItemDto,
+  AdminSubscriptionPlanPriceRequest,
   CreateAdminSubscriptionPlanRequest,
   UpdateAdminSubscriptionPlanRequest,
 } from "@/contracts/admin/subscription-plans";
-import type { SubscriptionPlanFormValues } from "@/features/admin/schemas/subscriptionPlanFormSchema";
+import type {
+  SubscriptionPlanFormValues,
+  SubscriptionPlanPriceFormValues,
+} from "@/features/admin/schemas/subscriptionPlanFormSchema";
 import { parsePriceInput } from "@/utils/parsePriceInput";
 
 function emptyToUndefined(value: string): string | undefined {
@@ -20,10 +24,36 @@ export function mapAdminSubscriptionPlanToForm(
   return {
     name: plan.name,
     description: plan.description ?? "",
-    price: plan.price.toFixed(2).replace(".", ","),
     advertisementLimit: plan.advertisementLimit,
     displayOrder: plan.displayOrder,
     isActive: plan.isActive,
+    prices: [...plan.prices]
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map((price) => ({
+        id: price.id,
+        billingCycle: price.billingCycle,
+        price: price.price.toFixed(2).replace(".", ","),
+        displayName: price.displayName ?? "",
+        description: price.description ?? "",
+        displayOrder: price.displayOrder,
+        isActive: price.isActive,
+        isRecommended: price.isRecommended,
+      })),
+  };
+}
+
+function mapPriceFormToRequest(
+  price: SubscriptionPlanPriceFormValues,
+): AdminSubscriptionPlanPriceRequest {
+  return {
+    id: price.id,
+    billingCycle: price.billingCycle,
+    price: parsePriceInput(price.price),
+    displayName: emptyToUndefined(price.displayName),
+    description: emptyToUndefined(price.description),
+    displayOrder: price.displayOrder,
+    isActive: price.isActive,
+    isRecommended: price.isRecommended,
   };
 }
 
@@ -36,10 +66,10 @@ export function mapSubscriptionPlanFormToCreateRequest(
   return {
     name: values.name.trim(),
     description: emptyToUndefined(values.description),
-    price: parsePriceInput(values.price),
     advertisementLimit: values.advertisementLimit,
     displayOrder: values.displayOrder,
     isActive: values.isActive,
+    prices: values.prices.map(mapPriceFormToRequest),
   };
 }
 
@@ -52,9 +82,9 @@ export function mapSubscriptionPlanFormToUpdateRequest(
   return {
     name: values.name.trim(),
     description: emptyToUndefined(values.description),
-    price: parsePriceInput(values.price),
     advertisementLimit: values.advertisementLimit,
     displayOrder: values.displayOrder,
     isActive: values.isActive,
+    prices: values.prices.map(mapPriceFormToRequest),
   };
 }

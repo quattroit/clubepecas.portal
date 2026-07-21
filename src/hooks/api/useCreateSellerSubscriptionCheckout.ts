@@ -3,9 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { ROUTES } from "@/constants/routes";
+import type { BillingCycle } from "@/contracts/common/enums";
 import { ApiError, isCanceledError } from "@/lib/errors";
 import { queryKeys } from "@/lib/queryKeys";
 import { sellerService } from "@/services/seller.service";
+
+type CreateCheckoutVariables = {
+  subscriptionPlanId: number;
+  billingCycle: BillingCycle;
+};
 
 function buildCheckoutUrls() {
   const origin =
@@ -41,11 +47,15 @@ export function useCreateSellerSubscriptionCheckout(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (subscriptionPlanId: number) => {
+    mutationFn: async ({
+      subscriptionPlanId,
+      billingCycle,
+    }: CreateCheckoutVariables) => {
       const urls = buildCheckoutUrls();
 
       return sellerService.createSubscriptionCheckout({
         subscriptionPlanId,
+        billingCycle,
         ...urls,
       });
     },

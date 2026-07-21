@@ -135,6 +135,16 @@ const CODE_MESSAGES: Record<string, string> = {
     "Informe uma ordem de exibição válida (zero ou maior).",
   "admin.subscription_plans.in_use":
     "Este plano não pode ser excluído pois está em uso.",
+  "admin.subscription_plans.prices.required":
+    "Adicione ao menos um ciclo de cobrança.",
+  "admin.subscription_plans.prices.price.invalid":
+    "Informe um preço válido (zero ou maior) para o ciclo de cobrança.",
+  "admin.subscription_plans.prices.billing_cycle.duplicate":
+    "Cada ciclo de cobrança pode ser adicionado apenas uma vez.",
+  "seller.subscription.billing_cycle.required":
+    "Selecione o ciclo de cobrança.",
+  "seller.subscription.billing_cycle.invalid":
+    "Este plano não oferece o ciclo de cobrança selecionado.",
   "photo.file.required": "Selecione um arquivo de imagem.",
   "photo.extension.invalid":
     "Extensão de arquivo não permitida. Use JPG, JPEG, PNG ou WEBP.",

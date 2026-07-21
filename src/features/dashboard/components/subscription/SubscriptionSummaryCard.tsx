@@ -16,6 +16,7 @@ import {
 } from "@/features/dashboard/components/subscription/subscription-display";
 import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import { formatPlanPrice } from "@/features/plans/utils/plan-display";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 
 type SubscriptionSummaryCardProps = {
@@ -25,10 +26,12 @@ type SubscriptionSummaryCardProps = {
 function SubscriptionSummaryCard({
   subscription,
 }: SubscriptionSummaryCardProps) {
+  const billingCycle =
+    subscription.currentPaymentBillingCycle ?? subscription.billingCycle;
   const billingAmount =
     subscription.currentPaymentAmount != null
-      ? formatPlanPrice(subscription.currentPaymentAmount)
-      : formatPlanPrice(subscription.price);
+      ? formatPlanPrice(subscription.currentPaymentAmount, billingCycle)
+      : formatPlanPrice(subscription.price, subscription.billingCycle);
 
   return (
     <Card>
@@ -61,11 +64,19 @@ function SubscriptionSummaryCard({
       </CardHeader>
 
       <CardContent className="pb-4">
-        <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <dt className="text-muted-foreground text-xs">Preço mensal</dt>
+            <dt className="text-muted-foreground text-xs">Recorrência</dt>
             <dd className="text-sm font-medium">
-              {formatPlanPrice(subscription.price)}
+              {subscription.billingCycleLabel}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-xs">
+              Equivalente mensal
+            </dt>
+            <dd className="text-sm font-medium">
+              {formatCurrency(subscription.equivalentMonthlyPrice)} / mês
             </dd>
           </div>
           <div>
@@ -88,7 +99,9 @@ function SubscriptionSummaryCard({
           </p>
           <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <dt className="text-muted-foreground text-xs">Próxima cobrança</dt>
+              <dt className="text-muted-foreground text-xs">
+                Próxima renovação
+              </dt>
               <dd className="text-sm font-medium">
                 {subscription.nextBillingDateUtc
                   ? formatDate(subscription.nextBillingDateUtc)

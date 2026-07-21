@@ -287,7 +287,7 @@ function AdminSubscriptionPlansView() {
                         {plan.name}
                       </td>
                       <td className="text-foreground px-4 py-3 tabular-nums">
-                        {formatCurrency(plan.price)}
+                        A partir de {formatCurrency(plan.startingPrice)}
                       </td>
                       <td className="text-foreground px-4 py-3 tabular-nums">
                         {plan.advertisementLimit}
