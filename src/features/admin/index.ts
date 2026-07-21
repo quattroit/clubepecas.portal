@@ -10,5 +10,6 @@ export { AdminVehicleModelsView } from "@/features/admin/components/AdminVehicle
 export { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsView";
 export { AdminSettingsView } from "@/features/admin/components/AdminSettingsView";
 export { AdminSubscriptionPlansView } from "@/features/admin/components/AdminSubscriptionPlansView";
+export { AdminPaymentsView } from "@/features/admin/components/AdminPaymentsView";
 export { AdminAuditView } from "@/features/admin/components/AdminAuditView";
 export { AdminFilesView } from "@/features/admin/components/AdminFilesView";

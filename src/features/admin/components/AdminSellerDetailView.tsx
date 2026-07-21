@@ -394,6 +394,81 @@ function AdminSellerDetailView() {
           ) : null}
         </AdminSection>
 
+        <AdminSection title="Financeiro (somente leitura)">
+          {sellerQuery.isLoading ? (
+            <AdminCard>
+              <div className="bg-muted h-24 animate-pulse rounded-lg" />
+            </AdminCard>
+          ) : data ? (
+            <AdminCard>
+              {data.financial ? (
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-muted-foreground text-xs">Provedor</dt>
+                    <dd className="text-sm font-medium">
+                      {data.financial.provider === 1
+                        ? "Asaas"
+                        : data.financial.provider === 0
+                          ? "Nenhum"
+                          : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">
+                      Status da assinatura
+                    </dt>
+                    <dd className="text-sm">
+                      {data.financial.subscriptionStatus === 1
+                        ? "Ativa"
+                        : data.financial.subscriptionStatus === 4
+                          ? "Pendente (checkout)"
+                          : data.financial.subscriptionStatus === 2
+                            ? "Cancelada"
+                            : data.financial.subscriptionStatus === 3
+                              ? "Expirada"
+                              : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">
+                      Status do pagamento
+                    </dt>
+                    <dd className="text-sm">
+                      {data.financial.currentPaymentStatus === 1
+                        ? "Pendente"
+                        : data.financial.currentPaymentStatus === 3
+                          ? "Pago"
+                          : data.financial.currentPaymentStatus != null
+                            ? String(data.financial.currentPaymentStatus)
+                            : "—"}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-muted-foreground text-xs">
+                      External Customer ID
+                    </dt>
+                    <dd className="text-sm break-all font-mono">
+                      {data.financial.externalCustomerId ?? "—"}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-muted-foreground text-xs">
+                      External Subscription ID
+                    </dt>
+                    <dd className="text-sm break-all font-mono">
+                      {data.financial.externalSubscriptionId ?? "—"}
+                    </dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Nenhuma assinatura ou checkout registrado para este vendedor.
+                </p>
+              )}
+            </AdminCard>
+          ) : null}
+        </AdminSection>
+
         <AdminSection title="Dados da loja">
           {sellerQuery.isLoading ? (
             <AdminCard>

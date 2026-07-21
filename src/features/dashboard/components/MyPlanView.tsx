@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { ChoosePlanDialog } from "@/features/dashboard/components/ChoosePlanDialog";
 import { AvailablePlansCard } from "@/features/dashboard/components/subscription/AvailablePlansCard";
+import { PaymentHistoryCard } from "@/features/dashboard/components/subscription/PaymentHistoryCard";
 import { SubscriptionActionsCard } from "@/features/dashboard/components/subscription/SubscriptionActionsCard";
 import { SubscriptionFaqCard } from "@/features/dashboard/components/subscription/SubscriptionFaqCard";
 import { SubscriptionHistoryCard } from "@/features/dashboard/components/subscription/SubscriptionHistoryCard";
@@ -20,6 +21,7 @@ import { SubscriptionUsageCard } from "@/features/dashboard/components/subscript
 import { useActiveSubscriptionPlans } from "@/hooks/api/useActiveSubscriptionPlans";
 import { useCancelSellerSubscription } from "@/hooks/api/useCancelSellerSubscription";
 import { useCurrentSellerSubscription } from "@/hooks/api/useCurrentSellerSubscription";
+import { useSellerPayments } from "@/hooks/api/useSellerPayments";
 import { useSellerSubscriptions } from "@/hooks/api/useSellerSubscriptions";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 
@@ -29,6 +31,7 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 function MyPlanView() {
   const subscriptionQuery = useCurrentSellerSubscription();
   const historyQuery = useSellerSubscriptions();
+  const paymentsQuery = useSellerPayments();
   const plansQuery = useActiveSubscriptionPlans();
   const cancelMutation = useCancelSellerSubscription();
 
@@ -111,6 +114,19 @@ function MyPlanView() {
 
       {!historyQuery.isLoading && !historyQuery.isError ? (
         <SubscriptionHistoryCard items={historyQuery.data ?? []} />
+      ) : null}
+
+      {paymentsQuery.isLoading ? <SubscriptionHistorySkeleton /> : null}
+
+      {paymentsQuery.isError ? (
+        <ErrorMessage
+          title="Não foi possível carregar o histórico financeiro"
+          message={getFriendlyErrorMessage(paymentsQuery.error)}
+        />
+      ) : null}
+
+      {!paymentsQuery.isLoading && !paymentsQuery.isError ? (
+        <PaymentHistoryCard items={paymentsQuery.data ?? []} />
       ) : null}
 
       <SubscriptionFaqCard />

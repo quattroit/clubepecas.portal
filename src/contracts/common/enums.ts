@@ -40,6 +40,46 @@ export enum SellerSubscriptionStatus {
   Active = 1,
   Cancelled = 2,
   Expired = 3,
+  /** Aguardando conclusão do checkout (Sprint 8.2). */
+  Pending = 4,
+}
+
+/** Tipo da movimentação financeira (Épico 8). */
+export enum PaymentType {
+  Subscription = 1,
+  Renewal = 2,
+  Refund = 3,
+  Credit = 4,
+  Discount = 5,
+  Adjustment = 6,
+}
+
+/** Status do pagamento (Épico 8). */
+export enum PaymentStatus {
+  Pending = 1,
+  Processing = 2,
+  Paid = 3,
+  Cancelled = 4,
+  Failed = 5,
+  Expired = 6,
+  Refunded = 7,
+}
+
+/** Provedor de pagamento (Épico 8). */
+export enum PaymentProvider {
+  None = 0,
+  Asaas = 1,
+  Stripe = 2,
+  MercadoPago = 3,
+}
+
+/** Meio de pagamento (Épico 8). */
+export enum PaymentMethod {
+  Unknown = 0,
+  Pix = 1,
+  CreditCard = 2,
+  Boleto = 3,
+  BankTransfer = 4,
 }
 
 /** Tipo de pessoa do vendedor (Sprint 5.6). */

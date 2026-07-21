@@ -1,4 +1,9 @@
-import type { SellerSubscriptionStatus } from "@/contracts/common/enums";
+import type {
+  PaymentMethod,
+  PaymentProvider,
+  PaymentStatus,
+  SellerSubscriptionStatus,
+} from "@/contracts/common/enums";
 
 /** GET/POST/DELETE /api/v1/seller/subscription */
 export type SellerSubscriptionDto = {
@@ -13,6 +18,15 @@ export type SellerSubscriptionDto = {
   status: SellerSubscriptionStatus;
   startDate: string;
   endDate?: string | null;
+  currentPaymentId?: number | null;
+  nextBillingDateUtc?: string | null;
+  activatedAtUtc?: string | null;
+  autoRenew?: boolean;
+  gracePeriodUntilUtc?: string | null;
+  currentPaymentStatus?: PaymentStatus | null;
+  currentPaymentMethod?: PaymentMethod | null;
+  currentPaymentAmount?: number | null;
+  currentPaymentCurrency?: string | null;
 };
 
 /** GET /api/v1/seller/subscriptions */
@@ -25,6 +39,28 @@ export type ListSellerSubscriptionsResponse = {
 /** POST /api/v1/seller/subscription */
 export type CreateSellerSubscriptionRequest = {
   subscriptionPlanId: number;
+};
+
+/** POST /api/v1/seller/subscription/checkout */
+export type CreateSellerSubscriptionCheckoutRequest = {
+  subscriptionPlanId: number;
+  successUrl: string;
+  cancelUrl: string;
+  expiredUrl?: string;
+};
+
+export type CreateSellerSubscriptionCheckoutResponse = {
+  checkoutUrl?: string | null;
+  expiresAtUtc?: string | null;
+  paymentId: number;
+  subscriptionId: number;
+  externalCustomerId?: string | null;
+  externalCheckoutId?: string | null;
+  externalSubscriptionId?: string | null;
+  provider: PaymentProvider;
+  reusedExistingCheckout: boolean;
+  /** True quando o plano é R$ 0 e a assinatura foi ativada sem Asaas. */
+  activatedWithoutCheckout: boolean;
 };
 
 /** GET /api/v1/subscription-plans — catálogo público (apenas ativos). */

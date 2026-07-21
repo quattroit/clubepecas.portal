@@ -60,6 +60,11 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     document: dto.document,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
+    zipCode: dto.zipCode,
+    street: dto.street,
+    number: dto.number,
+    complement: dto.complement,
+    neighborhood: dto.neighborhood,
   };
 }
 

@@ -15,6 +15,7 @@ import {
   ScrollText,
   Settings,
   Store,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -82,6 +83,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_PLANS,
     label: "Planos",
     icon: CreditCard,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_PAYMENTS,
+    label: "Pagamentos",
+    icon: Wallet,
     exact: false,
   },
   {

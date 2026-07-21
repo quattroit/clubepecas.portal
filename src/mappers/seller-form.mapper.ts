@@ -7,6 +7,7 @@ import type { SellerProfileFormValues } from "@/features/dashboard/schemas/selle
 import type { Seller } from "@/types/Seller";
 import { formatDocumentInput } from "@/utils/document";
 import { formatInstagramHandle } from "@/utils/instagram";
+import { formatPostalCodeInput } from "@/utils/postalCode";
 
 /**
  * Seller (UI) → valores do formulário de perfil.
@@ -27,6 +28,11 @@ export function mapSellerToProfileFormValues(
     document: seller.document
       ? formatDocumentInput(seller.document, personType)
       : "",
+    zipCode: seller.zipCode ? formatPostalCodeInput(seller.zipCode) : "",
+    street: seller.street ?? "",
+    number: seller.number ?? "",
+    complement: seller.complement ?? "",
+    neighborhood: seller.neighborhood ?? "",
     description: seller.description ?? "",
     whatsApp: seller.whatsApp ?? "",
     instagram: seller.instagram
@@ -63,7 +69,12 @@ function mapSellerProfileFormToRequest(
     cityId: values.cityId,
     personType: values.personType,
     document: values.document.trim(),
+    zipCode: values.zipCode.trim(),
+    street: values.street.trim(),
+    number: values.number.trim(),
+    neighborhood: values.neighborhood.trim(),
     description: emptyToNull(values.description),
+    complement: emptyToNull(values.complement),
     whatsApp: values.whatsApp.trim(),
     instagram: emptyToNull(values.instagram),
     photoUrl: emptyToNull(values.photoUrl),

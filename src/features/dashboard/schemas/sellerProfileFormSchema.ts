@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { PersonType } from "@/contracts/common/enums";
 import { isValidDocument } from "@/utils/document";
+import { isValidPostalCode } from "@/utils/postalCode";
 
 const optionalText = z.string();
 
@@ -34,6 +35,15 @@ export const sellerProfileFormSchema = z
       error: "Selecione o tipo de pessoa",
     }),
     document: z.string().trim().min(1, "Informe o CPF ou CNPJ"),
+    zipCode: z
+      .string()
+      .trim()
+      .min(1, "Informe o CEP")
+      .refine(isValidPostalCode, "Informe um CEP válido com 8 dígitos"),
+    street: z.string().trim().min(1, "Informe o logradouro"),
+    number: z.string().trim().min(1, "Informe o número"),
+    complement: optionalText,
+    neighborhood: z.string().trim().min(1, "Informe o bairro"),
     description: optionalText,
     whatsApp: z
       .string()
@@ -76,6 +86,11 @@ export const sellerProfileFormDefaultValues: SellerProfileFormValues = {
   cityId: 0,
   personType: PersonType.Individual,
   document: "",
+  zipCode: "",
+  street: "",
+  number: "",
+  complement: "",
+  neighborhood: "",
   description: "",
   whatsApp: "",
   instagram: "",

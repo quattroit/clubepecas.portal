@@ -12,10 +12,13 @@ import type {
   SellerPublicProfileResponse,
 } from "@/contracts/seller/responses";
 import type {
+  CreateSellerSubscriptionCheckoutRequest,
+  CreateSellerSubscriptionCheckoutResponse,
   CreateSellerSubscriptionRequest,
   ListSellerSubscriptionsResponse,
   SellerSubscriptionDto,
 } from "@/contracts/seller/subscription";
+import type { ListSellerPaymentsResponse } from "@/contracts/seller/payments";
 import { api } from "@/lib/api";
 
 /**
@@ -77,10 +80,27 @@ export const sellerService = {
       .then((response) => response.data);
   },
 
+  /** POST /api/v1/seller/subscription/checkout — Hosted Checkout Asaas */
+  createSubscriptionCheckout(payload: CreateSellerSubscriptionCheckoutRequest) {
+    return api
+      .post<CreateSellerSubscriptionCheckoutResponse>(
+        "/api/v1/seller/subscription/checkout",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
   /** DELETE /api/v1/seller/subscription — cancela ACTIVE. */
   cancelSubscription() {
     return api
       .delete<SellerSubscriptionDto>("/api/v1/seller/subscription")
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/payments — histórico financeiro. */
+  listPayments() {
+    return api
+      .get<ListSellerPaymentsResponse>("/api/v1/seller/payments")
       .then((response) => response.data);
   },
 

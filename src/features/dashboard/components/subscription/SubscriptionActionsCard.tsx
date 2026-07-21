@@ -29,8 +29,8 @@ function SubscriptionActionsCard({
         <CardHeader>
           <CardTitle className="text-h3">Comece a anunciar</CardTitle>
           <CardDescription>
-            Escolha um plano para publicar anúncios na plataforma. O pagamento
-            será configurado em uma etapa futura.
+            Escolha um plano e conclua o pagamento no checkout seguro para
+            publicar anúncios na plataforma.
           </CardDescription>
         </CardHeader>
         <CardContent className="pb-4">
@@ -41,7 +41,7 @@ function SubscriptionActionsCard({
             icon={<CreditCard aria-hidden />}
             action={
               <Button type="button" variant="primary" onClick={onChoosePlan}>
-                Escolher Plano
+                Assinar Plano
               </Button>
             }
           />

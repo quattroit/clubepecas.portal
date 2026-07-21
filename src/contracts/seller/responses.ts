@@ -21,6 +21,11 @@ export type SellerMeDto = {
   whatsApp: string;
   instagram: string | null;
   photoUrl: string | null;
+  zipCode: string | null;
+  street: string | null;
+  number: string | null;
+  complement: string | null;
+  neighborhood: string | null;
   isActive: boolean;
   createdAt: string;
 };

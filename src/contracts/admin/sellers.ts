@@ -104,6 +104,15 @@ export type AdminSellerDetailResponse = {
   whatsappClicks: number;
   conversionRate: number | null;
   advertisements: AdminSellerAdvertisementDto[];
+  financial?: AdminSellerFinancialInfoDto | null;
+};
+
+export type AdminSellerFinancialInfoDto = {
+  provider?: number | null;
+  externalCustomerId?: string | null;
+  externalSubscriptionId?: string | null;
+  subscriptionStatus?: number | null;
+  currentPaymentStatus?: number | null;
 };
 
 export type AdminSellerAdvertisementDto = {

@@ -1,0 +1,17 @@
+---
+description: Sempre aplicar migrations EF Core no banco após criá-las
+alwaysApply: true
+---
+
+# Migrations EF Core
+
+Ao criar ou alterar migrations no backend (`ClubePecas`):
+
+1. Gerar a migration com `dotnet ef migrations add ...`
+2. **Sempre** aplicar em seguida com:
+
+```bash
+dotnet ef database update --project src/ClubePecas.Infrastructure --startup-project src/ClubePecas.Api
+```
+
+Não deixar a migration só no código — o banco local deve ficar atualizado na mesma tarefa.

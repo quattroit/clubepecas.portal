@@ -69,6 +69,23 @@ const CODE_MESSAGES: Record<string, string> = {
   "seller.subscription.not_found":
     "Nenhuma assinatura ativa encontrada.",
   "seller.subscription.plan_not_found": "Plano de assinatura não encontrado.",
+  "seller.subscription.document_required":
+    "Informe CPF ou CNPJ no perfil da loja antes de assinar um plano.",
+  "seller.address.required":
+    "Complete o endereço no perfil da loja (CEP, logradouro, número e bairro) antes de assinar um plano.",
+  "seller.postal_code.required": "Informe o CEP.",
+  "seller.postal_code.invalid": "Informe um CEP válido com 8 dígitos.",
+  "seller.street.required": "Informe o logradouro.",
+  "seller.address_number.required": "Informe o número.",
+  "seller.neighborhood.required": "Informe o bairro.",
+  "payment.checkout.urls_required":
+    "Não foi possível iniciar o checkout. Atualize a página e tente novamente.",
+  "payment.checkout.failed":
+    "Não foi possível iniciar o checkout. Tente novamente.",
+  "payment.provider.error":
+    "Não foi possível conectar ao gateway de pagamento. Tente novamente em instantes.",
+  "payment.provider.configuration":
+    "Pagamentos não configurados. A chave de API do Asaas (Sandbox) precisa ser configurada no servidor.",
   "seller.document.already_exists":
     "Já existe um vendedor cadastrado com este CPF ou CNPJ.",
   "seller.document.invalid": "Informe um CPF ou CNPJ válido.",
@@ -193,6 +210,11 @@ export function getFriendlyErrorMessage(error: unknown): string {
       .find(Boolean);
 
     if (mapped) return mapped;
+
+    const apiMessage = error.message?.trim();
+    if (apiMessage && apiMessage !== "Erro na requisição") {
+      return apiMessage;
+    }
   }
 
   return "Não foi possível concluir a operação. Tente novamente.";

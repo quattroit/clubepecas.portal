@@ -20,4 +20,9 @@ export type Seller = {
   document?: string | null;
   whatsApp?: string | null;
   instagram?: string | null;
+  zipCode?: string | null;
+  street?: string | null;
+  number?: string | null;
+  complement?: string | null;
+  neighborhood?: string | null;
 };

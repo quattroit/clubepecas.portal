@@ -7,6 +7,10 @@ import {
 } from "@/components/ui/card";
 import type { SellerSubscriptionDto } from "@/contracts/seller/subscription";
 import {
+  paymentMethodLabel,
+  paymentStatusLabel,
+} from "@/features/dashboard/components/subscription/payment-display";
+import {
   subscriptionStatusBadgeVariant,
   subscriptionStatusLabel,
 } from "@/features/dashboard/components/subscription/subscription-display";
@@ -21,6 +25,11 @@ type SubscriptionSummaryCardProps = {
 function SubscriptionSummaryCard({
   subscription,
 }: SubscriptionSummaryCardProps) {
+  const billingAmount =
+    subscription.currentPaymentAmount != null
+      ? formatPlanPrice(subscription.currentPaymentAmount)
+      : formatPlanPrice(subscription.price);
+
   return (
     <Card>
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -65,33 +74,34 @@ function SubscriptionSummaryCard({
           </div>
         </dl>
 
-        {/* Reserva de layout para o épico de pagamentos */}
-        <div
-          className="border-border mt-5 border-t pt-4"
-          data-slot="subscription-billing-placeholder"
-        >
+        <div className="border-border mt-5 border-t pt-4" data-slot="subscription-billing">
           <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-            Pagamento
-          </p>
-          <p className="text-small text-muted-foreground mt-1">
-            Informações de cobrança e faturas estarão disponíveis em breve.
+            Status financeiro
           </p>
           <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <dt className="text-muted-foreground text-xs">Próxima cobrança</dt>
-              <dd className="text-muted-foreground text-sm">Em breve</dd>
+              <dd className="text-sm font-medium">
+                {subscription.nextBillingDateUtc
+                  ? formatDate(subscription.nextBillingDateUtc)
+                  : "—"}
+              </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground text-xs">Forma de pagamento</dt>
-              <dd className="text-muted-foreground text-sm">Em breve</dd>
+              <dt className="text-muted-foreground text-xs">Valor</dt>
+              <dd className="text-sm font-medium">{billingAmount}</dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground text-xs">Método</dt>
+              <dd className="text-sm font-medium">
+                {paymentMethodLabel(subscription.currentPaymentMethod)}
+              </dd>
             </div>
             <div>
               <dt className="text-muted-foreground text-xs">Status da cobrança</dt>
-              <dd className="text-muted-foreground text-sm">Em breve</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground text-xs">Faturas</dt>
-              <dd className="text-muted-foreground text-sm">Em breve</dd>
+              <dd className="text-sm font-medium">
+                {paymentStatusLabel(subscription.currentPaymentStatus)}
+              </dd>
             </div>
           </dl>
         </div>

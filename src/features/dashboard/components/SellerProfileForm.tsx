@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Controller, useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,12 +20,17 @@ import {
   type SellerProfileFormValues,
 } from "@/features/dashboard/schemas/sellerProfileFormSchema";
 import { useCities } from "@/hooks/api/useCities";
+import { useViaCepLookup } from "@/hooks/api/useViaCepLookup";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import {
   documentPlaceholder,
   formatDocumentInput,
 } from "@/utils/document";
+import {
+  formatPostalCodeInput,
+  normalizePostalCode,
+} from "@/utils/postalCode";
 
 const selectClassName = cn(
   "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3",
@@ -84,8 +89,35 @@ function SellerProfileForm({
   const personType = useWatch({ control, name: "personType" });
   const photoUrl = useWatch({ control, name: "photoUrl" }) ?? "";
   const cityId = useWatch({ control, name: "cityId" }) ?? 0;
+  const zipCode = useWatch({ control, name: "zipCode" }) ?? "";
+
+  const viaCepQuery = useViaCepLookup(zipCode, !isSubmitting);
+  const lastAutofilledCep = useRef<string | null>(null);
 
   const [selectedState, setSelectedState] = useState<string | null>(null);
+
+  useEffect(() => {
+    const digits = normalizePostalCode(zipCode);
+    const lookup = viaCepQuery.data;
+
+    if (
+      !lookup ||
+      digits.length !== 8 ||
+      lastAutofilledCep.current === digits
+    ) {
+      return;
+    }
+
+    setValue("street", lookup.street, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("neighborhood", lookup.neighborhood, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    lastAutofilledCep.current = digits;
+  }, [viaCepQuery.data, zipCode, setValue]);
 
   useEffect(() => {
     reset({
@@ -358,6 +390,139 @@ function SellerProfileForm({
           {errors.cityId.message}
         </p>
       ) : null}
+
+      <div className="flex flex-col gap-2">
+        <h2 className="text-sm font-semibold">Endereço da loja</h2>
+        <p className="text-muted-foreground text-xs">
+          Obrigatório para pagamentos via Asaas. Informe o CEP para preencher
+          logradouro e bairro automaticamente.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-zip-code">CEP</Label>
+          <Controller
+            name="zipCode"
+            control={control}
+            render={({ field }) => (
+              <Input
+                id="seller-zip-code"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                placeholder="00000-000"
+                disabled={isSubmitting}
+                aria-invalid={Boolean(errors.zipCode)}
+                aria-describedby={
+                  errors.zipCode ? "seller-zip-code-error" : "seller-zip-code-hint"
+                }
+                value={field.value}
+                onChange={(event) => {
+                  lastAutofilledCep.current = null;
+                  field.onChange(formatPostalCodeInput(event.target.value));
+                }}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+          <p id="seller-zip-code-hint" className="text-muted-foreground text-xs">
+            {viaCepQuery.isFetching
+              ? "Consultando CEP…"
+              : viaCepQuery.isError
+                ? "Não foi possível consultar o CEP. Preencha manualmente."
+                : "Digite os 8 dígitos do CEP."}
+          </p>
+          {errors.zipCode ? (
+            <p
+              id="seller-zip-code-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.zipCode.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-street">Logradouro</Label>
+          <Input
+            id="seller-street"
+            autoComplete="street-address"
+            aria-invalid={Boolean(errors.street)}
+            aria-describedby={
+              errors.street ? "seller-street-error" : undefined
+            }
+            disabled={isSubmitting}
+            {...register("street")}
+          />
+          {errors.street ? (
+            <p
+              id="seller-street-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.street.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-number">Número</Label>
+          <Input
+            id="seller-number"
+            autoComplete="off"
+            aria-invalid={Boolean(errors.number)}
+            aria-describedby={
+              errors.number ? "seller-number-error" : undefined
+            }
+            disabled={isSubmitting}
+            {...register("number")}
+          />
+          {errors.number ? (
+            <p
+              id="seller-number-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.number.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-complement">Complemento (opcional)</Label>
+          <Input
+            id="seller-complement"
+            autoComplete="off"
+            aria-invalid={Boolean(errors.complement)}
+            disabled={isSubmitting}
+            {...register("complement")}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 sm:col-span-2">
+          <Label htmlFor="seller-neighborhood">Bairro</Label>
+          <Input
+            id="seller-neighborhood"
+            autoComplete="off"
+            aria-invalid={Boolean(errors.neighborhood)}
+            aria-describedby={
+              errors.neighborhood ? "seller-neighborhood-error" : undefined
+            }
+            disabled={isSubmitting}
+            {...register("neighborhood")}
+          />
+          {errors.neighborhood ? (
+            <p
+              id="seller-neighborhood-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.neighborhood.message}
+            </p>
+          ) : null}
+        </div>
+      </div>
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="seller-description">Descrição (opcional)</Label>
