@@ -32,6 +32,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       ...(apiPattern ? [apiPattern] : []),
       {
+        protocol: "http",
+        hostname: "localhost",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "localhost",
+        pathname: "/**",
+      },
+      {
         protocol: "https",
         hostname: "localhost",
         port: "7000",
