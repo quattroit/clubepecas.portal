@@ -47,6 +47,16 @@ export type SubscriptionFinancialSummaryDto = {
   paymentStatusLabel?: string | null;
   hasPendingPayment: boolean;
   hasOverduePayment: boolean;
+  totalPaid: number;
+  totalInvoices: number;
+  totalPendingInvoices: number;
+  nextInvoiceValue?: number | null;
+  nextInvoiceDate?: string | null;
+  currentPlanSavings?: number | null;
+  annualSavings?: number | null;
+  quarterlySavings?: number | null;
+  lifetimeValue: number;
+  paymentLink?: string | null;
 };
 
 export type SubscriptionIndicatorsDto = {
@@ -75,8 +85,24 @@ export type SubscriptionAvailableActionsDto = {
   canCancel: boolean;
   /** Apenas quando status = CancellationRequested. */
   canReactivate: boolean;
+  /** Assinatura Cancelled/Expired — iniciar novo checkout. */
+  canSubscribe: boolean;
   canRetryPayment: boolean;
+  canNewCharge: boolean;
   canSyncPayment: boolean;
+};
+
+/** POST /api/v1/seller/subscription/retry-payment | new-charge */
+export type PaymentRecoveryResponse = {
+  paymentId: number;
+  status: PaymentStatus;
+  statusLabel: string;
+  amount: number;
+  currency: string;
+  dueDateUtc?: string | null;
+  invoiceUrl?: string | null;
+  checkoutUrl?: string | null;
+  message: string;
 };
 
 export type SubscriptionPendingChangeDto = {

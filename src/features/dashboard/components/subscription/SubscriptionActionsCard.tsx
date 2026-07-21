@@ -14,27 +14,37 @@ import type { SubscriptionAvailableActionsDto } from "@/contracts/seller/subscri
 type SubscriptionActionsCardProps = {
   hasSubscription: boolean;
   actions?: SubscriptionAvailableActionsDto | null;
+  retryPaymentLabel?: string;
   onChoosePlan: () => void;
   onUpgrade?: () => void;
   onDowngrade?: () => void;
   onChangeBillingCycle?: () => void;
   onCancel: () => void;
   onReactivate?: () => void;
+  onRetryPayment?: () => void;
+  onNewCharge?: () => void;
   cancelLoading?: boolean;
   reactivateLoading?: boolean;
+  retryLoading?: boolean;
+  newChargeLoading?: boolean;
 };
 
 function SubscriptionActionsCard({
   hasSubscription,
   actions,
+  retryPaymentLabel = "Reintentar pagamento",
   onChoosePlan,
   onUpgrade,
   onDowngrade,
   onChangeBillingCycle,
   onCancel,
   onReactivate,
+  onRetryPayment,
+  onNewCharge,
   cancelLoading = false,
   reactivateLoading = false,
+  retryLoading = false,
+  newChargeLoading = false,
 }: SubscriptionActionsCardProps) {
   if (!hasSubscription) {
     return (
@@ -63,11 +73,14 @@ function SubscriptionActionsCard({
     );
   }
 
-  const canViewPlans =
+  const canSubscribe = Boolean(actions?.canSubscribe);
+  const canReactivate = Boolean(actions?.canReactivate);
+  const canManagePlan =
     Boolean(actions?.canUpgrade) ||
     Boolean(actions?.canDowngrade) ||
-    Boolean(actions?.canChangeBillingCycle) ||
-    Boolean(actions?.canReactivate);
+    Boolean(actions?.canChangeBillingCycle);
+  const canRetry = Boolean(actions?.canRetryPayment);
+  const canNewCharge = Boolean(actions?.canNewCharge);
 
   return (
     <Card>
@@ -78,55 +91,13 @@ function SubscriptionActionsCard({
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2 pb-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onChoosePlan}
-          disabled={!canViewPlans}
-        >
-          Ver planos
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onUpgrade}
-          disabled={!actions?.canUpgrade || !onUpgrade}
-        >
-          Upgrade
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onDowngrade}
-          disabled={!actions?.canDowngrade || !onDowngrade}
-        >
-          Downgrade
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onChangeBillingCycle}
-          disabled={!actions?.canChangeBillingCycle || !onChangeBillingCycle}
-        >
-          Alterar ciclo
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!actions?.canRetryPayment}
-          title="Reintento de pagamento será habilitado em breve"
-        >
-          Reintentar pagamento
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!actions?.canSyncPayment}
-          title="Sincronização manual disponível no admin"
-        >
-          Sincronizar
-        </Button>
-        {actions?.canReactivate ? (
+        {canSubscribe ? (
+          <Button type="button" variant="primary" onClick={onChoosePlan}>
+            Assinar novo plano
+          </Button>
+        ) : null}
+
+        {canReactivate ? (
           <Button
             type="button"
             variant="primary"
@@ -137,6 +108,70 @@ function SubscriptionActionsCard({
             Reativar assinatura
           </Button>
         ) : null}
+
+        {canManagePlan ? (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onUpgrade}
+              disabled={!actions?.canUpgrade || !onUpgrade}
+            >
+              Upgrade
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onDowngrade}
+              disabled={!actions?.canDowngrade || !onDowngrade}
+            >
+              Downgrade
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onChangeBillingCycle}
+              disabled={
+                !actions?.canChangeBillingCycle || !onChangeBillingCycle
+              }
+            >
+              Alterar ciclo
+            </Button>
+          </>
+        ) : null}
+
+        {canRetry ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onRetryPayment}
+            disabled={retryLoading || !onRetryPayment}
+            aria-busy={retryLoading}
+          >
+            {retryPaymentLabel}
+          </Button>
+        ) : null}
+
+        {canNewCharge ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onNewCharge}
+            disabled={newChargeLoading || !onNewCharge}
+            aria-busy={newChargeLoading}
+          >
+            Gerar nova cobrança
+          </Button>
+        ) : null}
+
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!actions?.canSyncPayment}
+          title="Sincronização manual disponível no admin"
+        >
+          Sincronizar
+        </Button>
         <Button
           type="button"
           variant="destructive"

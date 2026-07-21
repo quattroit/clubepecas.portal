@@ -24,6 +24,7 @@ import type {
   ListSellerSubscriptionHistoryResponse,
   ListSellerSubscriptionPaymentsResponse,
   ListSellerSubscriptionsResponse,
+  PaymentRecoveryResponse,
   ReactivateSellerSubscriptionResponse,
   SellerSubscriptionDto,
 } from "@/contracts/seller/subscription";
@@ -164,6 +165,24 @@ export const sellerService = {
     return api
       .put<ReactivateSellerSubscriptionResponse>(
         "/api/v1/seller/subscription/reactivate",
+      )
+      .then((response) => response.data);
+  },
+
+  /** POST /api/v1/seller/subscription/retry-payment */
+  retrySubscriptionPayment() {
+    return api
+      .post<PaymentRecoveryResponse>(
+        "/api/v1/seller/subscription/retry-payment",
+      )
+      .then((response) => response.data);
+  },
+
+  /** POST /api/v1/seller/subscription/new-charge */
+  createSubscriptionNewCharge() {
+    return api
+      .post<PaymentRecoveryResponse>(
+        "/api/v1/seller/subscription/new-charge",
       )
       .then((response) => response.data);
   },

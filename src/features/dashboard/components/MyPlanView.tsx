@@ -27,9 +27,11 @@ import { SubscriptionTimelineCard } from "@/features/dashboard/components/subscr
 import { SubscriptionUsageCard } from "@/features/dashboard/components/subscription/SubscriptionUsageCard";
 import { useCancelSellerSubscriptionRenewal } from "@/hooks/api/useCancelSellerSubscriptionRenewal";
 import { useChangeSellerSubscriptionBillingCycle } from "@/hooks/api/useChangeSellerSubscriptionBillingCycle";
+import { useCreateSellerSubscriptionNewCharge } from "@/hooks/api/useCreateSellerSubscriptionNewCharge";
 import { useCurrentSellerSubscription } from "@/hooks/api/useCurrentSellerSubscription";
 import { useDowngradeSellerSubscription } from "@/hooks/api/useDowngradeSellerSubscription";
 import { useReactivateSellerSubscription } from "@/hooks/api/useReactivateSellerSubscription";
+import { useRetrySellerSubscriptionPayment } from "@/hooks/api/useRetrySellerSubscriptionPayment";
 import { useSellerSubscriptionHistory } from "@/hooks/api/useSellerSubscriptionHistory";
 import { useSellerSubscriptionPayments } from "@/hooks/api/useSellerSubscriptionPayments";
 import { useUpgradeSellerSubscription } from "@/hooks/api/useUpgradeSellerSubscription";
@@ -66,9 +68,16 @@ function MyPlanView() {
   });
   const cancelRenewalMutation = useCancelSellerSubscriptionRenewal();
   const reactivateMutation = useReactivateSellerSubscription();
+  const retryPaymentMutation = useRetrySellerSubscriptionPayment();
+  const newChargeMutation = useCreateSellerSubscriptionNewCharge();
 
   const subscription = subscriptionQuery.data ?? null;
   const openChoosePlan = () => setChooseOpen(true);
+  const retryPaymentLabel =
+    subscription?.financial.hasOverduePayment ||
+    subscription?.financial.hasPendingPayment
+      ? "Pagar agora"
+      : "Reintentar pagamento";
 
   const upgradePlans =
     subscription?.availablePlans.filter(
@@ -151,20 +160,32 @@ function MyPlanView() {
             />
           ) : null}
           <SubscriptionMessagesCard messages={subscription.messages} />
-          <SubscriptionFinancialCard subscription={subscription} />
+          <SubscriptionFinancialCard
+            subscription={subscription}
+            actions={subscription.actions}
+            onRetryPayment={() => retryPaymentMutation.mutate()}
+            onNewCharge={() => newChargeMutation.mutate()}
+            retryLoading={retryPaymentMutation.isPending}
+            newChargeLoading={newChargeMutation.isPending}
+          />
           <SubscriptionUsageCard subscription={subscription} />
           <SubscriptionTimelineCard items={subscription.timeline} />
           <SubscriptionActionsCard
             hasSubscription
             actions={subscription.actions}
+            retryPaymentLabel={retryPaymentLabel}
             onChoosePlan={openChoosePlan}
             onUpgrade={() => setPlanPriceMode("upgrade")}
             onDowngrade={() => setPlanPriceMode("downgrade")}
             onChangeBillingCycle={() => setPlanPriceMode("change-cycle")}
             onCancel={() => setCancelOpen(true)}
             onReactivate={() => reactivateMutation.mutate()}
+            onRetryPayment={() => retryPaymentMutation.mutate()}
+            onNewCharge={() => newChargeMutation.mutate()}
             cancelLoading={cancelRenewalMutation.isPending}
             reactivateLoading={reactivateMutation.isPending}
+            retryLoading={retryPaymentMutation.isPending}
+            newChargeLoading={newChargeMutation.isPending}
           />
           <AvailablePlansCard
             plans={subscription.availablePlans}

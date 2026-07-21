@@ -127,6 +127,9 @@ export const queryKeys = {
       list: (params: Record<string, unknown>) =>
         ["admin", "payments", "list", params] as const,
     },
+    financial: {
+      dashboard: ["admin", "financial", "dashboard"] as const,
+    },
     audit: {
       all: ["admin", "audit"] as const,
       list: (params: Record<string, unknown>) =>

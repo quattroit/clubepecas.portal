@@ -70,6 +70,9 @@ import type {
   UpdatePlatformSettingsRequest,
 } from "@/contracts/admin/settings";
 import type {
+  AdminFinancialDashboardResponse,
+} from "@/contracts/admin/financial";
+import type {
   ListAdminPaymentsParams,
   ListAdminPaymentsResponse,
   SyncAdminPaymentResponse,
@@ -414,6 +417,15 @@ export const adminService = {
   syncPayment(paymentId: number) {
     return api
       .post<SyncAdminPaymentResponse>(`/api/v1/admin/payments/${paymentId}/sync`)
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/admin/financial/dashboard */
+  getFinancialDashboard() {
+    return api
+      .get<AdminFinancialDashboardResponse>(
+        "/api/v1/admin/financial/dashboard",
+      )
       .then((response) => response.data);
   },
 

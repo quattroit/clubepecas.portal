@@ -7,7 +7,8 @@ Documento de referência do domínio financeiro do ClubePeças.
 **Sprint 8.3:** webhooks Asaas, ativação automática, grace period e reconciliação manual.  
 **Sprint 8.3.1:** modelo comercial com múltiplas recorrências (`SubscriptionPlanPrice` + `BillingCycle`).  
 **Sprint 8.4:** Central de Gestão da Assinatura (`SubscriptionSummaryService` + Meu Plano consolidado).  
-**Sprint 8.5:** Upgrade, downgrade agendado, alteração de ciclo, cancelamento de renovação e reativação (`SubscriptionChangeService`).
+**Sprint 8.5:** Upgrade, downgrade agendado, alteração de ciclo, cancelamento de renovação e reativação (`SubscriptionChangeService`).  
+**Sprint 8.6:** Recuperação de pagamentos, nova cobrança, jobs financeiros, notificações e dashboards (`PaymentAutomationService` + `FinancialDashboardService`).
 
 ---
 
@@ -208,6 +209,9 @@ Nunca usar a API Key do Asaas como `WebhookToken`.
 | PUT | `/api/v1/seller/subscription/cancel` | Seller — cancela renovação (soft) |
 | PUT | `/api/v1/seller/subscription/reactivate` | Seller — reativa após CancellationRequested |
 | DELETE | `/api/v1/seller/subscription` | Seller — alias do soft-cancel (8.5) |
+| POST | `/api/v1/seller/subscription/retry-payment` | Seller — recupera pagamento pendente (8.6) |
+| POST | `/api/v1/seller/subscription/new-charge` | Seller — gera nova cobrança (8.6) |
+| GET | `/api/v1/admin/financial/dashboard` | Admin — dashboard financeiro (8.6) |
 
 ### 8.1 Central de Gestão — `GET /seller/subscription`
 
@@ -217,11 +221,11 @@ Retorno consolidado via `ISubscriptionSummaryService` / `SubscriptionSummaryServ
 |-------|----------|
 | Assinatura | Status, ciclo, valor, períodos, próxima cobrança, dias restantes, grace |
 | `Plan` | Nome, limite, usados, restantes, `%` cota |
-| `Financial` | Último/próximo pagamento, pendências, vencidos |
+| `Financial` | Total pago, LTV, próximas faturas, economias, `PaymentLink`, pendências |
 | `Indicators` | Cores, flags (`IsNearExpiration`, `IsGracePeriod`, …) — **prontos para UI** |
 | `Messages` | Textos amigáveis (sem regra no frontend) |
 | `Timeline` | Criação, pagamentos, renovações, grace, próxima cobrança, expiração |
-| `Actions` | `CanUpgrade`, `CanDowngrade`, `CanChangeBillingCycle`, `CanCancel`, `CanReactivate`, … |
+| `Actions` | Inclui `CanRetryPayment`, `CanNewCharge`, `CanSyncPayment`, … |
 | `AvailablePlans` | Planos + ciclos (`SubscriptionPlanPriceId`) + economia — base para 8.5 |
 | `PendingChange` | Plano/ciclo/preço/data efetiva agendados |
 | `CancellationRequested` | Flag de cancelamento de renovação |
@@ -250,6 +254,24 @@ Auditoria: `subscription.upgrade.requested|completed`, `subscription.downgrade.s
 - `SubscriptionPaymentItem` — pagamentos locais (InvoiceUrl/ReceiptUrl do `MetadataJson`)
 - `SubscriptionHistoryItem` — `AuditLog` filtrado + `WebhookEvent` correlacionado
 
+### 8.4 Automação financeira (Sprint 8.6) — `IPaymentAutomationService`
+
+Centraliza recuperação e jobs. Usado por endpoints seller, `PaymentAutomationHostedService` (intervalo ~1h) e futuras automações.
+
+| Operação | Comportamento |
+|----------|---------------|
+| **Retry payment** | Localiza pendência → atualiza invoice/checkout no gateway ou gera nova cobrança → auditoria `payment.retry` |
+| **New charge** | Cancela cobranças abertas → `CreatePaymentAsync` no `IPaymentProvider` → metadata com `invoiceUrl` → `payment.new_charge.created` |
+| **Expire grace** | Assinaturas com grace vencido → `Expired` + `subscription.grace.expired` |
+| **Apply pending** | Downgrades/upgrades/ciclos com `PendingEffectiveDate` vencida → `TryApplyPendingChangesAsync` |
+| **Due tomorrow** | Notifica cobranças com vencimento no dia seguinte |
+| **Sync stale** | `SyncPaymentWithProviderAsync` em pendentes com `ExternalPaymentId` |
+| **Reprocess webhooks** | Eventos não processados com `Attempts > 0` — idempotente via `ProcessWebhookAsync` |
+| **Cleanup** | Remove webhooks processados com > 90 dias (não remove auditoria) |
+
+Notificações: `IFinancialNotifier` / `FinancialNotifier` (templates `FinancialEmailTemplates` + layout existente).  
+Dashboard admin: `IFinancialDashboardService` — MRR/ARR, receita, assinaturas, cobranças, planos, ciclos, ticket, churn, conversão, inadimplência.
+
 ---
 
 ## 9. `IPaymentService` (métodos 8.3)
@@ -269,8 +291,13 @@ Auditoria: `subscription.upgrade.requested|completed`, `subscription.downgrade.s
 |--------|--------|
 | `webhook.received` / `processed` / `ignored` | Ciclo do webhook |
 | `webhook.sync` | Sync admin |
+| `webhook.reprocessed` | Reprocessamento pelo job (8.6) |
 | `payment.received` / `confirmed` / `overdue` / `refunded` / `cancelled` | Eventos de pagamento |
+| `payment.retry` / `payment.new_charge.created` | Recuperação (8.6) |
+| `payment.financial_sync.executed` | Pacote de jobs (8.6) |
 | `subscription.activated` / `expired` / `cancelled` | Ciclo da assinatura |
+| `subscription.grace.expired` | Expiração automática do grace (8.6) |
+| `subscription.pending.applied_by_job` | Alteração pendente pelo job (8.6) |
 
 Logs: evento, tempo, IDs internos — **sem** API Key, PII ou payload completo sensível.
 
@@ -279,10 +306,11 @@ Logs: evento, tempo, IDs internos — **sem** API Key, PII ou payload completo s
 ## 11. Frontend
 
 - **/planos:** opções Mensal / Trimestral / Anual com economia e selo “Melhor custo-benefício” (dados da API)
-- **Meu Plano (`/painel/meu-plano`) — Sprint 8.4/8.5:** resumo + operações (upgrade/downgrade/ciclo/cancelar renovação/reativar); avisos de alteração pendente e cancelamento agendado; **sem regras de negócio no cliente**
+- **Meu Plano (`/painel/meu-plano`) — Sprint 8.4/8.5/8.6:** resumo financeiro (total pago, LTV, economias), **Pagar agora** / **Gerar nova cobrança**, operações de plano; **sem regras de negócio no cliente**
 - **Checkout (Meu Plano):** plano → recorrência → checkout com `billingCycle` (novos e upgrades)
 - **Admin / Planos:** CRUD de recorrências e preços
 - **Admin / Pagamentos:** listagem + sync Asaas
+- **Admin / Financeiro (`/admin/financeiro`) — Sprint 8.6:** MRR/ARR, receita, indicadores, distribuição por plano e ciclo
 
 ---
 
@@ -307,4 +335,4 @@ Eventos recomendados: `PAYMENT_RECEIVED`, `PAYMENT_CONFIRMED`, `PAYMENT_OVERDUE`
 
 ## 13. Fora de escopo (Épico 8)
 
-Cupom, split, jobs de cobrança dedicados, mensageria, Redis, e-mail de cobrança.
+Cupom, split, mensageria externa (fila), Redis.

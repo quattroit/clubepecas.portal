@@ -10,6 +10,7 @@ import {
   FolderTree,
   FolderOpen,
   LayoutDashboard,
+  LineChart,
   MapPin,
   Package,
   ScrollText,
@@ -89,6 +90,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_PAYMENTS,
     label: "Pagamentos",
     icon: Wallet,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_FINANCIAL,
+    label: "Financeiro",
+    icon: LineChart,
     exact: false,
   },
   {
