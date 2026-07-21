@@ -47,8 +47,16 @@ function SubscriptionSummaryCard({
             />
           ) : null}
         </div>
-        <Badge variant={subscriptionStatusBadgeVariant(subscription.status)}>
-          {subscriptionStatusLabel(subscription.status)}
+        <Badge
+          variant={subscriptionStatusBadgeVariant(
+            subscription.status,
+            subscription.gracePeriodUntilUtc,
+          )}
+        >
+          {subscriptionStatusLabel(
+            subscription.status,
+            subscription.gracePeriodUntilUtc,
+          )}
         </Badge>
       </CardHeader>
 
@@ -103,6 +111,16 @@ function SubscriptionSummaryCard({
                 {paymentStatusLabel(subscription.currentPaymentStatus)}
               </dd>
             </div>
+            {subscription.gracePeriodUntilUtc ? (
+              <div>
+                <dt className="text-muted-foreground text-xs">
+                  Carência até
+                </dt>
+                <dd className="text-sm font-medium">
+                  {formatDate(subscription.gracePeriodUntilUtc)}
+                </dd>
+              </div>
+            ) : null}
           </dl>
         </div>
       </CardContent>

@@ -120,6 +120,11 @@ export const queryKeys = {
       detail: (id: number) =>
         ["admin", "subscriptionPlans", "detail", id] as const,
     },
+    payments: {
+      all: ["admin", "payments"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "payments", "list", params] as const,
+    },
     audit: {
       all: ["admin", "audit"] as const,
       list: (params: Record<string, unknown>) =>

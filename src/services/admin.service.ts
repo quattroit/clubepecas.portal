@@ -70,6 +70,11 @@ import type {
   UpdatePlatformSettingsRequest,
 } from "@/contracts/admin/settings";
 import type {
+  ListAdminPaymentsParams,
+  ListAdminPaymentsResponse,
+  SyncAdminPaymentResponse,
+} from "@/contracts/admin/payments";
+import type {
   AdminSubscriptionPlanDetailDto,
   CreateAdminSubscriptionPlanRequest,
   GetAdminSubscriptionPlansResponse,
@@ -397,6 +402,18 @@ export const adminService = {
   deleteSubscriptionPlan(id: number) {
     return api
       .delete(`/api/v1/admin/subscription-plans/${id}`)
+      .then((response) => response.data);
+  },
+
+  listPayments(params: ListAdminPaymentsParams = {}) {
+    return api
+      .get<ListAdminPaymentsResponse>("/api/v1/admin/payments", { params })
+      .then((response) => response.data);
+  },
+
+  syncPayment(paymentId: number) {
+    return api
+      .post<SyncAdminPaymentResponse>(`/api/v1/admin/payments/${paymentId}/sync`)
       .then((response) => response.data);
   },
 

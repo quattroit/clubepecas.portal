@@ -4,7 +4,7 @@ Documento de referência do domínio financeiro do ClubePeças.
 
 **Sprint 8.1:** domínio local + `NullPaymentProvider`.  
 **Sprint 8.2:** integração Asaas (Hosted Checkout, Sandbox) via `IPaymentProvider`.  
-**Sprint 8.3 (futura):** webhooks e ativação automática pós-pagamento.
+**Sprint 8.3:** webhooks Asaas, ativação automática, grace period e reconciliação manual.
 
 ---
 
@@ -13,191 +13,153 @@ Documento de referência do domínio financeiro do ClubePeças.
 | Conceito | Responsabilidade |
 |----------|------------------|
 | **Payment** | Registro financeiro oficial da plataforma (qualquer movimentação) |
-| **SellerSubscription** | Ciclo de vida da assinatura (ativo, pendente, cancelado, renovação) |
+| **SellerSubscription** | Ciclo de vida da assinatura (ativo, pendente, cancelado, expirado, renovação) |
 | **SubscriptionPlan** | Catálogo de planos (preço, limites) |
-| **WebhookEvent** | Envelope bruto de eventos do provedor (preparação Sprint 8.3) |
+| **WebhookEvent** | Envelope bruto do provedor + idempotência (`ExternalId` único) |
 | **Money** | Value object monetário (`Amount` + `Currency`) |
 
-`Payment` **não** é apenas uma cobrança. Representa:
+---
 
-- assinatura inicial (`Subscription`)
-- renovação (`Renewal`)
-- reembolso (`Refund`)
-- crédito (`Credit`)
-- desconto (`Discount`)
-- ajuste (`Adjustment`)
+## 2. Fluxo Hosted Checkout (Sprint 8.2)
+
+```
+Vendedor escolhe plano → POST /seller/subscription/checkout
+→ Customer + Subscription Pending + Payment Pending
+→ Redirect Asaas Hosted Checkout
+```
+
+Plano **R$ 0**: ativação local sem Asaas (`ActivatedWithoutCheckout`).
+
+Endereço do checkout vem do **perfil do vendedor** (CEP, logradouro, número, bairro).
 
 ---
 
-## 2. Fluxo completo (Sprint 8.2 — Asaas Hosted Checkout)
+## 3. Fluxo de webhook (Sprint 8.3)
 
 ```
-Vendedor escolhe plano (Meu Plano)
+Asaas POST /api/v1/payments/webhooks/asaas
+        │
+        ├─ valida header asaas-access-token (= Payments:Asaas:WebhookToken)
+        ▼
+ProcessAsaasWebhook.Handler
         │
         ▼
-POST /api/v1/seller/subscription/checkout
+IPaymentService.ProcessWebhookAsync
         │
-        ▼
-IPaymentService.StartSubscriptionCheckoutAsync
-        │
-        ├─ valida documento fiscal, plano, assinatura ativa
-        ├─ idempotência (reutiliza checkout Pending não expirado)
-        ├─ IPaymentProvider.EnsureCustomerAsync
-        │       ├─ reutiliza Seller.ExternalCustomerId
-        │       └─ ou GET/POST /v3/customers (Asaas)
-        ├─ SellerSubscription.CreatePending (Status=Pending)
-        ├─ Payment (Status=Pending, Method=Unknown)
-        ├─ IPaymentProvider.CreateSubscriptionAsync → POST /v3/subscriptions
-        ├─ IPaymentProvider.CreateCheckoutAsync → POST /v3/checkouts (RECURRENT)
-        ├─ persiste ExternalCustomerId, ExternalSubscriptionId, checkoutUrl
-        └─ retorna CheckoutUrl
-                │
-                ▼
-Frontend: window.location.href = CheckoutUrl
-                │
-                ▼
-Asaas Hosted Checkout (cartão / PIX)
-                │
-                ▼
-[Sprint 8.3] Webhook → Payment Paid → SellerSubscription Active
+        ├─ ExternalId já Processed? → 200 (idempotente)
+        ├─ Persiste WebhookEvent
+        ├─ Despacha por event oficial:
+        │     PAYMENT_RECEIVED / PAYMENT_CONFIRMED → MarkPaid + Activate
+        │     PAYMENT_OVERDUE → MarkExpired + GracePeriod
+        │     PAYMENT_DELETED → MarkCancelled
+        │     PAYMENT_REFUNDED → MarkRefunded + Cancel subscription
+        │     SUBSCRIPTION_DELETED / INACTIVATED → Cancel
+        │     SUBSCRIPTION_UPDATED → nextDueDate / status
+        ├─ MarkProcessed + ProcessedAtUtc
+        └─ Auditoria webhook.* / payment.* / subscription.*
 ```
 
-Nesta sprint **não** há webhook HTTP: a assinatura permanece `Pending` até a Sprint 8.3.
+Correlação local: `externalReference = payment:{id}`, depois `ExternalPaymentId` (`pay_…`) e `ExternalSubscriptionId` (`sub_…`).
 
----
-
-## 3. Entidades (campos externos Sprint 8.2)
-
-### Seller
-- `ExternalCustomerId` — ID do customer no Asaas
-
-### SellerSubscription
-- `ExternalSubscriptionId` — ID da assinatura no Asaas
-- `Status = Pending` — aguardando conclusão do checkout
-- `CurrentPaymentId`, `NextBillingDateUtc`, demais campos da Sprint 8.1
-
-### Payment
-Campos principais: `SellerId`, `SubscriptionId?`, `Provider`, `Status`, `Type`, `Method`, `Money`, `ExternalPaymentId`, `ExternalCustomerId`, `ExternalSubscriptionId`, `Reference`, `Description`, `MetadataJson` (contém `checkoutUrl`), `ExpiresAtUtc`.
-
----
-
-## 4. Abstrações
-
-### IPaymentProvider
-Única porta para gateway. Métodos: `EnsureCustomerAsync`, checkout, criar/cancelar assinatura e pagamento, consultar, health-check.
-
-Implementações:
-
-| Classe | Uso |
-|--------|-----|
-| `NullPaymentProvider` | `DefaultProvider=None` — desenvolvimento sem gateway |
-| `AsaasPaymentProvider` | `DefaultProvider=Asaas` — Sandbox/Produção |
-| `PaymentProviderFactory` | Resolve provider via DI conforme config |
-
-### IPaymentService
-Orquestrador financeiro da Application. Checkout: `StartSubscriptionCheckoutAsync`.
-
-A Application **nunca** referencia DTOs ou HTTP do Asaas.
-
----
-
-## 5. Camada Infrastructure — Asaas
+### Ativação
 
 ```
-Domain command/response
-        ↓
-AsaasCheckoutMapper
-        ↓
-Asaas DTO (Requests/Responses)
-        ↓
-AsaasHttpClient (IHttpClientFactory)
-        ↓
-API Asaas
+PAYMENT_CONFIRMED | PAYMENT_RECEIVED
+→ Payment.MarkPaid
+→ SellerSubscription.ActivateFromCheckout (Pending → Active)
+→ CurrentPaymentId / NextBillingDateUtc / GracePeriodUntilUtc=null
 ```
 
-- **AsaasHttpClient:** headers `access_token`, `Accept`, `User-Agent`; timeout configurável; retry leve em erros transitórios.
-- **Exceções:** `PaymentProviderException` e derivadas na **Application** (`CustomerCreationException`, `CheckoutCreationException`, etc.).
-- **Logs:** customer criado/reutilizado, subscription, checkout, tempo de resposta. **Nunca** logar API Key, CPF/CNPJ ou payloads sensíveis.
+### Vencimento + Grace Period
 
----
-
-## 6. Configuração
-
-```json
-{
-  "Payments": {
-    "DefaultProvider": "Asaas",
-    "DefaultCurrency": "BRL",
-    "GracePeriodDays": 3,
-    "RetryAttempts": 3,
-    "RetryIntervalHours": 24,
-    "WebhookToleranceMinutes": 5,
-    "Asaas": {
-      "ApiKey": "",
-      "BaseUrl": "https://api-sandbox.asaas.com",
-      "Environment": "Sandbox",
-      "TimeoutSeconds": 30,
-      "WebhookToken": "",
-      "CheckoutMinutesToExpire": 60,
-      "UserAgent": "ClubePecas/1.0.0"
-    }
-  }
-}
+```
+PAYMENT_OVERDUE
+→ Payment.MarkExpired (se Pending/Processing)
+→ GracePeriodUntilUtc = now + Payments:GracePeriodDays
+→ Subscription permanece Pending (ou Active em renovação)
+→ Em webhooks/sync posteriores: se GracePeriodUntilUtc passou → Expire
 ```
 
-**Credenciais:** User Secrets ou variáveis de ambiente — nunca em código.
+### Cancelamento / reembolso
 
-| Ambiente | BaseUrl | DefaultProvider |
-|----------|---------|-----------------|
-| Sandbox (dev) | `https://api-sandbox.asaas.com` | `Asaas` |
-| Produção | `https://api.asaas.com` | `Asaas` |
-| Local sem gateway | — | `None` |
-
----
-
-## 7. Sequência de chamadas Asaas (Sandbox)
-
-1. `GET /v3/customers?cpfCnpj={doc}` — buscar customer existente  
-2. `POST /v3/customers` — criar se não existir  
-3. `POST /v3/subscriptions` — assinatura recorrente mensal  
-4. `GET /v3/cities?name={cidade}&state={UF}` — resolve `cityId` da loja do vendedor  
-5. ViaCEP (`/ws/{UF}/{cidade}/Rua/json/`) — resolve CEP/logradouro reais da cidade da loja  
-6. `POST /v3/checkouts` — Hosted Checkout (`chargeTypes: ["RECURRENT"]`, `billingTypes: ["CREDIT_CARD"]`)  
-7. Resposta: `link` (URL de redirect) + `id` (ExternalCheckoutId)
-
-Auth: header `access_token: {ApiKey}`.
-
-Endereço do checkout é montado a partir da **cidade/UF da loja** (cityId Asaas + CEP ViaCEP). Não há endereço mockado em `appsettings`.
-
----
-
-## 8. API pública (Sprint 8.2)
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/api/v1/seller/payments` | Histórico financeiro |
-| POST | `/api/v1/seller/subscription/checkout` | Inicia Hosted Checkout |
-
-Request checkout:
-
-```json
-{
-  "subscriptionPlanId": 1,
-  "successUrl": "https://app/meu-plano?checkout=success",
-  "cancelUrl": "https://app/meu-plano?checkout=cancel",
-  "expiredUrl": "https://app/meu-plano?checkout=expired"
-}
+```
+SUBSCRIPTION_DELETED | SUBSCRIPTION_INACTIVATED → Cancel / CancelPending
+PAYMENT_REFUNDED → MarkRefunded + Cancel assinatura Active
 ```
 
 ---
 
-## 9. Idempotência
+## 4. Reconciliação manual
 
-Múltiplos cliques em **Assinar Plano** não criam customers/subscriptions/payments duplicados:
+```
+POST /api/v1/admin/payments/{paymentId}/sync
+→ IPaymentProvider.GetPaymentAsync / GetSubscriptionAsync
+→ Atualiza Payment + SellerSubscription
+→ Auditoria webhook.sync
+```
 
-- Reutiliza `Seller.ExternalCustomerId`
-- Reutiliza checkout `Pending` não expirado (`MetadataJson.checkoutUrl`)
-- Bloqueia nova assinatura se já existir `Active`
+Uso: suporte e recuperação de inconsistências (sem editar banco manualmente).
+
+---
+
+## 5. Idempotência de webhooks
+
+1. Busca `WebhookEvent` com mesmo `Provider` + `ExternalId` + `Processed=true`  
+2. Se existir → retorna 200 sem reprocessar  
+3. Senão → persiste, processa, `MarkProcessed()`  
+4. Índice único filtrado: `UX_WebhookEvents_ExternalId` (`ExternalId IS NOT NULL`)
+
+Asaas entrega *at least once* — duplicados são esperados.
+
+---
+
+## 6. Máquina de estados (Payment)
+
+```
+Pending    → Processing, Paid, Cancelled, Failed, Expired
+Processing → Paid, Cancelled, Failed, Expired
+Paid       → Refunded
+Cancelled / Failed / Expired / Refunded → (terminal)
+```
+
+Transições inválidas lançam exceção (`PaymentStatusTransitions`).
+
+`SellerSubscription.Expire()` aceita **Active** ou **Pending**.
+
+---
+
+## 7. Segurança do webhook
+
+| Checagem | Detalhe |
+|----------|---------|
+| `asaas-access-token` | Comparação em tempo constante com `WebhookToken` |
+| Token vazio | 503 `payment.webhook.configuration` |
+| Token inválido | 401 |
+| User-Agent | Log debug (não bloqueia) |
+
+Nunca usar a API Key do Asaas como `WebhookToken`.
+
+---
+
+## 8. API (Sprint 8.3)
+
+| Método | Rota | Auth |
+|--------|------|------|
+| POST | `/api/v1/payments/webhooks/asaas` | Token Asaas |
+| GET | `/api/v1/admin/payments` | Admin |
+| POST | `/api/v1/admin/payments/{id}/sync` | Admin |
+| GET | `/api/v1/seller/subscription` | Seller (Active **ou** Pending) |
+
+---
+
+## 9. `IPaymentService` (métodos 8.3)
+
+- `ProcessWebhookAsync`
+- `ActivateSubscriptionAsync`
+- `ExpireSubscriptionAsync`
+- `CancelSubscriptionAsync` (Pending ou Active)
+- `RefundPaymentAsync`
+- `SyncPaymentWithProviderAsync`
 
 ---
 
@@ -205,31 +167,41 @@ Múltiplos cliques em **Assinar Plano** não criam customers/subscriptions/payme
 
 | Action | Quando |
 |--------|--------|
-| `payment.customer.created` | Customer criado ou reutilizado no provedor |
-| `payment.subscription.created` | Subscription criada no Asaas |
-| `payment.checkout.created` | Checkout hospedado gerado |
-| `payment.provider.error` | Falha mapeada do gateway (handler) |
+| `webhook.received` / `processed` / `ignored` | Ciclo do webhook |
+| `webhook.sync` | Sync admin |
+| `payment.received` / `confirmed` / `overdue` / `refunded` / `cancelled` | Eventos de pagamento |
+| `subscription.activated` / `expired` / `cancelled` | Ciclo da assinatura |
+
+Logs: evento, tempo, IDs internos — **sem** API Key, PII ou payload completo sensível.
 
 ---
 
 ## 11. Frontend
 
-- **Meu Plano:** botão **Assinar Plano** → POST checkout → redirect Asaas  
-- **Admin / vendedor:** seção financeira somente leitura (Provider, IDs externos, status)
+- **Meu Plano:** badges Pending / Active / Grace Period / Expired / Cancelled; refetch a cada 15s se Pending  
+- **Admin / Pagamentos:** listagem + botão **Sincronizar com Asaas** + último webhook  
 
 ---
 
-## 12. Sprint 8.3 (preparado, não implementado)
+## 12. Configuração
 
-- Endpoint HTTP de webhook Asaas  
-- Persistir `WebhookEvent`  
-- Atualizar `Payment` → `Paid` e `SellerSubscription` → `Active`  
-- Renovações, cancelamentos automáticos, jobs  
+```json
+"Payments": {
+  "GracePeriodDays": 3,
+  "Asaas": {
+    "WebhookToken": "<token do painel Asaas, 32–255 chars>"
+  }
+}
+```
 
-**Não alterar** entidades ou contratos públicos para adicionar webhooks — apenas processar eventos recebidos.
+No painel Asaas, aponte o webhook para:
+
+`https://{api}/api/v1/payments/webhooks/asaas`
+
+Eventos recomendados: `PAYMENT_RECEIVED`, `PAYMENT_CONFIRMED`, `PAYMENT_OVERDUE`, `PAYMENT_DELETED`, `PAYMENT_REFUNDED`, `SUBSCRIPTION_UPDATED`, `SUBSCRIPTION_DELETED`, `SUBSCRIPTION_INACTIVATED`.
 
 ---
 
-## 13. O que NÃO está na Sprint 8.2
+## 13. Fora de escopo (Épico 8)
 
-Webhook HTTP, renovação automática, cancelamento automático, reembolso, PIX/boleto manual, troca/downgrade/upgrade de plano, jobs, mensageria, Redis.
+Troca/upgrade/downgrade de plano, cupom, split, jobs de cobrança dedicados, mensageria, Redis, e-mail de cobrança.
