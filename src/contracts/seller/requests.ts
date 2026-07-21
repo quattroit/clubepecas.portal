@@ -1,7 +1,7 @@
 export type CreateSellerRequest = {
   storeName: string;
   displayName: string;
-  cityId: string;
+  cityId: number;
   personType: number;
   document: string;
   description?: string | null;
@@ -13,7 +13,7 @@ export type CreateSellerRequest = {
 export type UpdateSellerRequest = {
   storeName: string;
   displayName: string;
-  cityId: string;
+  cityId: number;
   personType: number;
   document: string;
   description?: string | null;

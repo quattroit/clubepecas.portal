@@ -10,7 +10,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { advertisementService } from "@/services/advertisement.service";
 
 type UpdateAdvertisementInput = {
-  id: string;
+  id: number;
   request: UpdateAdvertisementRequest;
 };
 

@@ -99,7 +99,7 @@ export const sellerService = {
 
   deletePhoto() {
     return api
-      .delete<{ sellerId: string }>("/api/v1/seller/me/photo")
+      .delete<{ sellerId: number }>("/api/v1/seller/me/photo")
       .then((response) => response.data);
   },
 };

@@ -11,7 +11,7 @@ import { adminService } from "@/services/admin.service";
  * Detalhes do vendedor + métricas + anúncios (uma requisição).
  */
 export function useAdminSeller(
-  id: string,
+  id: number,
   period: MetricsPeriodParam = "all",
 ) {
   const authReady = useAuthQueryEnabled();

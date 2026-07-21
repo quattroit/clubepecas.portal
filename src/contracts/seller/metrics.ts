@@ -20,7 +20,7 @@ export type MetricGroupDto = {
 };
 
 export type ListingMetricItemDto = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   thumbnailUrl: string | null;

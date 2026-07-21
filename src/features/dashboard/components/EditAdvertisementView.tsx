@@ -17,12 +17,13 @@ import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { mapAdvertisementFormToUpdateRequest } from "@/mappers/advertisement-form.mapper";
 import { cn } from "@/lib/utils";
+import { parseRouteId } from "@/utils/parseRouteId";
 
 function EditAdvertisementView() {
   const params = useParams<{ id: string }>();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const id = parseRouteId(params.id);
 
-  const advertisementQuery = useAdvertisementById(id ?? "");
+  const advertisementQuery = useAdvertisementById(id ?? 0);
   const categoriesQuery = useCategories();
   const vehicleBrandsQuery = useVehicleBrands();
   const updateMutation = useUpdateAdvertisement();

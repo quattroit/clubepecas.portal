@@ -26,6 +26,16 @@ function isAdvertisementLimitError(error: unknown): boolean {
   );
 }
 
+function isSubscriptionRequiredError(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+
+  if (error.code === "advertisement.subscription.required") return true;
+
+  return error.errors.some(
+    (item) => item.code === "advertisement.subscription.required",
+  );
+}
+
 /**
  * Cria anúncio e, se houver, envia as fotos em seguida.
  */
@@ -85,6 +95,13 @@ export function useCreateAdvertisement() {
       if (isAdvertisementLimitError(error)) {
         toast.error(
           "Você atingiu o limite de anúncios permitido pelo seu plano.",
+        );
+        return;
+      }
+
+      if (isSubscriptionRequiredError(error)) {
+        toast.error(
+          "Você precisa contratar um plano para publicar anúncios.",
         );
       }
     },

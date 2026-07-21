@@ -4,7 +4,7 @@ import type {
 } from "@/contracts/advertisements/requests";
 import type { AdvertisementDetailDto } from "@/contracts/advertisements/responses";
 import type { AdvertisementCondition } from "@/contracts/common/enums";
-import type { AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
+import type { AdvertisementFormInput, AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
 import { parsePriceInput } from "@/utils/parsePriceInput";
 
 /**
@@ -28,23 +28,42 @@ export function mapAdvertisementFormToUpdateRequest(
 /**
  * Detalhe da API → valores do formulário (create/edit).
  * Fotos são gerenciadas fora do formulário via upload multipart.
+ * Campos opcionais vazios usam "" para o select exibir "Selecione".
  */
 export function mapAdvertisementDetailToFormValues(
   dto: AdvertisementDetailDto,
-): AdvertisementFormValues {
+): AdvertisementFormInput {
   return {
     title: dto.title,
     description: dto.description,
     categoryId: dto.categoryId,
-    vehicleBrandId: dto.vehicleBrandId,
+    vehicleBrandId: dto.vehicleBrandId ?? "",
     vehicleModelId: dto.vehicleModelId ?? "",
-    manufacturingYear: String(dto.manufacturingYear),
-    modelYear: String(dto.modelYear),
-    compatibilityDescription: dto.compatibilityDescription,
+    manufacturingYear:
+      dto.manufacturingYear != null ? String(dto.manufacturingYear) : "",
+    modelYear: dto.modelYear != null ? String(dto.modelYear) : "",
+    compatibilityDescription: dto.compatibilityDescription ?? "",
     condition: String(dto.condition),
     price: dto.price.toFixed(2).replace(".", ","),
     stockQuantity: String(dto.stockQuantity),
   };
+}
+
+function emptyToNull(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function toOptionalId(value: number | string | null | undefined): number | null {
+  if (value == null || value === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function toOptionalYear(value: string | null | undefined): number | null {
+  if (value == null || String(value).trim() === "") return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : null;
 }
 
 function mapAdvertisementFormToRequest(
@@ -53,12 +72,12 @@ function mapAdvertisementFormToRequest(
   return {
     title: values.title.trim(),
     description: values.description.trim(),
-    categoryId: values.categoryId,
-    vehicleBrandId: values.vehicleBrandId,
-    vehicleModelId: values.vehicleModelId,
-    manufacturingYear: Number(values.manufacturingYear),
-    modelYear: Number(values.modelYear),
-    compatibilityDescription: values.compatibilityDescription.trim(),
+    categoryId: Number(values.categoryId),
+    vehicleBrandId: toOptionalId(values.vehicleBrandId),
+    vehicleModelId: toOptionalId(values.vehicleModelId),
+    manufacturingYear: toOptionalYear(values.manufacturingYear),
+    modelYear: toOptionalYear(values.modelYear),
+    compatibilityDescription: emptyToNull(values.compatibilityDescription),
     condition: Number(values.condition) as AdvertisementCondition,
     price: parsePriceInput(values.price),
     stockQuantity: Number(values.stockQuantity),

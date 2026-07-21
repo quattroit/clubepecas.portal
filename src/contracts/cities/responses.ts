@@ -3,7 +3,7 @@
  * GET /api/v1/cities — apenas ativas por padrão (Sprint 4.3.7).
  */
 export type PublicCityListItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   state: string;

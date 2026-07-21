@@ -148,7 +148,7 @@ export function buildAdvertisementsHref(
  */
 export function toMarketplaceApiParams(filters: MarketplaceListingFilters): {
   q?: string;
-  categoryId?: string;
+  categoryId?: number;
   vehicleBrandSlug?: string;
   vehicleModelSlug?: string;
   manufacturingYear?: number;
@@ -167,7 +167,9 @@ export function toMarketplaceApiParams(filters: MarketplaceListingFilters): {
 
   return {
     ...(filters.q ? { q: filters.q } : {}),
-    ...(filters.category ? { categoryId: filters.category } : {}),
+    ...(filters.category
+      ? { categoryId: Number(filters.category) }
+      : {}),
     ...(filters.brand ? { vehicleBrandSlug: filters.brand } : {}),
     ...(filters.model ? { vehicleModelSlug: filters.model } : {}),
     ...(Number.isInteger(manufacturingYear)

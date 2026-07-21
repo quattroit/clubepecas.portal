@@ -31,7 +31,7 @@ export type UploadQueueItem = {
 const MAX_CONCURRENT = 3;
 
 type UsePhotoUploadQueueOptions = {
-  advertisementId: string;
+  advertisementId: number;
   maxPhotos: number;
   usedCount: number;
   maxFileSizeMB: number;

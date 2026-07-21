@@ -16,7 +16,7 @@ export type AdminVehicleBrandsListParams = {
 };
 
 export type AdminVehicleBrandListItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   displayOrder: number;
@@ -50,14 +50,14 @@ export type UpdateAdminVehicleBrandStatusRequest = {
 };
 
 export type UpdateAdminVehicleBrandStatusResponse = {
-  id: string;
+  id: number;
   isActive: boolean;
   name: string;
 };
 
 /** PUT /api/v1/admin/vehicle-brands/reorder */
 export type ReorderAdminVehicleBrandsRequest = {
-  orderedIds: string[];
+  orderedIds: number[];
 };
 
 export type ReorderAdminVehicleBrandsResponse = {

@@ -3,7 +3,7 @@
  * Backend: CRUD administrativo (Sprint 4.3.7) — `id` é Guid.
  */
 export type City = {
-  id: string;
+  id: number;
   slug: string;
   name: string;
   state: string;

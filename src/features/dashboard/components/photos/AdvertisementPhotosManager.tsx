@@ -12,7 +12,7 @@ import { advertisementService } from "@/services/advertisement.service";
 import { cn } from "@/lib/utils";
 
 type AdvertisementPhotosManagerProps = {
-  advertisementId: string;
+  advertisementId: number;
   photos: AdvertisementPhotoDto[];
   maxPhotos: number;
   usedCount: number;
@@ -37,7 +37,7 @@ function AdvertisementPhotosManager({
   errorMessage = null,
 }: AdvertisementPhotosManagerProps) {
   const [localPhotos, setLocalPhotos] = useState(photos);
-  const [busyPhotoId, setBusyPhotoId] = useState<string | null>(null);
+  const [busyPhotoId, setBusyPhotoId] = useState<number | null>(null);
   const [reordering, setReordering] = useState(false);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ function AdvertisementPhotosManager({
     }
   };
 
-  const handleSetPrimary = async (photoId: string) => {
+  const handleSetPrimary = async (photoId: number) => {
     if (disabled || busyPhotoId) return;
     setBusyPhotoId(photoId);
     try {
@@ -117,7 +117,7 @@ function AdvertisementPhotosManager({
     }
   };
 
-  const handleDelete = async (photoId: string) => {
+  const handleDelete = async (photoId: number) => {
     if (disabled || busyPhotoId) return;
     setBusyPhotoId(photoId);
     try {

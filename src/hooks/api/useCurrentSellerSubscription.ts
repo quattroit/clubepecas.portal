@@ -2,19 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { NotFoundError } from "@/lib/errors";
+import { ApiError } from "@/lib/errors";
 import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
 import { queryKeys } from "@/lib/queryKeys";
 import { sellerService } from "@/services/seller.service";
 
-function isSubscriptionNotFound(error: unknown): boolean {
-  if (!(error instanceof NotFoundError)) return false;
-
-  if (error.code === "seller.subscription.not_found") return true;
-
-  return error.errors.some(
-    (item) => item.code === "seller.subscription.not_found",
-  );
+/**
+ * GET /seller/subscription responde 404 quando não há ACTIVE
+ * (`seller.subscription.not_found`) ou sem perfil (`seller.not_found`).
+ * Ambos são estado vazio válido na UI — não erro.
+ */
+function isCurrentSubscriptionAbsent(error: unknown): boolean {
+  return error instanceof ApiError && error.statusCode === 404;
 }
 
 /**
@@ -27,11 +26,12 @@ export function useCurrentSellerSubscription() {
   return useQuery({
     queryKey: queryKeys.seller.subscription,
     enabled: authReady,
+    retry: false,
     queryFn: async () => {
       try {
         return await sellerService.getCurrentSubscription();
       } catch (error) {
-        if (isSubscriptionNotFound(error)) {
+        if (isCurrentSubscriptionAbsent(error)) {
           return null;
         }
         throw error;

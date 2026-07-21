@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -71,7 +71,7 @@ function VehicleModelFormDialog({
     setValue,
     formState: { errors },
   } = useForm<VehicleModelFormValues>({
-    resolver: zodResolver(vehicleModelFormSchema),
+    resolver: zodResolver(vehicleModelFormSchema) as Resolver<VehicleModelFormValues>,
     shouldFocusError: true,
     defaultValues: vehicleModelFormDefaultValues,
   });

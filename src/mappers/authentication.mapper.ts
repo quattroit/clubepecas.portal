@@ -3,7 +3,7 @@ import type { LoginResponse } from "@/contracts/authentication/responses";
 export type AuthSession = {
   accessToken: string;
   expiresAt: string;
-  userId: string;
+  userId: number;
   fullName: string;
   email: string;
   role: number;

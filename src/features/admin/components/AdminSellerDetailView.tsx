@@ -49,6 +49,7 @@ import {
   formatConversionRate,
   formatMetricCount,
 } from "@/utils/formatMetrics";
+import { parseRouteId } from "@/utils/parseRouteId";
 
 const PERIOD_OPTIONS: { value: MetricsPeriodParam; label: string }[] = [
   { value: "7d", label: "7 dias" },
@@ -101,16 +102,17 @@ function AdminSellerDetailView() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sellerId = params.id;
+  const sellerId = parseRouteId(params.id);
   const period = parsePeriod(searchParams.get("period"));
 
-  const sellerQuery = useAdminSeller(sellerId, period);
+  const sellerQuery = useAdminSeller(sellerId ?? 0, period);
   const updateStatus = useUpdateAdminSellerStatus();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const data = sellerQuery.data;
 
   const setPeriod = (next: MetricsPeriodParam) => {
+    if (!sellerId) return;
     const query = new URLSearchParams(searchParams.toString());
     if (next === "all") {
       query.delete("period");

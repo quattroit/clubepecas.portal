@@ -8,7 +8,7 @@ import type {
  * GET /api/v1/categories — CRUD administrativo por trás (Sprint 4.3.6).
  */
 export type PublicCategoryListItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   description: string | null;
@@ -28,23 +28,24 @@ export type GetCategoriesResponse = {
  * Categoria identificada por Guid (`categoryId`) — não mais enum.
  */
 export type MarketplaceItemDto = {
+  id: number;
   slug: string;
   title: string;
   price: number;
   stockQuantity: number;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
   condition: AdvertisementCondition;
-  cityId: string;
+  cityId: number;
   citySlug: string;
   city: string;
   state: string;

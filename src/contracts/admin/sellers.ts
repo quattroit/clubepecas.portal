@@ -55,7 +55,7 @@ export type AdminSellersListResponse = {
 };
 
 export type AdminSellerListItemDto = {
-  id: string;
+  id: number;
   displayName: string;
   storeName: string;
   slug: string;
@@ -77,8 +77,8 @@ export type AdminSellerListItemDto = {
 };
 
 export type AdminSellerDetailResponse = {
-  id: string;
-  userId: string;
+  id: number;
+  userId: number;
   displayName: string;
   storeName: string;
   description: string | null;
@@ -107,11 +107,11 @@ export type AdminSellerDetailResponse = {
 };
 
 export type AdminSellerAdvertisementDto = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   thumbnailUrl: string | null;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   stockQuantity: number;
   status: AdvertisementStatus;
@@ -125,7 +125,7 @@ export type UpdateAdminSellerStatusRequest = {
 };
 
 export type UpdateAdminSellerStatusResponse = {
-  id: string;
+  id: number;
   isActive: boolean;
   storeName: string;
 };

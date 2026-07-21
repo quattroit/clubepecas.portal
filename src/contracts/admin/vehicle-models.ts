@@ -13,12 +13,12 @@ export type AdminVehicleModelsListParams = {
   status?: AdminVehicleModelStatusFilter;
   sort?: AdminVehicleModelSortParam;
   sortDir?: AdminVehicleModelSortDir;
-  brandId?: string;
+  brandId?: number;
 };
 
 export type AdminVehicleModelListItemDto = {
-  id: string;
-  vehicleBrandId: string;
+  id: number;
+  vehicleBrandId: number;
   vehicleBrandName: string;
   vehicleBrandSlug: string;
   name: string;
@@ -35,7 +35,7 @@ export type GetAdminVehicleModelsResponse = {
 
 /** POST /api/v1/admin/vehicle-models */
 export type CreateAdminVehicleModelRequest = {
-  vehicleBrandId: string;
+  vehicleBrandId: number;
   name: string;
   slug?: string;
   displayOrder?: number;
@@ -44,7 +44,7 @@ export type CreateAdminVehicleModelRequest = {
 
 /** PUT /api/v1/admin/vehicle-models/{id} */
 export type UpdateAdminVehicleModelRequest = {
-  vehicleBrandId: string;
+  vehicleBrandId: number;
   name: string;
   slug?: string;
   displayOrder?: number;
@@ -56,14 +56,14 @@ export type UpdateAdminVehicleModelStatusRequest = {
 };
 
 export type UpdateAdminVehicleModelStatusResponse = {
-  id: string;
+  id: number;
   isActive: boolean;
   name: string;
 };
 
 /** PUT /api/v1/admin/vehicle-models/reorder */
 export type ReorderAdminVehicleModelsRequest = {
-  orderedIds: string[];
+  orderedIds: number[];
 };
 
 export type ReorderAdminVehicleModelsResponse = {

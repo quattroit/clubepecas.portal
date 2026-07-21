@@ -5,24 +5,24 @@
 
 /** Modelo de anúncio usado por cards, grids e páginas públicas. */
 export type Advertisement = {
-  id: string;
+  id: number;
   title: string;
   price: number;
-  cityId?: string;
+  cityId?: number;
   citySlug?: string;
   city: string;
   state: string;
   /** Nome da categoria (categoryName da API). */
   category: string;
-  categoryId?: string;
+  categoryId?: number;
   categorySlug?: string;
   /** Nome da marca de veículo (vehicleBrandName da API). */
   vehicleBrand?: string;
-  vehicleBrandId?: string;
+  vehicleBrandId?: number;
   vehicleBrandSlug?: string;
   /** Nome do modelo de veículo (vehicleModelName da API). */
   vehicleModel?: string;
-  vehicleModelId?: string;
+  vehicleModelId?: number;
   vehicleModelSlug?: string;
   /** Ano de fabricação do veículo. */
   manufacturingYear?: number;
@@ -44,7 +44,7 @@ export type Advertisement = {
   statusLabel?: string;
   /** ISO date string — só quando o DTO fornece */
   updatedAt?: string | null;
-  sellerId?: string;
+  sellerId?: number;
   slug?: string;
   compatibilityDescription?: string;
 };

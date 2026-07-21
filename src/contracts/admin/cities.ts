@@ -13,7 +13,7 @@ export type AdminCitiesListParams = {
 };
 
 export type AdminCityListItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   state: string;
@@ -50,14 +50,14 @@ export type UpdateAdminCityStatusRequest = {
 };
 
 export type UpdateAdminCityStatusResponse = {
-  id: string;
+  id: number;
   isActive: boolean;
   name: string;
 };
 
 /** PUT /api/v1/admin/cities/reorder */
 export type ReorderAdminCitiesRequest = {
-  orderedIds: string[];
+  orderedIds: number[];
 };
 
 export type ReorderAdminCitiesResponse = {

@@ -32,7 +32,7 @@ function ImageGallery({ images, thumbnails, alt, className }: ImageGalleryProps)
             alt={`${alt} — foto ${activeIndex + 1}`}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
+            className="object-contain"
             priority
           />
         ) : (
@@ -73,7 +73,7 @@ function ImageGallery({ images, thumbnails, alt, className }: ImageGalleryProps)
                     alt=""
                     fill
                     sizes="96px"
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </button>
               </li>

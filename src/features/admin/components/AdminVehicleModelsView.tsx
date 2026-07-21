@@ -87,8 +87,8 @@ function AdminVehicleModelsView() {
 
   const [items, setItems] = useState<AdminVehicleModelListItemDto[]>([]);
   const [lastLoadedData, setLastLoadedData] = useState(modelsQuery.data);
-  const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<number | null>(null);
+  const [dragOverId, setDragOverId] = useState<number | null>(null);
 
   if (filters.q !== lastSearchQ) {
     setLastSearchQ(filters.q);
@@ -162,7 +162,7 @@ function AdminVehicleModelsView() {
     );
   };
 
-  const handleDrop = (targetId: string) => {
+  const handleDrop = (targetId: number) => {
     if (!draggedId || draggedId === targetId) {
       setDraggedId(null);
       setDragOverId(null);
@@ -246,7 +246,7 @@ function AdminVehicleModelsView() {
               onChange={(event) => {
                 const value = event.target.value;
                 patchFilters({
-                  brandId: value === "all" ? undefined : value,
+                  brandId: value === "all" ? undefined : Number(value),
                 });
               }}
             >

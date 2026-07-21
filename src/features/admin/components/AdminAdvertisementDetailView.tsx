@@ -47,6 +47,7 @@ import {
   formatMetricCount,
 } from "@/utils/formatMetrics";
 import { formatVehicleYears } from "@/utils/vehicle-years";
+import { parseRouteId } from "@/utils/parseRouteId";
 
 const PERIOD_OPTIONS: { value: MetricsPeriodParam; label: string }[] = [
   { value: "7d", label: "7 dias" },
@@ -93,16 +94,17 @@ function AdminAdvertisementDetailView() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const advertisementId = params.id;
+  const advertisementId = parseRouteId(params.id);
   const period = parsePeriod(searchParams.get("period"));
 
-  const adQuery = useAdminAdvertisement(advertisementId, period);
+  const adQuery = useAdminAdvertisement(advertisementId ?? 0, period);
   const updateStatus = useUpdateAdminAdvertisementStatus();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const data = adQuery.data;
 
   const setPeriod = (next: MetricsPeriodParam) => {
+    if (!advertisementId) return;
     const query = new URLSearchParams(searchParams.toString());
     if (next === "all") {
       query.delete("period");
@@ -318,7 +320,7 @@ function AdminAdvertisementDetailView() {
                 </div>
                 <div>
                   <dt className="text-muted-foreground text-xs">Marca</dt>
-                  <dd className="text-sm">{data.vehicleBrandName}</dd>
+                  <dd className="text-sm">{data.vehicleBrandName || "—"}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground text-xs">Modelo</dt>

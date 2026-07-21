@@ -12,7 +12,7 @@ export type AdminVehicleModelsUrlFilters = {
   status?: AdminVehicleModelStatusFilter;
   sort?: AdminVehicleModelSortParam;
   sortDir?: AdminVehicleModelSortDir;
-  brandId?: string;
+  brandId?: number;
 };
 
 const SORT_VALUES: AdminVehicleModelSortParam[] = [
@@ -46,7 +46,12 @@ export function parseAdminVehicleModelsFilters(
 
   const q = normalizeSearchQuery(search.get("q") ?? "");
   const status = parseStatus(search.get("status"));
-  const brandId = search.get("brandId")?.trim() ?? "";
+  const brandRaw = search.get("brandId")?.trim() ?? "";
+  const brandIdParsed = Number(brandRaw);
+  const brandId =
+    brandRaw && Number.isInteger(brandIdParsed) && brandIdParsed > 0
+      ? brandIdParsed
+      : undefined;
   const sortRaw = search.get("sort")?.trim() ?? "";
   const sortDirRaw = search.get("sortDir")?.trim().toLowerCase() ?? "";
 
@@ -76,8 +81,8 @@ export function buildAdminVehicleModelsHref(
   if (filters.status && filters.status !== "all") {
     params.set("status", filters.status);
   }
-  if (filters.brandId?.trim()) {
-    params.set("brandId", filters.brandId.trim());
+  if (filters.brandId) {
+    params.set("brandId", String(filters.brandId));
   }
   if (filters.sort && filters.sort !== "order") {
     params.set("sort", filters.sort);

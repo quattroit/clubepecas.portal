@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
+import { PageLoader } from "@/components/feedback/PageLoader";
 import { APP_NAME } from "@/constants/app";
 import { ROUTES } from "@/constants/routes";
 import { StoresPageView } from "@/features/marketplace/components/StoresPageView";
@@ -25,5 +27,9 @@ export const metadata: Metadata = {
 };
 
 export default function StoresPage() {
-  return <StoresPageView />;
+  return (
+    <Suspense fallback={<PageLoader label="Carregando lojas…" />}>
+      <StoresPageView />
+    </Suspense>
+  );
 }

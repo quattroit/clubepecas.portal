@@ -29,14 +29,14 @@ type PhotoGridProps = {
   photos: AdvertisementPhotoDto[];
   queueItems: UploadQueueItem[];
   disabled?: boolean;
-  busyPhotoId?: string | null;
+  busyPhotoId?: number | null;
   remaining: number;
   maxPhotos: number;
   usedCount: number;
   maxFileSizeMB: number;
   onReorder: (photos: AdvertisementPhotoDto[]) => void;
-  onSetPrimary: (photoId: string) => void;
-  onDelete: (photoId: string) => void;
+  onSetPrimary: (photoId: number) => void;
+  onDelete: (photoId: number) => void;
   onCancelUpload: (localId: string) => void;
   onRemoveUpload: (localId: string) => void;
   onFilesSelected: (files: FileList | File[]) => void;

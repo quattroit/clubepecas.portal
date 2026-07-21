@@ -16,7 +16,7 @@ export function useUpdateAdminCityStatus() {
     mutationFn: ({
       id,
       ...payload
-    }: UpdateAdminCityStatusRequest & { id: string }) =>
+    }: UpdateAdminCityStatusRequest & { id: number }) =>
       adminService.updateCityStatus(id, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({

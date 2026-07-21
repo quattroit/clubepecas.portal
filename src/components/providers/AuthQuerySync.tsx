@@ -15,7 +15,7 @@ import {
 function AuthQuerySync() {
   const { user, isLoading } = useAuth();
   const queryClient = useQueryClient();
-  const previousUserIdRef = useRef<string | null>(null);
+  const previousUserIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (isLoading) return;

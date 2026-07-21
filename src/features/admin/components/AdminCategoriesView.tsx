@@ -83,8 +83,8 @@ function AdminCategoriesView() {
 
   const [items, setItems] = useState<AdminCategoryListItemDto[]>([]);
   const [lastLoadedData, setLastLoadedData] = useState(categoriesQuery.data);
-  const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<number | null>(null);
+  const [dragOverId, setDragOverId] = useState<number | null>(null);
 
   // Sincroniza estado local a partir da URL/dados carregados durante a
   // renderização (evita setState em efeito — ver react.dev/learn/you-might-not-need-an-effect).
@@ -154,7 +154,7 @@ function AdminCategoriesView() {
     );
   };
 
-  const handleDrop = (targetId: string) => {
+  const handleDrop = (targetId: number) => {
     if (!draggedId || draggedId === targetId) {
       setDraggedId(null);
       setDragOverId(null);

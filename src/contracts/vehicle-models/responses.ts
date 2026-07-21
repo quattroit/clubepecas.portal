@@ -3,8 +3,8 @@
  * GET /api/v1/vehicle-models — apenas ativos por padrão (Sprint 4.3.9).
  */
 export type PublicVehicleModelListItemDto = {
-  id: string;
-  vehicleBrandId: string;
+  id: number;
+  vehicleBrandId: number;
   vehicleBrandName: string;
   vehicleBrandSlug: string;
   name: string;
@@ -20,7 +20,7 @@ export type GetVehicleModelsResponse = {
 
 /** Query params de GET /api/v1/vehicle-models */
 export type GetVehicleModelsParams = {
-  brandId?: string;
+  brandId?: number;
   brandSlug?: string;
   includeInactive?: boolean;
 };

@@ -24,7 +24,12 @@ export const sellerProfileFormSchema = z
   .object({
     storeName: z.string().trim().min(1, "Informe o nome da loja"),
     displayName: z.string().trim().min(1, "Informe o nome de exibição"),
-    cityId: z.string().trim().min(1, "Selecione a cidade"),
+    cityId: z
+      .union([z.string(), z.number()])
+      .transform((value) => Number(value))
+      .pipe(
+        z.number().int("Selecione a cidade").positive("Selecione a cidade"),
+      ),
     personType: z.nativeEnum(PersonType, {
       error: "Selecione o tipo de pessoa",
     }),
@@ -68,7 +73,7 @@ export type SellerProfileFormValues = z.infer<typeof sellerProfileFormSchema>;
 export const sellerProfileFormDefaultValues: SellerProfileFormValues = {
   storeName: "",
   displayName: "",
-  cityId: "",
+  cityId: 0,
   personType: PersonType.Individual,
   document: "",
   description: "",

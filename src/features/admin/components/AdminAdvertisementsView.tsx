@@ -288,7 +288,8 @@ function AdminAdvertisementsView() {
               onChange={(event) => {
                 const value = event.target.value;
                 patchFilters({
-                  categoryId: value === "all" ? undefined : value,
+                  categoryId:
+                    value === "all" ? undefined : Number(value),
                 });
               }}
             >

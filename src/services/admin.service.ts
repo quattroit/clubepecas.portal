@@ -118,7 +118,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  getSeller(id: string, period: MetricsPeriodParam = "all") {
+  getSeller(id: number, period: MetricsPeriodParam = "all") {
     return api
       .get<AdminSellerDetailResponse>(`/api/v1/admin/sellers/${id}`, {
         params: { period },
@@ -126,7 +126,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  updateSellerStatus(id: string, payload: UpdateAdminSellerStatusRequest) {
+  updateSellerStatus(id: number, payload: UpdateAdminSellerStatusRequest) {
     return api
       .put<UpdateAdminSellerStatusResponse>(
         `/api/v1/admin/sellers/${id}/status`,
@@ -143,7 +143,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  getAdvertisement(id: string, period: MetricsPeriodParam = "all") {
+  getAdvertisement(id: number, period: MetricsPeriodParam = "all") {
     return api
       .get<AdminAdvertisementDetailResponse>(
         `/api/v1/admin/advertisements/${id}`,
@@ -153,7 +153,7 @@ export const adminService = {
   },
 
   updateAdvertisementStatus(
-    id: string,
+    id: number,
     payload: UpdateAdminAdvertisementStatusRequest,
   ) {
     return api
@@ -181,7 +181,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  updateCategory(id: string, payload: UpdateAdminCategoryRequest) {
+  updateCategory(id: number, payload: UpdateAdminCategoryRequest) {
     return api
       .put<GetAdminCategoriesResponse["items"][number]>(
         `/api/v1/admin/categories/${id}`,
@@ -191,7 +191,7 @@ export const adminService = {
   },
 
   updateCategoryStatus(
-    id: string,
+    id: number,
     payload: UpdateAdminCategoryStatusRequest,
   ) {
     return api
@@ -228,7 +228,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  updateCity(id: string, payload: UpdateAdminCityRequest) {
+  updateCity(id: number, payload: UpdateAdminCityRequest) {
     return api
       .put<GetAdminCitiesResponse["items"][number]>(
         `/api/v1/admin/cities/${id}`,
@@ -237,7 +237,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  updateCityStatus(id: string, payload: UpdateAdminCityStatusRequest) {
+  updateCityStatus(id: number, payload: UpdateAdminCityStatusRequest) {
     return api
       .put<UpdateAdminCityStatusResponse>(
         `/api/v1/admin/cities/${id}/status`,
@@ -272,7 +272,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  updateVehicleBrand(id: string, payload: UpdateAdminVehicleBrandRequest) {
+  updateVehicleBrand(id: number, payload: UpdateAdminVehicleBrandRequest) {
     return api
       .put<GetAdminVehicleBrandsResponse["items"][number]>(
         `/api/v1/admin/vehicle-brands/${id}`,
@@ -282,7 +282,7 @@ export const adminService = {
   },
 
   updateVehicleBrandStatus(
-    id: string,
+    id: number,
     payload: UpdateAdminVehicleBrandStatusRequest,
   ) {
     return api
@@ -310,7 +310,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  listVehicleModelsByBrand(brandId: string) {
+  listVehicleModelsByBrand(brandId: number) {
     return api
       .get<GetAdminVehicleModelsResponse>(
         `/api/v1/admin/vehicle-models/by-brand/${brandId}`,
@@ -327,7 +327,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  updateVehicleModel(id: string, payload: UpdateAdminVehicleModelRequest) {
+  updateVehicleModel(id: number, payload: UpdateAdminVehicleModelRequest) {
     return api
       .put<GetAdminVehicleModelsResponse["items"][number]>(
         `/api/v1/admin/vehicle-models/${id}`,
@@ -337,7 +337,7 @@ export const adminService = {
   },
 
   updateVehicleModelStatus(
-    id: string,
+    id: number,
     payload: UpdateAdminVehicleModelStatusRequest,
   ) {
     return api
@@ -365,7 +365,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  getSubscriptionPlan(id: string) {
+  getSubscriptionPlan(id: number) {
     return api
       .get<AdminSubscriptionPlanDetailDto>(
         `/api/v1/admin/subscription-plans/${id}`,
@@ -383,7 +383,7 @@ export const adminService = {
   },
 
   updateSubscriptionPlan(
-    id: string,
+    id: number,
     payload: UpdateAdminSubscriptionPlanRequest,
   ) {
     return api
@@ -394,7 +394,7 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  deleteSubscriptionPlan(id: string) {
+  deleteSubscriptionPlan(id: number) {
     return api
       .delete(`/api/v1/admin/subscription-plans/${id}`)
       .then((response) => response.data);

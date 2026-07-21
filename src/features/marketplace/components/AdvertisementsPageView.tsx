@@ -74,7 +74,7 @@ function AdvertisementsPageView() {
   const filterCategories = [
     { id: "all", label: "Todas" },
     ...(categoriesQuery.data ?? []).map((category) => ({
-      id: category.id,
+      id: String(category.id),
       label: category.name,
     })),
   ];

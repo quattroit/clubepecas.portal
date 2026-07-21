@@ -5,17 +5,17 @@ export type GetMarketplaceRequest = {
   /** Filtro legado só no título — preferir `q`. */
   title?: string;
   /** Guid da categoria. */
-  categoryId?: string;
+  categoryId?: number;
   /** Slug da categoria — alternativa ao `categoryId`. */
   categorySlug?: string;
   /** Guid da marca de veículo. */
-  vehicleBrandId?: string;
+  vehicleBrandId?: number;
   /** Slug da marca — alternativa ao `vehicleBrandId`. */
   vehicleBrandSlug?: string;
   /** Alias de `vehicleBrandSlug` (querystring pública `?brand=`). */
   brand?: string;
   /** Guid do modelo de veículo. */
-  vehicleModelId?: string;
+  vehicleModelId?: number;
   /** Slug do modelo — alternativa ao `vehicleModelId`. */
   vehicleModelSlug?: string;
   /** Alias de `vehicleModelSlug` (querystring pública `?model=`). */

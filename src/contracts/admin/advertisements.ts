@@ -24,11 +24,11 @@ export type AdminAdvertisementsListParams = {
   q?: string;
   status?: AdminAdvertisementStatusFilter;
   /** Guid da categoria. */
-  categoryId?: string;
+  categoryId?: number;
   city?: string;
   state?: string;
   store?: string;
-  sellerId?: string;
+  sellerId?: number;
   publishedFrom?: string;
   publishedTo?: string;
   stockMin?: number;
@@ -48,23 +48,23 @@ export type AdminAdvertisementsListResponse = {
 };
 
 export type AdminAdvertisementListItemDto = {
-  id: string;
+  id: number;
   slug: string;
   thumbnailUrl: string | null;
   title: string;
-  sellerId: string;
+  sellerId: number;
   storeName: string;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
   city: string;
   state: string;
   stockQuantity: number;
@@ -79,22 +79,22 @@ export type AdminAdvertisementListItemDto = {
 };
 
 export type AdminAdvertisementDetailResponse = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   description: string;
-  compatibilityDescription: string;
-  categoryId: string;
+  compatibilityDescription?: string | null;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
   condition: AdvertisementCondition;
   price: number;
   stockQuantity: number;
@@ -102,7 +102,7 @@ export type AdminAdvertisementDetailResponse = {
   isActive: boolean;
   publishedAt: string;
   imageUrls: string[];
-  sellerId: string;
+  sellerId: number;
   storeName: string;
   ownerName: string;
   city: string;
@@ -123,7 +123,7 @@ export type UpdateAdminAdvertisementStatusRequest = {
 };
 
 export type UpdateAdminAdvertisementStatusResponse = {
-  id: string;
+  id: number;
   isActive: boolean;
   status: AdvertisementStatus;
   title: string;

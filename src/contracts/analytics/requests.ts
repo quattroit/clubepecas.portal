@@ -10,6 +10,6 @@ export type TrackAnalyticsEventRequest = {
 };
 
 export type TrackAnalyticsEventResponse = {
-  id: string;
+  id: number;
   occurredAt: string;
 };

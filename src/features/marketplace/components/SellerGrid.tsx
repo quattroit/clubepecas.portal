@@ -17,7 +17,7 @@ function SellerGrid({ sellers, className }: SellerGridProps) {
       aria-label="Vendedores"
     >
       {sellers.map((seller) => (
-        <li key={seller.id}>
+        <li key={seller.slug || String(seller.id)}>
           <SellerCard seller={seller} />
         </li>
       ))}

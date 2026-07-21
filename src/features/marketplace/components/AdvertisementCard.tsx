@@ -34,7 +34,7 @@ function AdvertisementCard({
     isNew,
   } = advertisement;
   const location = `${city}, ${state}`;
-  const href = advertisementPath(slug ?? id);
+  const href = advertisementPath(slug ?? String(id));
   const vehicleYearsLabel =
     typeof manufacturingYear === "number" && typeof modelYear === "number"
       ? formatVehicleYears(manufacturingYear, modelYear)
@@ -56,7 +56,7 @@ function AdvertisementCard({
               alt={`Foto do anúncio: ${title}`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover/card:scale-[1.03]"
+              className="object-contain transition-transform duration-300 group-hover/card:scale-[1.03]"
             />
           ) : (
             <div

@@ -1,12 +1,14 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import type { CreateSellerRequest } from "@/contracts/seller/requests";
+import type { CreateSellerResponse } from "@/contracts/seller/responses";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { isCanceledError } from "@/lib/errors";
+import { ApiError, isCanceledError } from "@/lib/errors";
 import { queryKeys } from "@/lib/queryKeys";
+import { mapSellerMeToSeller } from "@/mappers/seller.mapper";
 import { sellerService } from "@/services/seller.service";
 
 type CreateSellerInput = {
@@ -14,31 +16,73 @@ type CreateSellerInput = {
   photoFile?: File | null;
 };
 
+type CreateSellerResult = CreateSellerResponse & {
+  alreadyExisted?: boolean;
+};
+
+function isSellerAlreadyExists(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+  if (error.code === "seller.already_exists") return true;
+  return error.errors.some((item) => item.code === "seller.already_exists");
+}
+
+async function syncSellerMeCache(queryClient: QueryClient) {
+  const me = await sellerService.getMe();
+  queryClient.setQueryData(queryKeys.seller.me, mapSellerMeToSeller(me));
+  return me;
+}
+
 /**
  * Cria perfil de vendedor e, se houver, envia a foto em seguida.
+ * Após criar (ou se já existir — 409), sincroniza o cache de `seller.me`
+ * para o formulário sair do modo criação.
  */
 export function useCreateSeller() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ request, photoFile }: CreateSellerInput) => {
-      const created = await sellerService.create(request);
+    mutationFn: async ({
+      request,
+      photoFile,
+    }: CreateSellerInput): Promise<CreateSellerResult> => {
+      try {
+        const created = await sellerService.create(request);
 
-      if (photoFile) {
-        try {
-          await sellerService.uploadPhoto(photoFile);
-        } catch (error) {
-          if (isCanceledError(error)) throw error;
-          toast.warning(
-            `Perfil criado, mas a foto não pôde ser enviada: ${getFriendlyErrorMessage(error)}`,
-          );
+        if (photoFile) {
+          try {
+            await sellerService.uploadPhoto(photoFile);
+          } catch (error) {
+            if (isCanceledError(error)) throw error;
+            toast.warning(
+              `Perfil criado, mas a foto não pôde ser enviada: ${getFriendlyErrorMessage(error)}`,
+            );
+          }
         }
+
+        await syncSellerMeCache(queryClient);
+        return created;
+      } catch (error) {
+        if (!isSellerAlreadyExists(error)) {
+          throw error;
+        }
+
+        const existing = await syncSellerMeCache(queryClient);
+        return {
+          id: existing.id,
+          storeName: existing.storeName,
+          displayName: existing.displayName,
+          alreadyExisted: true,
+        };
+      }
+    },
+    onSuccess: (result) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.seller.me });
+
+      if (result.alreadyExisted) {
+        toast.message("Você já possui um perfil de vendedor.");
+        return;
       }
 
-      return created;
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.seller.me });
       toast.success("Perfil de vendedor criado com sucesso!");
     },
   });

@@ -3,10 +3,10 @@
  * Diferente dos DTOs em `src/contracts/seller`.
  */
 export type Seller = {
-  id: string;
+  id: number;
   slug: string;
   name: string;
-  cityId?: string;
+  cityId?: number;
   city: string;
   state: string;
   citySlug?: string;

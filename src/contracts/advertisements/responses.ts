@@ -4,7 +4,7 @@ import type {
 } from "@/contracts/common/enums";
 
 export type CreateAdvertisementResponse = {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   price: number;
@@ -14,24 +14,24 @@ export type CreateAdvertisementResponse = {
 };
 
 export type AdvertisementListItemDto = {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   price: number;
   stockQuantity: number;
   status: AdvertisementStatus;
   condition: AdvertisementCondition;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
   createdAt: string;
   thumbnailUrl?: string | null;
 };
@@ -41,22 +41,22 @@ export type GetMyAdvertisementsResponse = {
 };
 
 export type AdvertisementDetailDto = {
-  id: string;
-  sellerId: string;
+  id: number;
+  sellerId: number;
   title: string;
   description: string;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
-  compatibilityDescription: string;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
+  compatibilityDescription?: string | null;
   condition: AdvertisementCondition;
   price: number;
   stockQuantity: number;
@@ -74,6 +74,7 @@ export type PublicAdvertisementSellerDto = {
   whatsApp: string;
   instagram: string | null;
   slug: string;
+  advertisementCount: number;
 };
 
 export type PublicAdvertisementPhotoDto = {
@@ -84,21 +85,22 @@ export type PublicAdvertisementPhotoDto = {
 
 /** GET /api/v1/advertisements/{slug} — público */
 export type AdvertisementBySlugResponse = {
+  id: number;
   title: string;
   description: string;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
   condition: AdvertisementCondition;
-  compatibilityDescription: string;
+  compatibilityDescription?: string | null;
   price: number;
   stockQuantity: number;
   status: AdvertisementStatus;
@@ -109,12 +111,12 @@ export type AdvertisementBySlugResponse = {
 };
 
 export type DeleteAdvertisementResponse = {
-  id: string;
+  id: number;
 };
 
 export type AdvertisementPhotoDto = {
-  id: string;
-  advertisementId: string;
+  id: number;
+  advertisementId: number;
   storageKey?: string | null;
   publicUrl: string;
   thumbnailStorageKey?: string | null;
@@ -138,7 +140,7 @@ export type GetPhotosResponse = {
 };
 
 export type UpdatePhotoOrderItemDto = {
-  id: string;
+  id: number;
   displayOrder: number;
   isPrimary: boolean;
 };
@@ -148,11 +150,11 @@ export type UpdatePhotoOrderResponse = {
 };
 
 export type DeletePhotoResponse = {
-  id: string;
+  id: number;
 };
 
 export type SetPrimaryPhotoResponse = {
-  id: string;
-  advertisementId: string;
+  id: number;
+  advertisementId: number;
   isPrimary: boolean;
 };

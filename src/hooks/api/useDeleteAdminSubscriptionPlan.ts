@@ -12,7 +12,7 @@ export function useDeleteAdminSubscriptionPlan() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => adminService.deleteSubscriptionPlan(id),
+    mutationFn: (id: number) => adminService.deleteSubscriptionPlan(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.admin.subscriptionPlans.all,

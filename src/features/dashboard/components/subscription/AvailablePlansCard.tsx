@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { SubscriptionPlanCatalogItemDto } from "@/contracts/seller/subscription";
+import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import {
   formatPlanAdvertisementLimit,
   formatPlanPrice,
@@ -17,7 +18,7 @@ import {
 
 type AvailablePlansCardProps = {
   plans: SubscriptionPlanCatalogItemDto[];
-  currentPlanId?: string | null;
+  currentPlanId?: number | null;
   onSelectPlan: () => void;
 };
 
@@ -61,9 +62,11 @@ function AvailablePlansCard({
                   {formatPlanAdvertisementLimit(plan.advertisementLimit)}
                 </p>
                 {plan.description ? (
-                  <p className="text-small text-muted-foreground line-clamp-2">
-                    {plan.description}
-                  </p>
+                  <PlanDescription
+                    description={plan.description}
+                    compact
+                    className="line-clamp-6"
+                  />
                 ) : null}
                 {!isCurrent ? (
                   <Button

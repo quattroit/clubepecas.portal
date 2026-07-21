@@ -3,12 +3,12 @@ import type { AdvertisementCondition } from "@/contracts/common/enums";
 export type CreateAdvertisementRequest = {
   title: string;
   description: string;
-  categoryId: string;
-  vehicleBrandId: string;
-  vehicleModelId: string;
-  manufacturingYear: number;
-  modelYear: number;
-  compatibilityDescription: string;
+  categoryId: number;
+  vehicleBrandId: number | null;
+  vehicleModelId: number | null;
+  manufacturingYear: number | null;
+  modelYear: number | null;
+  compatibilityDescription: string | null;
   condition: AdvertisementCondition;
   price: number;
   stockQuantity: number;
@@ -17,17 +17,17 @@ export type CreateAdvertisementRequest = {
 export type UpdateAdvertisementRequest = {
   title: string;
   description: string;
-  categoryId: string;
-  vehicleBrandId: string;
-  vehicleModelId: string;
-  manufacturingYear: number;
-  modelYear: number;
-  compatibilityDescription: string;
+  categoryId: number;
+  vehicleBrandId: number | null;
+  vehicleModelId: number | null;
+  manufacturingYear: number | null;
+  modelYear: number | null;
+  compatibilityDescription: string | null;
   condition: AdvertisementCondition;
   price: number;
   stockQuantity: number;
 };
 
 export type UpdatePhotoOrderRequest = {
-  photoIds: string[];
+  photoIds: number[];
 };

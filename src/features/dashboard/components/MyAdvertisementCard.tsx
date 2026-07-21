@@ -83,7 +83,7 @@ function MyAdvertisementCard({
             alt={`Foto do anúncio: ${title}`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-            className="object-cover transition-transform duration-300 group-hover/card:scale-[1.03]"
+            className="object-contain transition-transform duration-300 group-hover/card:scale-[1.03]"
           />
         ) : (
           <div

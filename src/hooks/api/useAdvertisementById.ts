@@ -10,7 +10,7 @@ import { advertisementService } from "@/services/advertisement.service";
 /**
  * Carrega anúncio + fotos por id (painel — edição).
  */
-export function useAdvertisementById(id: string) {
+export function useAdvertisementById(id: number) {
   const authReady = useAuthQueryEnabled();
 
   return useQuery({

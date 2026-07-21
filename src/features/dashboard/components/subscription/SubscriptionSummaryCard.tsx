@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import {
   subscriptionStatusBadgeVariant,
   subscriptionStatusLabel,
 } from "@/features/dashboard/components/subscription/subscription-display";
+import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import { formatPlanPrice } from "@/features/plans/utils/plan-display";
 import { formatDate } from "@/utils/formatDate";
 
@@ -24,13 +24,18 @@ function SubscriptionSummaryCard({
   return (
     <Card>
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-            Resumo do plano
-          </p>
-          <CardTitle className="text-h2">{subscription.planName}</CardTitle>
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="space-y-1">
+            <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+              Resumo do plano
+            </p>
+            <CardTitle className="text-h2">{subscription.planName}</CardTitle>
+          </div>
           {subscription.planDescription ? (
-            <CardDescription>{subscription.planDescription}</CardDescription>
+            <PlanDescription
+              description={subscription.planDescription}
+              compact
+            />
           ) : null}
         </div>
         <Badge variant={subscriptionStatusBadgeVariant(subscription.status)}>

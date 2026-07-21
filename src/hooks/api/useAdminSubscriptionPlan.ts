@@ -9,11 +9,11 @@ import { adminService } from "@/services/admin.service";
 /**
  * Detalhe de um plano de assinatura administrativo.
  */
-export function useAdminSubscriptionPlan(id: string | undefined) {
+export function useAdminSubscriptionPlan(id: number | undefined) {
   const authReady = useAuthQueryEnabled();
 
   return useQuery({
-    queryKey: queryKeys.admin.subscriptionPlans.detail(id ?? ""),
+    queryKey: queryKeys.admin.subscriptionPlans.detail(id ?? 0),
     queryFn: () => adminService.getSubscriptionPlan(id!),
     enabled: authReady && Boolean(id),
     retry: false,

@@ -9,9 +9,9 @@ export const queryKeys = {
   advertisements: {
     all: ["advertisements"] as const,
     me: ["advertisements", "me"] as const,
-    detail: (id: string) => ["advertisements", "detail", id] as const,
+    detail: (id: number) => ["advertisements", "detail", id] as const,
     bySlug: (slug: string) => ["advertisements", "slug", slug] as const,
-    photos: (advertisementId: string) =>
+    photos: (advertisementId: number) =>
       ["advertisements", advertisementId, "photos"] as const,
   },
   marketplace: {
@@ -19,12 +19,12 @@ export const queryKeys = {
     list: (filters?: {
       q?: string;
       title?: string;
-      categoryId?: string;
+      categoryId?: number;
       categorySlug?: string;
-      vehicleBrandId?: string;
+      vehicleBrandId?: number;
       vehicleBrandSlug?: string;
       brand?: string;
-      vehicleModelId?: string;
+      vehicleModelId?: number;
       vehicleModelSlug?: string;
       model?: string;
       manufacturingYear?: number;
@@ -82,14 +82,14 @@ export const queryKeys = {
       all: ["admin", "sellers"] as const,
       list: (params: Record<string, unknown>) =>
         ["admin", "sellers", "list", params] as const,
-      detail: (id: string, period: string) =>
+      detail: (id: number, period: string) =>
         ["admin", "sellers", "detail", id, period] as const,
     },
     advertisements: {
       all: ["admin", "advertisements"] as const,
       list: (params: Record<string, unknown>) =>
         ["admin", "advertisements", "list", params] as const,
-      detail: (id: string, period: string) =>
+      detail: (id: number, period: string) =>
         ["admin", "advertisements", "detail", id, period] as const,
     },
     categories: {
@@ -116,7 +116,7 @@ export const queryKeys = {
       all: ["admin", "subscriptionPlans"] as const,
       list: (params: Record<string, unknown>) =>
         ["admin", "subscriptionPlans", "list", params] as const,
-      detail: (id: string) =>
+      detail: (id: number) =>
         ["admin", "subscriptionPlans", "detail", id] as const,
     },
     audit: {

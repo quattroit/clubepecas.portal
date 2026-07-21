@@ -10,7 +10,7 @@ import { normalizeSearchQuery } from "@/utils/marketplace-search";
 export type AdminAdvertisementsUrlFilters = {
   q?: string;
   status?: AdminAdvertisementStatusFilter;
-  categoryId?: string;
+  categoryId?: number;
   city?: string;
   state?: string;
   store?: string;
@@ -60,10 +60,15 @@ export function parseAdminAdvertisementsFilters(
 
   const q = normalizeSearchQuery(search.get("q") ?? "");
   const status = parseStatus(search.get("status"));
-  const categoryId =
+  const categoryRaw =
     search.get("categoryId")?.trim() ||
     search.get("category")?.trim() ||
     "";
+  const categoryIdParsed = Number(categoryRaw);
+  const categoryId =
+    categoryRaw && Number.isInteger(categoryIdParsed) && categoryIdParsed > 0
+      ? categoryIdParsed
+      : undefined;
   const city = search.get("city")?.trim() ?? "";
   const state = search.get("state")?.trim() ?? "";
   const store = search.get("store")?.trim() ?? "";
@@ -115,8 +120,8 @@ export function buildAdminAdvertisementsHref(
   if (filters.status && filters.status !== "all") {
     params.set("status", filters.status);
   }
-  if (filters.categoryId?.trim() && filters.categoryId !== "all") {
-    params.set("categoryId", filters.categoryId.trim());
+  if (filters.categoryId) {
+    params.set("categoryId", String(filters.categoryId));
   }
   if (filters.city?.trim()) params.set("city", filters.city.trim());
   if (filters.state?.trim()) {

@@ -15,7 +15,7 @@ export type AdminCategoriesListParams = {
 };
 
 export type AdminCategoryListItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   description: string | null;
@@ -67,14 +67,14 @@ export type UpdateAdminCategoryStatusRequest = {
 };
 
 export type UpdateAdminCategoryStatusResponse = {
-  id: string;
+  id: number;
   isActive: boolean;
   name: string;
 };
 
 /** PUT /api/v1/admin/categories/reorder */
 export type ReorderAdminCategoriesRequest = {
-  orderedIds: string[];
+  orderedIds: number[];
 };
 
 export type ReorderAdminCategoriesResponse = {

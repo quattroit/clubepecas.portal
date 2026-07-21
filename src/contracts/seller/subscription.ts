@@ -2,8 +2,8 @@ import type { SellerSubscriptionStatus } from "@/contracts/common/enums";
 
 /** GET/POST/DELETE /api/v1/seller/subscription */
 export type SellerSubscriptionDto = {
-  id: string;
-  subscriptionPlanId: string;
+  id: number;
+  subscriptionPlanId: number;
   planName: string;
   planDescription?: string | null;
   price: number;
@@ -24,12 +24,12 @@ export type ListSellerSubscriptionsResponse = {
 
 /** POST /api/v1/seller/subscription */
 export type CreateSellerSubscriptionRequest = {
-  subscriptionPlanId: string;
+  subscriptionPlanId: number;
 };
 
 /** GET /api/v1/subscription-plans — catálogo público (apenas ativos). */
 export type SubscriptionPlanCatalogItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   description?: string | null;

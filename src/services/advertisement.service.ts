@@ -37,7 +37,7 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  getById(id: string) {
+  getById(id: number) {
     return api
       .get<AdvertisementDetailDto>(`/api/v1/advertisements/${id}`)
       .then((response) => response.data);
@@ -49,20 +49,20 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  update(id: string, payload: UpdateAdvertisementRequest) {
+  update(id: number, payload: UpdateAdvertisementRequest) {
     return api
       .put<AdvertisementDetailDto>(`/api/v1/advertisements/${id}`, payload)
       .then((response) => response.data);
   },
 
-  remove(id: string) {
+  remove(id: number) {
     return api
       .delete<DeleteAdvertisementResponse>(`/api/v1/advertisements/${id}`)
       .then((response) => response.data);
   },
 
   uploadPhoto(
-    advertisementId: string,
+    advertisementId: number,
     file: File,
     options?: UploadPhotoOptions,
   ) {
@@ -86,7 +86,7 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  getPhotos(advertisementId: string) {
+  getPhotos(advertisementId: number) {
     return api
       .get<GetPhotosResponse>(
         `/api/v1/advertisements/${advertisementId}/photos`,
@@ -94,7 +94,7 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  updatePhotoOrder(advertisementId: string, payload: UpdatePhotoOrderRequest) {
+  updatePhotoOrder(advertisementId: number, payload: UpdatePhotoOrderRequest) {
     return api
       .put<UpdatePhotoOrderResponse>(
         `/api/v1/advertisements/${advertisementId}/photos/order`,
@@ -103,7 +103,7 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  setPrimaryPhoto(advertisementId: string, photoId: string) {
+  setPrimaryPhoto(advertisementId: number, photoId: number) {
     return api
       .put(
         `/api/v1/advertisements/${advertisementId}/photos/${photoId}/primary`,
@@ -111,7 +111,7 @@ export const advertisementService = {
       .then((response) => response.data);
   },
 
-  deletePhoto(advertisementId: string, photoId: string) {
+  deletePhoto(advertisementId: number, photoId: number) {
     return api
       .delete<DeletePhotoResponse>(
         `/api/v1/advertisements/${advertisementId}/photos/${photoId}`,

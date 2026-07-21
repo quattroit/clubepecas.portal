@@ -18,7 +18,7 @@ import {
 } from "@/lib/auth/storage";
 
 type AuthUser = {
-  userId: string;
+  userId: number;
   fullName: string;
   email: string;
   role: number;

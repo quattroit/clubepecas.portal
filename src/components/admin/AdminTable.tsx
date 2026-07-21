@@ -23,7 +23,7 @@ type AdminTableColumn<T> = {
 type AdminTableProps<T> = {
   columns: AdminTableColumn<T>[];
   data: T[];
-  getRowId: (row: T) => string;
+  getRowId: (row: T) => string | number;
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -157,7 +157,7 @@ function AdminTable<T>({
           <tbody className="divide-border divide-y">
             {data.map((row) => (
               <tr
-                key={getRowId(row)}
+                key={String(getRowId(row))}
                 className="hover:bg-muted/30 transition-colors"
               >
                 {columns.map((column) => (

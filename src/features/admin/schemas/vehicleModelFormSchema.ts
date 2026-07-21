@@ -7,12 +7,10 @@ const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
  */
 export const vehicleModelFormSchema = z.object({
   vehicleBrandId: z
-    .string()
-    .trim()
-    .min(1, "Selecione a marca")
-    .refine(
-      (value) => z.uuid().safeParse(value).success,
-      "Marca inválida",
+    .union([z.string(), z.number()])
+    .transform((value) => Number(value))
+    .pipe(
+      z.number().int("Selecione a marca").positive("Selecione a marca"),
     ),
   name: z
     .string()
@@ -37,7 +35,7 @@ export const vehicleModelFormSchema = z.object({
 export type VehicleModelFormValues = z.infer<typeof vehicleModelFormSchema>;
 
 export const vehicleModelFormDefaultValues: VehicleModelFormValues = {
-  vehicleBrandId: "",
+  vehicleBrandId: 0,
   name: "",
   slug: "",
   displayOrder: 0,

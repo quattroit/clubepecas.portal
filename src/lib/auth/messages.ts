@@ -66,6 +66,9 @@ const CODE_MESSAGES: Record<string, string> = {
     "Você atingiu o limite de anúncios permitido pelo seu plano.",
   "seller.subscription.already_active":
     "Você já possui uma assinatura ativa. Cancele a atual antes de assinar outro plano.",
+  "seller.subscription.not_found":
+    "Nenhuma assinatura ativa encontrada.",
+  "seller.subscription.plan_not_found": "Plano de assinatura não encontrado.",
   "seller.document.already_exists":
     "Já existe um vendedor cadastrado com este CPF ou CNPJ.",
   "seller.document.invalid": "Informe um CPF ou CNPJ válido.",

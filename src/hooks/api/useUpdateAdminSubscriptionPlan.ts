@@ -16,7 +16,7 @@ export function useUpdateAdminSubscriptionPlan() {
     mutationFn: ({
       id,
       ...payload
-    }: UpdateAdminSubscriptionPlanRequest & { id: string }) =>
+    }: UpdateAdminSubscriptionPlanRequest & { id: number }) =>
       adminService.updateSubscriptionPlan(id, payload),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({

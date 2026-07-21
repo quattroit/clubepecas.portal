@@ -2,17 +2,17 @@ import type { AdvertisementCondition } from "@/contracts/common/enums";
 import type { PersonType } from "@/contracts/common/enums";
 
 export type CreateSellerResponse = {
-  id: string;
+  id: number;
   storeName: string;
   displayName: string;
 };
 
 export type SellerMeDto = {
-  id: string;
+  id: number;
   storeName: string;
   displayName: string;
   description: string | null;
-  cityId: string;
+  cityId: number;
   city: string;
   state: string;
   citySlug: string;
@@ -26,20 +26,21 @@ export type SellerMeDto = {
 };
 
 export type PublicSellerAdvertisementDto = {
+  id: number;
   slug: string;
   title: string;
   price: number;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   categorySlug: string;
-  vehicleBrandId: string;
-  vehicleBrandName: string;
-  vehicleBrandSlug: string;
-  vehicleModelId?: string | null;
+  vehicleBrandId?: number | null;
+  vehicleBrandName?: string | null;
+  vehicleBrandSlug?: string | null;
+  vehicleModelId?: number | null;
   vehicleModelName?: string | null;
   vehicleModelSlug?: string | null;
-  manufacturingYear: number;
-  modelYear: number;
+  manufacturingYear?: number | null;
+  modelYear?: number | null;
   condition: AdvertisementCondition;
   thumbnailUrl: string | null;
   publishedAt: string;

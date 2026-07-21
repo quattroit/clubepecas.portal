@@ -16,7 +16,7 @@ export function useUpdateAdminCategoryStatus() {
     mutationFn: ({
       id,
       ...payload
-    }: UpdateAdminCategoryStatusRequest & { id: string }) =>
+    }: UpdateAdminCategoryStatusRequest & { id: number }) =>
       adminService.updateCategoryStatus(id, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({

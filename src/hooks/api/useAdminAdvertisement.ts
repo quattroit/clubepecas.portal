@@ -11,7 +11,7 @@ import { adminService } from "@/services/admin.service";
  * Detalhes do anúncio + métricas (uma requisição).
  */
 export function useAdminAdvertisement(
-  id: string,
+  id: number,
   period: MetricsPeriodParam = "all",
 ) {
   const authReady = useAuthQueryEnabled();

@@ -3,10 +3,10 @@
  * Backend: CRUD administrativo (Sprint 4.3.9) — `id` é Guid.
  */
 export type VehicleModel = {
-  id: string;
+  id: number;
   slug: string;
   name: string;
-  vehicleBrandId: string;
+  vehicleBrandId: number;
   vehicleBrandName: string;
   vehicleBrandSlug: string;
   advertisementCount: number;

@@ -14,7 +14,7 @@ type UseVehicleModelsParams = GetVehicleModelsParams;
  * Só busca quando `brandId` ou `brandSlug` é informado (cascade marca → modelo).
  */
 export function useVehicleModels(params: UseVehicleModelsParams = {}) {
-  const brandId = params.brandId?.trim() || undefined;
+  const brandId = params.brandId;
   const brandSlug = params.brandSlug?.trim() || undefined;
   const enabled = Boolean(brandId || brandSlug);
 

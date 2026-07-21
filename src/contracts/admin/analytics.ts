@@ -56,7 +56,7 @@ export type AdminAnalyticsSummaryDto = {
 };
 
 export type AdminAnalyticsStoreRankDto = {
-  id: string;
+  id: number;
   storeName: string;
   slug: string;
   city: string;
@@ -68,13 +68,13 @@ export type AdminAnalyticsStoreRankDto = {
 };
 
 export type AdminAnalyticsListingRankDto = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   thumbnailUrl: string | null;
-  sellerId: string;
+  sellerId: number;
   storeName: string;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   views: number;
   whatsappClicks: number;
@@ -82,7 +82,7 @@ export type AdminAnalyticsListingRankDto = {
 };
 
 export type AdminAnalyticsCategoryRankDto = {
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   advertisementCount: number;
   views: number;

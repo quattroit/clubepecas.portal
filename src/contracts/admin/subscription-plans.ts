@@ -4,7 +4,7 @@ export type AdminSubscriptionPlansListParams = {
 };
 
 export type AdminSubscriptionPlanListItemDto = {
-  id: string;
+  id: number;
   name: string;
   description?: string | null;
   price: number;

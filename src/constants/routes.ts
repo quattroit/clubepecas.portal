@@ -52,17 +52,17 @@ export function advertisementsSearchPath(q?: string | null) {
 }
 
 /** Helper para editar anúncio no painel */
-export function editAdvertisementPath(id: string) {
+export function editAdvertisementPath(id: number) {
   return `${ROUTES.MY_ADVERTISEMENTS}/${id}/editar` as const;
 }
 
 /** Helper para detalhe administrativo do vendedor */
-export function adminSellerPath(id: string) {
+export function adminSellerPath(id: number) {
   return `${ROUTES.ADMIN_SELLERS}/${id}` as const;
 }
 
 /** Helper para detalhe administrativo do anúncio */
-export function adminAdvertisementPath(id: string) {
+export function adminAdvertisementPath(id: number) {
   return `${ROUTES.ADMIN_ADVERTISEMENTS}/${id}` as const;
 }
 

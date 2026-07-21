@@ -3,7 +3,7 @@
  * GET /api/v1/vehicle-brands — apenas ativas por padrão (Sprint 4.3.8).
  */
 export type PublicVehicleBrandListItemDto = {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   displayOrder: number;

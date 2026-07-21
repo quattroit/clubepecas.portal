@@ -12,13 +12,13 @@ export function mapPublicSellerDtoToSeller(
   dto: PublicAdvertisementSellerDto,
 ): Seller {
   return {
-    id: dto.slug,
+    id: 0,
     slug: dto.slug,
     name: dto.storeName,
     displayName: dto.displayName,
     city: dto.city,
     state: dto.state,
-    advertisementCount: 0,
+    advertisementCount: dto.advertisementCount ?? 0,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
   };
@@ -28,7 +28,7 @@ export function mapSellerPublicProfileToSeller(
   dto: SellerPublicProfileResponse,
 ): Seller {
   return {
-    id: dto.slug,
+    id: 0,
     slug: dto.slug,
     name: dto.storeName,
     displayName: dto.displayName,

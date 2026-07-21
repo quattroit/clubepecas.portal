@@ -16,7 +16,7 @@ export function useUpdateAdminAdvertisementStatus() {
     mutationFn: ({
       id,
       ...payload
-    }: UpdateAdminAdvertisementStatusRequest & { id: string }) =>
+    }: UpdateAdminAdvertisementStatusRequest & { id: number }) =>
       adminService.updateAdvertisementStatus(id, payload),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({

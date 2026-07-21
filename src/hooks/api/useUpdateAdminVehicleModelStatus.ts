@@ -16,7 +16,7 @@ export function useUpdateAdminVehicleModelStatus() {
     mutationFn: ({
       id,
       ...payload
-    }: UpdateAdminVehicleModelStatusRequest & { id: string }) =>
+    }: UpdateAdminVehicleModelStatusRequest & { id: number }) =>
       adminService.updateVehicleModelStatus(id, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({

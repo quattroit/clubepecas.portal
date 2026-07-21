@@ -1,7 +1,7 @@
 export type AdminAuditListParams = {
   from?: string;
   to?: string;
-  userId?: string;
+  userId?: number;
   action?: string;
   success?: boolean;
   page?: number;
@@ -9,15 +9,15 @@ export type AdminAuditListParams = {
 };
 
 export type AdminAuditListItemDto = {
-  id: string;
+  id: number;
   occurredAtUtc: string;
-  userId: string | null;
+  userId: number | null;
   userEmail: string | null;
   userFullName: string | null;
-  sellerId: string | null;
+  sellerId: number | null;
   action: string;
   entityName: string | null;
-  entityId: string | null;
+  entityId: number | null;
   description: string;
   ipAddress: string | null;
   userAgent: string | null;

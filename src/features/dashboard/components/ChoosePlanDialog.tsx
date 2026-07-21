@@ -26,19 +26,36 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   const plansQuery = useActiveSubscriptionPlans(open);
   const createMutation = useCreateSellerSubscription();
 
-  const handleSubscribe = (planId: string) => {
+  const pendingPlanId = createMutation.isPending
+    ? createMutation.variables?.subscriptionPlanId
+    : undefined;
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen && createMutation.isPending) {
+      return;
+    }
+    if (!nextOpen) {
+      createMutation.reset();
+    }
+    onOpenChange(nextOpen);
+  };
+
+  const handleSubscribe = (planId: number) => {
+    if (createMutation.isPending) return;
+
     createMutation.mutate(
       { subscriptionPlanId: planId },
       {
         onSuccess: () => {
           onOpenChange(false);
+          createMutation.reset();
         },
       },
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Escolher plano</DialogTitle>
@@ -80,50 +97,54 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
         ) : null}
 
         <ul className="flex flex-col gap-3">
-          {plansQuery.data?.map((plan) => (
-            <li
-              key={plan.id}
-              className="border-border flex flex-col gap-3 rounded-lg border px-4 py-3"
-            >
-              <div className="flex flex-col gap-1">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="text-h3">{plan.name}</h3>
-                  <p className="text-sm font-semibold whitespace-nowrap">
-                    {formatCurrency(plan.price)}
+          {plansQuery.data?.map((plan) => {
+            const isThisPending = pendingPlanId === plan.id;
+
+            return (
+              <li
+                key={plan.id}
+                className="border-border flex flex-col gap-3 rounded-lg border px-4 py-3"
+              >
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="text-h3">{plan.name}</h3>
+                    <p className="text-sm font-semibold whitespace-nowrap">
+                      {formatCurrency(plan.price)}
+                    </p>
+                  </div>
+                  {plan.description ? (
+                    <PlanDescription
+                      description={plan.description}
+                      compact
+                      className="mt-1"
+                    />
+                  ) : null}
+                  <p className="text-small text-muted-foreground">
+                    Limite de anúncios:{" "}
+                    <span className="text-foreground font-medium">
+                      {plan.advertisementLimit}
+                    </span>
                   </p>
                 </div>
-                {plan.description ? (
-                  <PlanDescription
-                    description={plan.description}
-                    compact
-                    className="mt-1"
-                  />
-                ) : null}
-                <p className="text-small text-muted-foreground">
-                  Limite de anúncios:{" "}
-                  <span className="text-foreground font-medium">
-                    {plan.advertisementLimit}
-                  </span>
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="primary"
-                disabled={createMutation.isPending}
-                aria-busy={createMutation.isPending}
-                onClick={() => handleSubscribe(plan.id)}
-              >
-                {createMutation.isPending ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" aria-hidden />
-                    Assinando…
-                  </>
-                ) : (
-                  "Assinar"
-                )}
-              </Button>
-            </li>
-          ))}
+                <Button
+                  type="button"
+                  variant="primary"
+                  disabled={createMutation.isPending}
+                  aria-busy={isThisPending}
+                  onClick={() => handleSubscribe(plan.id)}
+                >
+                  {isThisPending ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                      Assinando…
+                    </>
+                  ) : (
+                    "Assinar"
+                  )}
+                </Button>
+              </li>
+            );
+          })}
         </ul>
       </DialogContent>
     </Dialog>

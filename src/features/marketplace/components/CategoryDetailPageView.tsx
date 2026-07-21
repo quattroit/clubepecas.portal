@@ -55,7 +55,7 @@ function CategoryDetailPageView() {
         buildAdvertisementsHref({
           ...next,
           // Mantém a categoria da página se o usuário não trocou no form.
-          category: next.category ?? category?.id,
+          category: next.category ?? (category ? String(category.id) : undefined),
         }),
       );
     },
@@ -66,7 +66,7 @@ function CategoryDetailPageView() {
     (sort: string) => {
       router.push(
         buildAdvertisementsHref({
-          category: category?.id,
+          category: category ? String(category.id) : undefined,
           sort,
         }),
       );
@@ -101,7 +101,7 @@ function CategoryDetailPageView() {
   const filterCategories = [
     { id: "all", label: "Todas" },
     ...categories.map((item) => ({
-      id: item.id,
+      id: String(item.id),
       label: item.name,
     })),
   ];
@@ -123,7 +123,7 @@ function CategoryDetailPageView() {
   ];
 
   const filterValues: MarketplaceListingFilters = {
-    ...(category?.id ? { category: category.id } : {}),
+    ...(category?.id ? { category: String(category.id) } : {}),
   };
 
   return (

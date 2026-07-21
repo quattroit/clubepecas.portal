@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { BRAZILIAN_STATE_OPTIONS } from "@/constants/brazilian-states";
 import { useVehicleModels } from "@/hooks/api/useVehicleModels";
 import { cn } from "@/lib/utils";
 import type { MarketplaceListingFilters } from "@/utils/marketplace-search";
@@ -38,36 +39,7 @@ const DEFAULT_BRANDS: FilterOption[] = [{ id: "all", label: "Todas" }];
 
 const DEFAULT_CITIES: FilterOption[] = [{ id: "all", label: "Todas" }];
 
-const DEFAULT_STATES: FilterOption[] = [
-  { id: "all", label: "Todos" },
-  { id: "AC", label: "Acre" },
-  { id: "AL", label: "Alagoas" },
-  { id: "AP", label: "Amapá" },
-  { id: "AM", label: "Amazonas" },
-  { id: "BA", label: "Bahia" },
-  { id: "CE", label: "Ceará" },
-  { id: "DF", label: "Distrito Federal" },
-  { id: "ES", label: "Espírito Santo" },
-  { id: "GO", label: "Goiás" },
-  { id: "MA", label: "Maranhão" },
-  { id: "MT", label: "Mato Grosso" },
-  { id: "MS", label: "Mato Grosso do Sul" },
-  { id: "MG", label: "Minas Gerais" },
-  { id: "PA", label: "Pará" },
-  { id: "PB", label: "Paraíba" },
-  { id: "PR", label: "Paraná" },
-  { id: "PE", label: "Pernambuco" },
-  { id: "PI", label: "Piauí" },
-  { id: "RJ", label: "Rio de Janeiro" },
-  { id: "RN", label: "Rio Grande do Norte" },
-  { id: "RS", label: "Rio Grande do Sul" },
-  { id: "RO", label: "Rondônia" },
-  { id: "RR", label: "Roraima" },
-  { id: "SC", label: "Santa Catarina" },
-  { id: "SP", label: "São Paulo" },
-  { id: "SE", label: "Sergipe" },
-  { id: "TO", label: "Tocantins" },
-];
+const DEFAULT_STATES = BRAZILIAN_STATE_OPTIONS;
 
 const selectClassName =
   "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted";

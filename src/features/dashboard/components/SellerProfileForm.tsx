@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { Textarea } from "@/components/ui/textarea";
 import { SellerPhotoPicker } from "@/features/dashboard/components/photos/SellerPhotoPicker";
+import { BRAZILIAN_STATE_OPTIONS } from "@/constants/brazilian-states";
 import { PersonType } from "@/contracts/common/enums";
 import {
   sellerProfileFormDefaultValues,
@@ -20,7 +22,6 @@ import {
 import { useCities } from "@/hooks/api/useCities";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
-import { formatCityLabel } from "@/mappers/city.mapper";
 import {
   documentPlaceholder,
   formatDocumentInput,
@@ -72,7 +73,7 @@ function SellerProfileForm({
     setValue,
     formState: { errors },
   } = useForm<SellerProfileFormValues>({
-    resolver: zodResolver(sellerProfileFormSchema),
+    resolver: zodResolver(sellerProfileFormSchema) as Resolver<SellerProfileFormValues>,
     shouldFocusError: true,
     defaultValues: {
       ...sellerProfileFormDefaultValues,
@@ -82,13 +83,47 @@ function SellerProfileForm({
 
   const personType = useWatch({ control, name: "personType" });
   const photoUrl = useWatch({ control, name: "photoUrl" }) ?? "";
+  const cityId = useWatch({ control, name: "cityId" }) ?? 0;
+
+  const [selectedState, setSelectedState] = useState<string | null>(null);
 
   useEffect(() => {
     reset({
       ...sellerProfileFormDefaultValues,
       ...defaultValues,
     });
+
+    const nextCityId = defaultValues?.cityId ?? 0;
+    if (!nextCityId || nextCityId <= 0) {
+      setSelectedState(null);
+    }
   }, [defaultValues, reset]);
+
+  useEffect(() => {
+    if (!cityId || cityId <= 0) return;
+    const city = cities.find((item) => item.id === cityId);
+    if (city) {
+      setSelectedState(city.state.toUpperCase());
+    }
+  }, [cityId, cities]);
+
+  const stateOptions = useMemo(
+    () =>
+      BRAZILIAN_STATE_OPTIONS.filter((option) => option.id !== "all").map(
+        (option) => ({ id: option.id, label: option.label }),
+      ),
+    [],
+  );
+
+  const cityOptions = useMemo(() => {
+    if (!selectedState) return [];
+    return cities
+      .filter((city) => city.state.toUpperCase() === selectedState.toUpperCase())
+      .map((city) => ({
+        id: String(city.id),
+        label: `${city.name} — ${city.state}`,
+      }));
+  }, [cities, selectedState]);
 
   const submit = handleSubmit((values) => {
     if (isSubmitting) return;
@@ -232,54 +267,97 @@ function SellerProfileForm({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="seller-city">Cidade</Label>
-        <select
-          id="seller-city"
-          className={selectClassName}
-          aria-invalid={Boolean(errors.cityId)}
-          aria-describedby={
-            errors.cityId
-              ? "seller-city-error"
-              : citiesQuery.isError
-                ? "seller-city-load-error"
-                : "seller-city-hint"
-          }
-          disabled={citiesDisabled}
-          {...register("cityId")}
-        >
-          <option value="">
-            {citiesLoading ? "Carregando cidades…" : "Selecione a cidade"}
-          </option>
-          {cities.map((city) => (
-            <option key={city.id} value={city.id}>
-              {formatCityLabel(city)}
-            </option>
-          ))}
-        </select>
-        {citiesQuery.isError ? (
-          <p
-            id="seller-city-load-error"
-            className="text-destructive text-xs"
-            role="alert"
-          >
-            Não foi possível carregar as cidades. Tente novamente mais tarde.
-          </p>
-        ) : (
-          <p id="seller-city-hint" className="text-muted-foreground text-xs">
-            Selecione a cidade onde a loja atua.
-          </p>
-        )}
-        {errors.cityId ? (
-          <p
-            id="seller-city-error"
-            className="text-destructive text-xs"
-            role="alert"
-          >
-            {errors.cityId.message}
-          </p>
-        ) : null}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-state">Estado</Label>
+          <SearchableCombobox
+            id="seller-state"
+            options={stateOptions}
+            value={selectedState}
+            disabled={citiesDisabled}
+            placeholder={
+              citiesLoading ? "Carregando…" : "Selecione o estado"
+            }
+            clearLabel="Limpar estado"
+            triggerLabel="Abrir lista de estados"
+            emptyMessage="Digite ou abra a lista para escolher o estado."
+            showOptionsWhenEmpty
+            maxResults={30}
+            onChange={(next) => {
+              setSelectedState(next);
+              setValue("cityId", 0, { shouldValidate: true, shouldDirty: true });
+            }}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="seller-city">Cidade</Label>
+          <Controller
+            name="cityId"
+            control={control}
+            render={({ field }) => (
+              <SearchableCombobox
+                id="seller-city"
+                options={cityOptions}
+                value={
+                  field.value && field.value > 0 ? String(field.value) : null
+                }
+                disabled={citiesDisabled || !selectedState}
+                invalid={Boolean(errors.cityId)}
+                placeholder={
+                  citiesLoading
+                    ? "Carregando cidades…"
+                    : selectedState
+                      ? "Selecione a cidade"
+                      : "Selecione o estado primeiro"
+                }
+                clearLabel="Limpar cidade"
+                triggerLabel="Abrir lista de cidades"
+                emptyMessage={
+                  selectedState
+                    ? "Digite ou abra a lista para escolher a cidade."
+                    : "Selecione o estado primeiro."
+                }
+                showOptionsWhenEmpty={Boolean(selectedState)}
+                maxResults={120}
+                aria-describedby={
+                  errors.cityId
+                    ? "seller-city-error"
+                    : citiesQuery.isError
+                      ? "seller-city-load-error"
+                      : "seller-city-hint"
+                }
+                onBlur={field.onBlur}
+                onChange={(cityId) => {
+                  field.onChange(cityId ? Number(cityId) : 0);
+                }}
+              />
+            )}
+          />
+        </div>
       </div>
+      {citiesQuery.isError ? (
+        <p
+          id="seller-city-load-error"
+          className="text-destructive text-xs"
+          role="alert"
+        >
+          Não foi possível carregar as cidades. Tente novamente mais tarde.
+        </p>
+      ) : (
+        <p id="seller-city-hint" className="text-muted-foreground text-xs">
+          Selecione o estado e depois a cidade. Você pode digitar para filtrar.
+        </p>
+      )}
+      {errors.cityId ? (
+        <p
+          id="seller-city-error"
+          className="text-destructive text-xs"
+          role="alert"
+        >
+          {errors.cityId.message}
+        </p>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="seller-description">Descrição (opcional)</Label>

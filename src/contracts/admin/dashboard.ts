@@ -47,7 +47,7 @@ export type AdminDashboardSummaryDto = {
 };
 
 export type AdminBestStoreDto = {
-  id: string;
+  id: number;
   storeName: string;
   slug: string;
   city: string;
@@ -59,13 +59,13 @@ export type AdminBestStoreDto = {
 };
 
 export type AdminBestListingDto = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   thumbnailUrl: string | null;
   storeName: string;
   storeSlug: string;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   views: number;
   whatsappClicks: number;
@@ -73,7 +73,7 @@ export type AdminBestListingDto = {
 };
 
 export type AdminRecentSellerDto = {
-  id: string;
+  id: number;
   storeName: string;
   slug: string;
   city: string;
@@ -85,11 +85,11 @@ export type AdminRecentSellerDto = {
 };
 
 export type AdminRecentAdvertisementDto = {
-  id: string;
+  id: number;
   slug: string;
   title: string;
   storeName: string;
-  categoryId: string;
+  categoryId: number;
   categoryName: string;
   status: AdvertisementStatus;
   publishedAt: string;
@@ -100,6 +100,6 @@ export type AdminActivityItemDto = {
   title: string;
   description: string;
   occurredAt: string;
-  entityId: string | null;
+  entityId: number | null;
   href: string | null;
 };

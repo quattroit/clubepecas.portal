@@ -25,10 +25,19 @@ type SellerCardProps = {
 };
 
 function SellerCard({ seller, className }: SellerCardProps) {
-  const { name, city, advertisementCount, avatarUrl, slug, whatsApp, instagram } =
-    seller;
+  const {
+    name,
+    city,
+    state,
+    advertisementCount,
+    avatarUrl,
+    slug,
+    whatsApp,
+    instagram,
+  } = seller;
   const adsLabel =
     advertisementCount === 1 ? "1 anúncio" : `${advertisementCount} anúncios`;
+  const location = state ? `${city}, ${state}` : city;
 
   const contactHref = whatsApp?.trim()
     ? buildWhatsAppUrl(whatsApp, buildStoreWhatsAppMessage())
@@ -64,7 +73,7 @@ function SellerCard({ seller, className }: SellerCardProps) {
             <h3 className="truncate text-sm font-semibold">{name}</h3>
             <p className="text-small flex items-center gap-1 text-xs">
               <MapPin className="text-location size-3 shrink-0" aria-hidden />
-              {city}
+              {location}
             </p>
             <Badge variant="secondary" className="mt-1">
               {adsLabel}

@@ -16,10 +16,19 @@ export function listVehicleYears(now = new Date()): number[] {
   return years;
 }
 
-/** Exibe par fabricação/modelo, ex.: `2020/2021`. */
+/** Exibe par fabricação/modelo, ex.: `2020/2021`. Retorna "—" se ambos vazios. */
 export function formatVehicleYears(
-  manufacturingYear: number,
-  modelYear: number,
+  manufacturingYear?: number | null,
+  modelYear?: number | null,
 ): string {
+  if (manufacturingYear == null && modelYear == null) {
+    return "—";
+  }
+  if (manufacturingYear == null) {
+    return String(modelYear);
+  }
+  if (modelYear == null) {
+    return String(manufacturingYear);
+  }
   return `${manufacturingYear}/${modelYear}`;
 }

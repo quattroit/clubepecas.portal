@@ -11,8 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH,
+  ADVERTISEMENT_DESCRIPTION_MAX_LENGTH,
+  ADVERTISEMENT_TITLE_MAX_LENGTH,
   advertisementFormDefaultValues,
   advertisementFormSchema,
+  type AdvertisementFormInput,
   type AdvertisementFormValues,
 } from "@/features/dashboard/schemas/advertisementFormSchema";
 import { useVehicleModels } from "@/hooks/api/useVehicleModels";
@@ -31,7 +35,7 @@ const selectClassName =
 
 type AdvertisementFormProps = {
   mode?: "create" | "edit";
-  defaultValues?: Partial<AdvertisementFormValues>;
+  defaultValues?: Partial<AdvertisementFormInput>;
   categories: Category[];
   categoriesLoading?: boolean;
   vehicleBrands: VehicleBrand[];
@@ -70,7 +74,7 @@ function AdvertisementForm({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<AdvertisementFormValues>({
+  } = useForm<AdvertisementFormInput, unknown, AdvertisementFormValues>({
     resolver: zodResolver(advertisementFormSchema),
     shouldFocusError: true,
     defaultValues: {
@@ -79,13 +83,38 @@ function AdvertisementForm({
     },
   });
 
+  const titleValue = watch("title") ?? "";
+  const descriptionValue = watch("description") ?? "";
+  const compatibilityValue = watch("compatibilityDescription") ?? "";
+  const titleRemaining = Math.max(
+    0,
+    ADVERTISEMENT_TITLE_MAX_LENGTH - titleValue.length,
+  );
+  const descriptionRemaining = Math.max(
+    0,
+    ADVERTISEMENT_DESCRIPTION_MAX_LENGTH - descriptionValue.length,
+  );
+  const compatibilityRemaining = Math.max(
+    0,
+    ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH - compatibilityValue.length,
+  );
+
   const selectedBrandId = watch("vehicleBrandId");
+  const selectedBrandNumber =
+    selectedBrandId === "" || selectedBrandId == null
+      ? undefined
+      : Number(selectedBrandId);
   const vehicleModelsQuery = useVehicleModels({
-    brandId: selectedBrandId || undefined,
+    brandId:
+      selectedBrandNumber && selectedBrandNumber > 0
+        ? selectedBrandNumber
+        : undefined,
   });
   const vehicleModels = vehicleModelsQuery.data ?? [];
   const vehicleModelsLoading = vehicleModelsQuery.isFetching;
-  const hasBrandSelected = Boolean(selectedBrandId?.trim());
+  const hasBrandSelected = Boolean(
+    selectedBrandNumber && selectedBrandNumber > 0,
+  );
 
   useEffect(() => {
     reset({
@@ -118,12 +147,24 @@ function AdvertisementForm({
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="ad-title">Título</Label>
+        <div className="flex items-end justify-between gap-3">
+          <Label htmlFor="ad-title">Título</Label>
+          <span
+            id="ad-title-count"
+            className="text-muted-foreground text-xs tabular-nums"
+            aria-live="polite"
+          >
+            {titleRemaining} caracteres restantes
+          </span>
+        </div>
         <Input
           id="ad-title"
           autoComplete="off"
+          maxLength={ADVERTISEMENT_TITLE_MAX_LENGTH}
           aria-invalid={Boolean(errors.title)}
-          aria-describedby={errors.title ? "ad-title-error" : undefined}
+          aria-describedby={
+            errors.title ? "ad-title-error ad-title-count" : "ad-title-count"
+          }
           disabled={isSubmitting}
           {...register("title")}
         />
@@ -135,13 +176,25 @@ function AdvertisementForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="ad-description">Descrição</Label>
+        <div className="flex items-end justify-between gap-3">
+          <Label htmlFor="ad-description">Descrição</Label>
+          <span
+            id="ad-description-count"
+            className="text-muted-foreground text-xs tabular-nums"
+            aria-live="polite"
+          >
+            {descriptionRemaining} caracteres restantes
+          </span>
+        </div>
         <Textarea
           id="ad-description"
           rows={5}
+          maxLength={ADVERTISEMENT_DESCRIPTION_MAX_LENGTH}
           aria-invalid={Boolean(errors.description)}
           aria-describedby={
-            errors.description ? "ad-description-error" : "ad-description-hint"
+            errors.description
+              ? "ad-description-error ad-description-count"
+              : "ad-description-hint ad-description-count"
           }
           disabled={isSubmitting}
           {...register("description")}
@@ -210,7 +263,6 @@ function AdvertisementForm({
               errors.vehicleBrandId ? "ad-vehicle-brand-error" : undefined
             }
             disabled={isSubmitting || vehicleBrandsLoading}
-            defaultValue=""
             {...register("vehicleBrandId", {
               onChange: () => {
                 setValue("vehicleModelId", "", { shouldValidate: false });
@@ -221,9 +273,7 @@ function AdvertisementForm({
               <option value="">Carregando…</option>
             ) : (
               <>
-                <option value="" disabled>
-                  Selecione uma marca
-                </option>
+                <option value="">Selecione</option>
                 {vehicleBrands.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
@@ -257,20 +307,17 @@ function AdvertisementForm({
             disabled={
               isSubmitting || !hasBrandSelected || vehicleModelsLoading
             }
-            defaultValue=""
             {...register("vehicleModelId")}
           >
             {!hasBrandSelected ? (
-              <option value="">Selecione uma marca</option>
+              <option value="">Selecione</option>
             ) : vehicleModelsLoading ? (
               <option value="">Carregando…</option>
             ) : vehicleModels.length === 0 ? (
               <option value="">Nenhum modelo cadastrado</option>
             ) : (
               <>
-                <option value="" disabled>
-                  Selecione um modelo
-                </option>
+                <option value="">Selecione</option>
                 {vehicleModels.map((model) => (
                   <option key={model.id} value={model.id}>
                     {model.name}
@@ -335,6 +382,7 @@ function AdvertisementForm({
             disabled={isSubmitting}
             {...register("manufacturingYear")}
           >
+            <option value="">Selecione</option>
             {vehicleYears.map((year) => (
               <option key={year} value={String(year)}>
                 {year}
@@ -364,6 +412,7 @@ function AdvertisementForm({
             disabled={isSubmitting}
             {...register("modelYear")}
           >
+            <option value="">Selecione</option>
             {vehicleYears.map((year) => (
               <option key={year} value={String(year)}>
                 {year}
@@ -383,21 +432,31 @@ function AdvertisementForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="ad-compatibility">Compatibilidade</Label>
+        <div className="flex items-end justify-between gap-3">
+          <Label htmlFor="ad-compatibility">Compatibilidade</Label>
+          <span
+            id="ad-compatibility-count"
+            className="text-muted-foreground text-xs tabular-nums"
+            aria-live="polite"
+          >
+            {compatibilityRemaining} caracteres restantes
+          </span>
+        </div>
         <Input
           id="ad-compatibility"
-          placeholder="Ex.: Civic 2014–2018, motor 1.8"
+          placeholder="Ex.: Civic 2014–2018, motor 1.8 (opcional)"
+          maxLength={ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH}
           aria-invalid={Boolean(errors.compatibilityDescription)}
           aria-describedby={
             errors.compatibilityDescription
-              ? "ad-compatibility-error"
-              : "ad-compatibility-hint"
+              ? "ad-compatibility-error ad-compatibility-count"
+              : "ad-compatibility-hint ad-compatibility-count"
           }
           disabled={isSubmitting}
           {...register("compatibilityDescription")}
         />
         <p id="ad-compatibility-hint" className="text-muted-foreground text-xs">
-          Modelos, anos ou motores compatíveis com a peça.
+          Opcional. Modelos, anos ou motores compatíveis com a peça.
         </p>
         {errors.compatibilityDescription ? (
           <p

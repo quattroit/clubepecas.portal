@@ -22,7 +22,7 @@ export function mapSellerToProfileFormValues(
   return {
     storeName: seller.name,
     displayName: seller.displayName ?? "",
-    cityId: seller.cityId ?? "",
+    cityId: seller.cityId ?? 0,
     personType,
     document: seller.document
       ? formatDocumentInput(seller.document, personType)
@@ -60,7 +60,7 @@ function mapSellerProfileFormToRequest(
   return {
     storeName: values.storeName.trim(),
     displayName: values.displayName.trim(),
-    cityId: values.cityId.trim(),
+    cityId: values.cityId,
     personType: values.personType,
     document: values.document.trim(),
     description: emptyToNull(values.description),

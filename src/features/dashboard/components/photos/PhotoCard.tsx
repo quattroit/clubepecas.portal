@@ -14,8 +14,8 @@ type SavedPhotoCardProps = {
   photo: AdvertisementPhotoDto;
   disabled?: boolean;
   busy?: boolean;
-  onSetPrimary: (photoId: string) => void;
-  onDelete: (photoId: string) => void;
+  onSetPrimary: (photoId: number) => void;
+  onDelete: (photoId: number) => void;
 };
 
 function SavedPhotoCard({

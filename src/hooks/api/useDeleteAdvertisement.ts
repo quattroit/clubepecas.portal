@@ -14,7 +14,7 @@ export function useDeleteAdvertisement() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => advertisementService.remove(id),
+    mutationFn: (id: number) => advertisementService.remove(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.advertisements.me,
