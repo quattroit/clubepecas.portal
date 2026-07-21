@@ -9,27 +9,21 @@ import { queryKeys } from "@/lib/queryKeys";
 import { sellerService } from "@/services/seller.service";
 
 /**
- * DELETE /seller/subscription — alias soft-cancel da renovação (Sprint 8.5).
- * Preferir `useCancelSellerSubscriptionRenewal` (PUT) na UI.
+ * PUT /seller/subscription/reactivate — reativa após CancellationRequested.
  */
-export function useCancelSellerSubscription() {
+export function useReactivateSellerSubscription() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => sellerService.cancelSubscription(),
-    onSuccess: () => {
+    mutationFn: () => sellerService.reactivateSubscription(),
+    onSuccess: (result) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscription,
       });
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.seller.subscriptions,
-      });
-      void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscriptionHistory,
       });
-      toast.success(
-        "Renovação cancelada. Você mantém os benefícios até o fim do período.",
-      );
+      toast.success(result.message || "Assinatura reativada.");
     },
     onError: (error) => {
       if (isCanceledError(error)) return;

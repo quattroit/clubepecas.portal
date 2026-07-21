@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { SubscriptionAvailablePlanDto } from "@/contracts/seller/subscription";
+import type { BillingCycle } from "@/contracts/common/enums";
+import type {
+  SubscriptionAvailablePlanCycleDto,
+  SubscriptionAvailablePlanDto,
+} from "@/contracts/seller/subscription";
 import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import {
   formatPlanAdvertisementLimit,
@@ -17,16 +22,45 @@ import {
 
 type AvailablePlansCardProps = {
   plans: SubscriptionAvailablePlanDto[];
+  currentBillingCycle?: BillingCycle | null;
+  selectionLoading?: boolean;
+  onUpgradePrice?: (
+    subscriptionPlanPriceId: number,
+    plan: SubscriptionAvailablePlanDto,
+    cycle: SubscriptionAvailablePlanCycleDto,
+  ) => void;
+  onDowngradePrice?: (
+    subscriptionPlanPriceId: number,
+    plan: SubscriptionAvailablePlanDto,
+    cycle: SubscriptionAvailablePlanCycleDto,
+  ) => void;
+  onChangeCyclePrice?: (
+    subscriptionPlanPriceId: number,
+    plan: SubscriptionAvailablePlanDto,
+    cycle: SubscriptionAvailablePlanCycleDto,
+  ) => void;
 };
 
-function AvailablePlansCard({ plans }: AvailablePlansCardProps) {
+function AvailablePlansCard({
+  plans,
+  currentBillingCycle = null,
+  selectionLoading = false,
+  onUpgradePrice,
+  onDowngradePrice,
+  onChangeCyclePrice,
+}: AvailablePlansCardProps) {
+  const interactive = Boolean(
+    onUpgradePrice || onDowngradePrice || onChangeCyclePrice,
+  );
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-h3">Planos disponíveis</CardTitle>
         <CardDescription>
-          Comparação preparatória (Sprint 8.5). Economia e classificação vêm da
-          API — nenhuma alteração é executada nesta tela.
+          {interactive
+            ? "Selecione um ciclo elegível quando a API permitir a alteração."
+            : "Comparação com base nos dados retornados pela API — sem regras de negócio no cliente."}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 pb-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -36,6 +70,24 @@ function AvailablePlansCard({ plans }: AvailablePlansCardProps) {
           </p>
         ) : (
           plans.map((plan) => {
+            const showUpgrade =
+              Boolean(onUpgradePrice) && plan.isUpgrade && plan.isAvailable;
+            const showDowngrade =
+              Boolean(onDowngradePrice) && plan.isDowngrade && plan.isAvailable;
+            const showChangeCycle =
+              Boolean(onChangeCyclePrice) && plan.isCurrent;
+            const cyclesForChange = showChangeCycle
+              ? plan.billingCycles.filter(
+                  (cycle) =>
+                    currentBillingCycle == null ||
+                    cycle.billingCycle !== currentBillingCycle,
+                )
+              : [];
+            const actionCycles = showChangeCycle
+              ? cyclesForChange
+              : showUpgrade || showDowngrade
+                ? plan.billingCycles
+                : [];
             const recommended = plan.billingCycles.find(
               (cycle) => cycle.isRecommended,
             );
@@ -94,6 +146,45 @@ function AvailablePlansCard({ plans }: AvailablePlansCardProps) {
                     compact
                     className="line-clamp-6"
                   />
+                ) : null}
+
+                {actionCycles.length > 0 ? (
+                  <div className="mt-auto flex flex-col gap-2">
+                    {actionCycles.map((cycle) => {
+                      const label = showChangeCycle
+                        ? `Alterar para ${cycle.billingCycleLabel}`
+                        : showUpgrade
+                          ? `Upgrade — ${cycle.billingCycleLabel}`
+                          : `Downgrade — ${cycle.billingCycleLabel}`;
+                      const handler = showChangeCycle
+                        ? onChangeCyclePrice
+                        : showUpgrade
+                          ? onUpgradePrice
+                          : onDowngradePrice;
+
+                      return (
+                        <Button
+                          key={cycle.subscriptionPlanPriceId}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={selectionLoading || !handler}
+                          aria-busy={selectionLoading}
+                          onClick={() =>
+                            handler?.(
+                              cycle.subscriptionPlanPriceId,
+                              plan,
+                              cycle,
+                            )
+                          }
+                        >
+                          {label}
+                          {" · "}
+                          {formatPlanPrice(cycle.price, cycle.billingCycle)}
+                        </Button>
+                      );
+                    })}
+                  </div>
                 ) : null}
               </article>
             );

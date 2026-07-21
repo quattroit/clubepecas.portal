@@ -42,6 +42,8 @@ export enum SellerSubscriptionStatus {
   Expired = 3,
   /** Aguardando conclusão do checkout (Sprint 8.2). */
   Pending = 4,
+  /** Renovação cancelada — benefícios até o fim do período (Sprint 8.5). */
+  CancellationRequested = 5,
 }
 
 /** Tipo da movimentação financeira (Épico 8). */

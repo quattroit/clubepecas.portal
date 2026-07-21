@@ -12,12 +12,19 @@ import type {
   SellerPublicProfileResponse,
 } from "@/contracts/seller/responses";
 import type {
+  CancelSellerSubscriptionRenewalRequest,
+  CancelSellerSubscriptionRenewalResponse,
+  ChangeSellerSubscriptionCheckoutRequest,
+  ChangeSellerSubscriptionCheckoutResponse,
   CreateSellerSubscriptionCheckoutRequest,
   CreateSellerSubscriptionCheckoutResponse,
   CreateSellerSubscriptionRequest,
+  DowngradeSellerSubscriptionRequest,
+  DowngradeSellerSubscriptionResponse,
   ListSellerSubscriptionHistoryResponse,
   ListSellerSubscriptionPaymentsResponse,
   ListSellerSubscriptionsResponse,
+  ReactivateSellerSubscriptionResponse,
   SellerSubscriptionDto,
 } from "@/contracts/seller/subscription";
 import type { ListSellerPaymentsResponse } from "@/contracts/seller/payments";
@@ -110,7 +117,58 @@ export const sellerService = {
       .then((response) => response.data);
   },
 
-  /** DELETE /api/v1/seller/subscription — cancela ACTIVE. */
+  /** PUT /api/v1/seller/subscription/upgrade */
+  upgradeSubscription(payload: ChangeSellerSubscriptionCheckoutRequest) {
+    return api
+      .put<ChangeSellerSubscriptionCheckoutResponse>(
+        "/api/v1/seller/subscription/upgrade",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  /** PUT /api/v1/seller/subscription/downgrade */
+  downgradeSubscription(payload: DowngradeSellerSubscriptionRequest) {
+    return api
+      .put<DowngradeSellerSubscriptionResponse>(
+        "/api/v1/seller/subscription/downgrade",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  /** PUT /api/v1/seller/subscription/change-billing-cycle */
+  changeSubscriptionBillingCycle(
+    payload: ChangeSellerSubscriptionCheckoutRequest,
+  ) {
+    return api
+      .put<ChangeSellerSubscriptionCheckoutResponse>(
+        "/api/v1/seller/subscription/change-billing-cycle",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  /** PUT /api/v1/seller/subscription/cancel — soft cancel da renovação */
+  cancelSubscriptionRenewal(payload?: CancelSellerSubscriptionRenewalRequest) {
+    return api
+      .put<CancelSellerSubscriptionRenewalResponse>(
+        "/api/v1/seller/subscription/cancel",
+        payload ?? {},
+      )
+      .then((response) => response.data);
+  },
+
+  /** PUT /api/v1/seller/subscription/reactivate */
+  reactivateSubscription() {
+    return api
+      .put<ReactivateSellerSubscriptionResponse>(
+        "/api/v1/seller/subscription/reactivate",
+      )
+      .then((response) => response.data);
+  },
+
+  /** DELETE /api/v1/seller/subscription — alias soft-cancel (Sprint 8.5). */
   cancelSubscription() {
     return api
       .delete<SellerSubscriptionDto>("/api/v1/seller/subscription")

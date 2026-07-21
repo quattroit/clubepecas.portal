@@ -2,30 +2,16 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { ROUTES } from "@/constants/routes";
 import type { BillingCycle } from "@/contracts/common/enums";
 import { ApiError, isCanceledError } from "@/lib/errors";
 import { queryKeys } from "@/lib/queryKeys";
+import { buildSubscriptionCheckoutUrls } from "@/lib/subscriptionCheckoutUrls";
 import { sellerService } from "@/services/seller.service";
 
 type CreateCheckoutVariables = {
   subscriptionPlanId: number;
   billingCycle: BillingCycle;
 };
-
-function buildCheckoutUrls() {
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3000";
-  // Asaas rejeita "localhost" nas URLs de callback — usar 127.0.0.1 em dev.
-  const normalizedOrigin = origin.replace(/:\/\/localhost(?=[:/]|$)/i, "://127.0.0.1");
-  const base = `${normalizedOrigin}${ROUTES.MY_PLAN}`;
-
-  return {
-    successUrl: `${base}?checkout=success`,
-    cancelUrl: `${base}?checkout=cancel`,
-    expiredUrl: `${base}?checkout=expired`,
-  };
-}
 
 function isProviderError(error: unknown): boolean {
   if (!(error instanceof ApiError)) return false;
@@ -51,7 +37,7 @@ export function useCreateSellerSubscriptionCheckout(
       subscriptionPlanId,
       billingCycle,
     }: CreateCheckoutVariables) => {
-      const urls = buildCheckoutUrls();
+      const urls = buildSubscriptionCheckoutUrls();
 
       return sellerService.createSubscriptionCheckout({
         subscriptionPlanId,
@@ -62,9 +48,15 @@ export function useCreateSellerSubscriptionCheckout(
     onSuccess: async (result) => {
       if (result.activatedWithoutCheckout) {
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: queryKeys.seller.subscription }),
-          queryClient.invalidateQueries({ queryKey: queryKeys.seller.subscriptions }),
-          queryClient.invalidateQueries({ queryKey: queryKeys.seller.payments }),
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.seller.subscription,
+          }),
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.seller.subscriptions,
+          }),
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.seller.payments,
+          }),
         ]);
         options?.onActivatedWithoutCheckout?.();
         return;

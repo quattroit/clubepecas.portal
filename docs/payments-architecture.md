@@ -6,7 +6,8 @@ Documento de referência do domínio financeiro do ClubePeças.
 **Sprint 8.2:** integração Asaas (Hosted Checkout, Sandbox) via `IPaymentProvider`.  
 **Sprint 8.3:** webhooks Asaas, ativação automática, grace period e reconciliação manual.  
 **Sprint 8.3.1:** modelo comercial com múltiplas recorrências (`SubscriptionPlanPrice` + `BillingCycle`).  
-**Sprint 8.4:** Central de Gestão da Assinatura (`SubscriptionSummaryService` + Meu Plano consolidado).
+**Sprint 8.4:** Central de Gestão da Assinatura (`SubscriptionSummaryService` + Meu Plano consolidado).  
+**Sprint 8.5:** Upgrade, downgrade agendado, alteração de ciclo, cancelamento de renovação e reativação (`SubscriptionChangeService`).
 
 ---
 
@@ -198,9 +199,15 @@ Nunca usar a API Key do Asaas como `WebhookToken`.
 | POST | `/api/v1/payments/webhooks/asaas` | Token Asaas |
 | GET | `/api/v1/admin/payments` | Admin |
 | POST | `/api/v1/admin/payments/{id}/sync` | Admin |
-| GET | `/api/v1/seller/subscription` | Seller — resumo consolidado (8.4) |
+| GET | `/api/v1/seller/subscription` | Seller — resumo consolidado (8.4/8.5) |
 | GET | `/api/v1/seller/subscription/payments` | Seller — histórico financeiro |
 | GET | `/api/v1/seller/subscription/history` | Seller — eventos (audit + webhooks) |
+| PUT | `/api/v1/seller/subscription/upgrade` | Seller — upgrade via Hosted Checkout |
+| PUT | `/api/v1/seller/subscription/downgrade` | Seller — agenda downgrade |
+| PUT | `/api/v1/seller/subscription/change-billing-cycle` | Seller — troca de ciclo via checkout |
+| PUT | `/api/v1/seller/subscription/cancel` | Seller — cancela renovação (soft) |
+| PUT | `/api/v1/seller/subscription/reactivate` | Seller — reativa após CancellationRequested |
+| DELETE | `/api/v1/seller/subscription` | Seller — alias do soft-cancel (8.5) |
 
 ### 8.1 Central de Gestão — `GET /seller/subscription`
 
@@ -214,12 +221,31 @@ Retorno consolidado via `ISubscriptionSummaryService` / `SubscriptionSummaryServ
 | `Indicators` | Cores, flags (`IsNearExpiration`, `IsGracePeriod`, …) — **prontos para UI** |
 | `Messages` | Textos amigáveis (sem regra no frontend) |
 | `Timeline` | Criação, pagamentos, renovações, grace, próxima cobrança, expiração |
-| `Actions` | `CanUpgrade`, `CanDowngrade`, `CanCancel`, `CanReactivate`, `CanRetryPayment`, `CanSyncPayment` |
-| `AvailablePlans` | Planos + ciclos + economia da API (`IsUpgrade` / `IsDowngrade` / `IsAvailable`) — preparação 8.5 |
+| `Actions` | `CanUpgrade`, `CanDowngrade`, `CanChangeBillingCycle`, `CanCancel`, `CanReactivate`, … |
+| `AvailablePlans` | Planos + ciclos (`SubscriptionPlanPriceId`) + economia — base para 8.5 |
+| `PendingChange` | Plano/ciclo/preço/data efetiva agendados |
+| `CancellationRequested` | Flag de cancelamento de renovação |
 
-Não altera estado financeiro. Não consulta Asaas nestas leituras. Uma chamada principal carrega a central; payments/history são sob demanda.
+Não altera estado financeiro na leitura. Não consulta Asaas nestas leituras.
 
-### 8.2 Contratos auxiliares (8.4)
+### 8.2 Operações de alteração (Sprint 8.5) — `ISubscriptionChangeService`
+
+| Operação | Comportamento |
+|----------|---------------|
+| **Upgrade** | Valida plano superior → agenda Pending → Hosted Checkout (ou aplica imediatamente se R$ 0) → no pagamento aprovado aplica + cancela recorrência antiga |
+| **Downgrade** | **Nunca imediato** — grava Pending* com `PendingEffectiveDate` = fim do período; atualiza valor/ciclo no Asaas para a próxima cobrança |
+| **Change billing cycle** | Mesmo plano, outro ciclo → fluxo semelhante ao upgrade (novo checkout) |
+| **Cancel renewal** | Cancela recorrência no gateway → `CancellationRequested` → benefícios até `EndDate`/`NextBilling` |
+| **Reactivate** | Somente `CancellationRequested` → recria recorrência no gateway → `Active` |
+
+Campos em `SellerSubscription`: `PendingSubscriptionPlanId`, `PendingSubscriptionPlanPriceId`, `PendingBillingCycle`, `PendingEffectiveDate`.  
+Status novo: `CancellationRequested`.
+
+Aplicação automática: `TryApplyPendingChangesAsync` (webhooks de pagamento aprovado + sync manual). Idempotente.
+
+Auditoria: `subscription.upgrade.requested|completed`, `subscription.downgrade.scheduled|applied`, `subscription.billing_cycle.changed`, `subscription.cancellation.requested`, `subscription.reactivated`.
+
+### 8.3 Contratos auxiliares (8.4)
 
 - `SubscriptionPaymentItem` — pagamentos locais (InvoiceUrl/ReceiptUrl do `MetadataJson`)
 - `SubscriptionHistoryItem` — `AuditLog` filtrado + `WebhookEvent` correlacionado
@@ -253,8 +279,8 @@ Logs: evento, tempo, IDs internos — **sem** API Key, PII ou payload completo s
 ## 11. Frontend
 
 - **/planos:** opções Mensal / Trimestral / Anual com economia e selo “Melhor custo-benefício” (dados da API)
-- **Meu Plano (`/painel/meu-plano`) — Sprint 8.4:** consome o resumo consolidado (mensagens, indicadores, timeline, ações, planos disponíveis) + endpoints de payments/history; **sem regras de negócio no cliente**
-- **Checkout (Meu Plano):** plano → recorrência → checkout com `billingCycle`
+- **Meu Plano (`/painel/meu-plano`) — Sprint 8.4/8.5:** resumo + operações (upgrade/downgrade/ciclo/cancelar renovação/reativar); avisos de alteração pendente e cancelamento agendado; **sem regras de negócio no cliente**
+- **Checkout (Meu Plano):** plano → recorrência → checkout com `billingCycle` (novos e upgrades)
 - **Admin / Planos:** CRUD de recorrências e preços
 - **Admin / Pagamentos:** listagem + sync Asaas
 
@@ -279,10 +305,6 @@ Eventos recomendados: `PAYMENT_RECEIVED`, `PAYMENT_CONFIRMED`, `PAYMENT_OVERDUE`
 
 ---
 
-## 13. Próximo — Sprint 8.5
-
-Upgrade, downgrade, alteração de ciclo e cancelamento operacional usando `AvailablePlans` / `Actions` já expostos na Central (8.4).
-
-## 14. Fora de escopo (Épico 8)
+## 13. Fora de escopo (Épico 8)
 
 Cupom, split, jobs de cobrança dedicados, mensageria, Redis, e-mail de cobrança.

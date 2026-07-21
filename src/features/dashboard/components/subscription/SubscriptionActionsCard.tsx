@@ -15,16 +15,26 @@ type SubscriptionActionsCardProps = {
   hasSubscription: boolean;
   actions?: SubscriptionAvailableActionsDto | null;
   onChoosePlan: () => void;
+  onUpgrade?: () => void;
+  onDowngrade?: () => void;
+  onChangeBillingCycle?: () => void;
   onCancel: () => void;
+  onReactivate?: () => void;
   cancelLoading?: boolean;
+  reactivateLoading?: boolean;
 };
 
 function SubscriptionActionsCard({
   hasSubscription,
   actions,
   onChoosePlan,
+  onUpgrade,
+  onDowngrade,
+  onChangeBillingCycle,
   onCancel,
+  onReactivate,
   cancelLoading = false,
+  reactivateLoading = false,
 }: SubscriptionActionsCardProps) {
   if (!hasSubscription) {
     return (
@@ -56,6 +66,7 @@ function SubscriptionActionsCard({
   const canViewPlans =
     Boolean(actions?.canUpgrade) ||
     Boolean(actions?.canDowngrade) ||
+    Boolean(actions?.canChangeBillingCycle) ||
     Boolean(actions?.canReactivate);
 
   return (
@@ -63,8 +74,7 @@ function SubscriptionActionsCard({
       <CardHeader>
         <CardTitle className="text-h3">Ações disponíveis</CardTitle>
         <CardDescription>
-          Disponibilidade definida pela API. Alterações de plano chegam na
-          Sprint 8.5.
+          Opções liberadas pela API conforme o estado atual da sua assinatura.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2 pb-4">
@@ -79,26 +89,26 @@ function SubscriptionActionsCard({
         <Button
           type="button"
           variant="outline"
-          disabled={!actions?.canUpgrade}
-          title={
-            actions?.canUpgrade
-              ? "Preparatório — alteração na Sprint 8.5"
-              : undefined
-          }
+          onClick={onUpgrade}
+          disabled={!actions?.canUpgrade || !onUpgrade}
         >
           Upgrade
         </Button>
         <Button
           type="button"
           variant="outline"
-          disabled={!actions?.canDowngrade}
-          title={
-            actions?.canDowngrade
-              ? "Preparatório — alteração na Sprint 8.5"
-              : undefined
-          }
+          onClick={onDowngrade}
+          disabled={!actions?.canDowngrade || !onDowngrade}
         >
           Downgrade
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onChangeBillingCycle}
+          disabled={!actions?.canChangeBillingCycle || !onChangeBillingCycle}
+        >
+          Alterar ciclo
         </Button>
         <Button
           type="button"
@@ -116,6 +126,17 @@ function SubscriptionActionsCard({
         >
           Sincronizar
         </Button>
+        {actions?.canReactivate ? (
+          <Button
+            type="button"
+            variant="primary"
+            onClick={onReactivate}
+            disabled={reactivateLoading || !onReactivate}
+            aria-busy={reactivateLoading}
+          >
+            Reativar assinatura
+          </Button>
+        ) : null}
         <Button
           type="button"
           variant="destructive"
@@ -123,7 +144,7 @@ function SubscriptionActionsCard({
           disabled={!actions?.canCancel || cancelLoading}
           aria-busy={cancelLoading}
         >
-          Cancelar assinatura
+          Cancelar renovação
         </Button>
       </CardContent>
     </Card>

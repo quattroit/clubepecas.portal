@@ -71,13 +71,27 @@ export type SubscriptionTimelineItemDto = {
 export type SubscriptionAvailableActionsDto = {
   canUpgrade: boolean;
   canDowngrade: boolean;
+  canChangeBillingCycle: boolean;
   canCancel: boolean;
+  /** Apenas quando status = CancellationRequested. */
   canReactivate: boolean;
   canRetryPayment: boolean;
   canSyncPayment: boolean;
 };
 
+export type SubscriptionPendingChangeDto = {
+  planId: number;
+  planName: string;
+  planPriceId?: number | null;
+  billingCycle?: BillingCycle | null;
+  billingCycleLabel?: string | null;
+  price?: number | null;
+  currency?: string | null;
+  effectiveDateUtc?: string | null;
+};
+
 export type SubscriptionAvailablePlanCycleDto = {
+  subscriptionPlanPriceId: number;
   billingCycle: BillingCycle;
   billingCycleLabel: string;
   price: number;
@@ -128,6 +142,8 @@ export type SellerSubscriptionDto = {
   timeline: SubscriptionTimelineItemDto[];
   actions: SubscriptionAvailableActionsDto;
   availablePlans: SubscriptionAvailablePlanDto[];
+  pendingChange?: SubscriptionPendingChangeDto | null;
+  cancellationRequested: boolean;
 
   // Compatibilidade Sprint 8.3.1
   subscriptionPlanId: number;
@@ -229,6 +245,59 @@ export type CreateSellerSubscriptionCheckoutResponse = {
   reusedExistingCheckout: boolean;
   /** True quando o plano é R$ 0 e a assinatura foi ativada sem Asaas. */
   activatedWithoutCheckout: boolean;
+};
+
+/** PUT /api/v1/seller/subscription/upgrade | change-billing-cycle */
+export type ChangeSellerSubscriptionCheckoutRequest = {
+  subscriptionPlanPriceId: number;
+  successUrl: string;
+  cancelUrl: string;
+  expiredUrl?: string;
+};
+
+export type ChangeSellerSubscriptionCheckoutResponse = {
+  subscriptionId: number;
+  paymentId: number;
+  checkoutUrl?: string | null;
+  expiresAtUtc?: string | null;
+  externalCustomerId?: string | null;
+  externalCheckoutId?: string | null;
+  externalSubscriptionId?: string | null;
+  provider: PaymentProvider;
+  activatedWithoutCheckout: boolean;
+};
+
+/** PUT /api/v1/seller/subscription/downgrade */
+export type DowngradeSellerSubscriptionRequest = {
+  subscriptionPlanPriceId: number;
+};
+
+export type DowngradeSellerSubscriptionResponse = {
+  subscriptionId: number;
+  status: SellerSubscriptionStatus;
+  pendingSubscriptionPlanId?: number | null;
+  pendingSubscriptionPlanPriceId?: number | null;
+  pendingBillingCycle?: BillingCycle | null;
+  pendingEffectiveDate?: string | null;
+  message: string;
+};
+
+/** PUT /api/v1/seller/subscription/cancel — soft cancel da renovação */
+export type CancelSellerSubscriptionRenewalRequest = {
+  reason?: string | null;
+};
+
+export type CancelSellerSubscriptionRenewalResponse = {
+  subscriptionId: number;
+  status: SellerSubscriptionStatus;
+  message: string;
+};
+
+/** PUT /api/v1/seller/subscription/reactivate */
+export type ReactivateSellerSubscriptionResponse = {
+  subscriptionId: number;
+  status: SellerSubscriptionStatus;
+  message: string;
 };
 
 /**

@@ -8,28 +8,27 @@ import { isCanceledError } from "@/lib/errors";
 import { queryKeys } from "@/lib/queryKeys";
 import { sellerService } from "@/services/seller.service";
 
+type DowngradeVariables = {
+  subscriptionPlanPriceId: number;
+};
+
 /**
- * DELETE /seller/subscription — alias soft-cancel da renovação (Sprint 8.5).
- * Preferir `useCancelSellerSubscriptionRenewal` (PUT) na UI.
+ * PUT /seller/subscription/downgrade — agenda alteração para o fim do período.
  */
-export function useCancelSellerSubscription() {
+export function useDowngradeSellerSubscription() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => sellerService.cancelSubscription(),
-    onSuccess: () => {
+    mutationFn: ({ subscriptionPlanPriceId }: DowngradeVariables) =>
+      sellerService.downgradeSubscription({ subscriptionPlanPriceId }),
+    onSuccess: (result) => {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscription,
       });
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.seller.subscriptions,
-      });
-      void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscriptionHistory,
       });
-      toast.success(
-        "Renovação cancelada. Você mantém os benefícios até o fim do período.",
-      );
+      toast.success(result.message || "Downgrade agendado.");
     },
     onError: (error) => {
       if (isCanceledError(error)) return;
