@@ -6,24 +6,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { SellerSubscriptionListItemDto } from "@/contracts/seller/subscription";
-import {
-  subscriptionStatusBadgeVariant,
-  subscriptionStatusLabel,
-} from "@/features/dashboard/components/subscription/subscription-display";
+import type { SubscriptionHistoryItemDto } from "@/contracts/seller/subscription";
 import { formatDate } from "@/utils/formatDate";
 
 type SubscriptionHistoryCardProps = {
-  items: SellerSubscriptionListItemDto[];
+  items: SubscriptionHistoryItemDto[];
 };
 
 function SubscriptionHistoryCard({ items }: SubscriptionHistoryCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-h3">Histórico</CardTitle>
+        <CardTitle className="text-h3">Histórico da assinatura</CardTitle>
         <CardDescription>
-          Assinaturas anteriores e a atual, da mais recente para a mais antiga.
+          Eventos relevantes montados a partir de auditoria e webhooks.
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
@@ -37,35 +33,38 @@ function SubscriptionHistoryCard({ items }: SubscriptionHistoryCardProps) {
               <thead>
                 <tr className="bg-muted/50 border-border border-b">
                   <th scope="col" className="px-4 py-3 font-medium">
-                    Plano
+                    Data
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
-                    Status
+                    Tipo
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
-                    Data início
+                    Descrição
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
-                    Data fim
+                    Origem
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Resultado
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item) => (
-                  <tr key={item.id} className="border-border border-b last:border-b-0">
-                    <td className="px-4 py-3 font-medium">{item.planName}</td>
+                  <tr
+                    key={`${item.type}-${item.occurredAtUtc}-${item.source}`}
+                    className="border-border border-b last:border-b-0"
+                  >
+                    <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
+                      {formatDate(item.occurredAtUtc)}
+                    </td>
+                    <td className="px-4 py-3 font-medium">{item.type}</td>
+                    <td className="px-4 py-3">{item.description}</td>
+                    <td className="px-4 py-3">{item.source}</td>
                     <td className="px-4 py-3">
-                      <Badge
-                        variant={subscriptionStatusBadgeVariant(item.status)}
-                      >
-                        {subscriptionStatusLabel(item.status)}
+                      <Badge variant={item.success ? "success" : "destructive"}>
+                        {item.success ? "Sucesso" : "Falha"}
                       </Badge>
-                    </td>
-                    <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
-                      {formatDate(item.startDate)}
-                    </td>
-                    <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
-                      {item.endDate ? formatDate(item.endDate) : "—"}
                     </td>
                   </tr>
                 ))}

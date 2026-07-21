@@ -9,37 +9,41 @@ import { AvailablePlansCard } from "@/features/dashboard/components/subscription
 import { PaymentHistoryCard } from "@/features/dashboard/components/subscription/PaymentHistoryCard";
 import { SubscriptionActionsCard } from "@/features/dashboard/components/subscription/SubscriptionActionsCard";
 import { SubscriptionFaqCard } from "@/features/dashboard/components/subscription/SubscriptionFaqCard";
+import { SubscriptionFinancialCard } from "@/features/dashboard/components/subscription/SubscriptionFinancialCard";
 import { SubscriptionHistoryCard } from "@/features/dashboard/components/subscription/SubscriptionHistoryCard";
+import { SubscriptionMessagesCard } from "@/features/dashboard/components/subscription/SubscriptionMessagesCard";
 import {
-  AvailablePlansSkeleton,
   SubscriptionHistorySkeleton,
   SubscriptionSummarySkeleton,
   SubscriptionUsageSkeleton,
 } from "@/features/dashboard/components/subscription/SubscriptionSkeletons";
 import { SubscriptionSummaryCard } from "@/features/dashboard/components/subscription/SubscriptionSummaryCard";
+import { SubscriptionTimelineCard } from "@/features/dashboard/components/subscription/SubscriptionTimelineCard";
 import { SubscriptionUsageCard } from "@/features/dashboard/components/subscription/SubscriptionUsageCard";
-import { useActiveSubscriptionPlans } from "@/hooks/api/useActiveSubscriptionPlans";
 import { useCancelSellerSubscription } from "@/hooks/api/useCancelSellerSubscription";
 import { useCurrentSellerSubscription } from "@/hooks/api/useCurrentSellerSubscription";
-import { useSellerPayments } from "@/hooks/api/useSellerPayments";
-import { useSellerSubscriptions } from "@/hooks/api/useSellerSubscriptions";
+import { useSellerSubscriptionHistory } from "@/hooks/api/useSellerSubscriptionHistory";
+import { useSellerSubscriptionPayments } from "@/hooks/api/useSellerSubscriptionPayments";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 
 /**
- * Central de gerenciamento da assinatura do vendedor (Sprint 5.5).
+ * Central de Gestão da Assinatura (Sprint 8.4).
+ * Renderiza exclusivamente dados da API — sem regras de negócio no cliente.
  */
 function MyPlanView() {
   const subscriptionQuery = useCurrentSellerSubscription();
-  const historyQuery = useSellerSubscriptions();
-  const paymentsQuery = useSellerPayments();
-  const plansQuery = useActiveSubscriptionPlans();
+  const paymentsQuery = useSellerSubscriptionPayments(
+    Boolean(subscriptionQuery.data),
+  );
+  const historyQuery = useSellerSubscriptionHistory(
+    Boolean(subscriptionQuery.data),
+  );
   const cancelMutation = useCancelSellerSubscription();
 
   const [chooseOpen, setChooseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
   const subscription = subscriptionQuery.data ?? null;
-  const hasActiveSubscription = subscription !== null;
   const openChoosePlan = () => setChooseOpen(true);
 
   return (
@@ -70,63 +74,55 @@ function MyPlanView() {
       subscription ? (
         <>
           <SubscriptionSummaryCard subscription={subscription} />
-          <SubscriptionUsageCard
-            subscription={subscription}
+          <SubscriptionMessagesCard messages={subscription.messages} />
+          <SubscriptionFinancialCard subscription={subscription} />
+          <SubscriptionUsageCard subscription={subscription} />
+          <SubscriptionTimelineCard items={subscription.timeline} />
+          <SubscriptionActionsCard
+            hasSubscription
+            actions={subscription.actions}
             onChoosePlan={openChoosePlan}
+            onCancel={() => setCancelOpen(true)}
+            cancelLoading={cancelMutation.isPending}
           />
+          <AvailablePlansCard plans={subscription.availablePlans} />
         </>
       ) : null}
 
-      {!subscriptionQuery.isLoading && !subscriptionQuery.isError ? (
+      {!subscriptionQuery.isLoading &&
+      !subscriptionQuery.isError &&
+      !subscription ? (
         <SubscriptionActionsCard
-          hasActiveSubscription={hasActiveSubscription}
+          hasSubscription={false}
           onChoosePlan={openChoosePlan}
           onCancel={() => setCancelOpen(true)}
-          cancelLoading={cancelMutation.isPending}
         />
       ) : null}
 
-      {plansQuery.isLoading ? <AvailablePlansSkeleton /> : null}
+      {subscription ? (
+        <>
+          {paymentsQuery.isLoading ? <SubscriptionHistorySkeleton /> : null}
+          {paymentsQuery.isError ? (
+            <ErrorMessage
+              title="Não foi possível carregar o histórico financeiro"
+              message={getFriendlyErrorMessage(paymentsQuery.error)}
+            />
+          ) : null}
+          {!paymentsQuery.isLoading && !paymentsQuery.isError ? (
+            <PaymentHistoryCard items={paymentsQuery.data ?? []} />
+          ) : null}
 
-      {plansQuery.isError ? (
-        <ErrorMessage
-          title="Não foi possível carregar os planos disponíveis"
-          message={getFriendlyErrorMessage(plansQuery.error)}
-        />
-      ) : null}
-
-      {!plansQuery.isLoading && !plansQuery.isError ? (
-        <AvailablePlansCard
-          plans={plansQuery.data ?? []}
-          currentPlanId={subscription?.subscriptionPlanId}
-          onSelectPlan={openChoosePlan}
-        />
-      ) : null}
-
-      {historyQuery.isLoading ? <SubscriptionHistorySkeleton /> : null}
-
-      {historyQuery.isError ? (
-        <ErrorMessage
-          title="Não foi possível carregar o histórico"
-          message={getFriendlyErrorMessage(historyQuery.error)}
-        />
-      ) : null}
-
-      {!historyQuery.isLoading && !historyQuery.isError ? (
-        <SubscriptionHistoryCard items={historyQuery.data ?? []} />
-      ) : null}
-
-      {paymentsQuery.isLoading ? <SubscriptionHistorySkeleton /> : null}
-
-      {paymentsQuery.isError ? (
-        <ErrorMessage
-          title="Não foi possível carregar o histórico financeiro"
-          message={getFriendlyErrorMessage(paymentsQuery.error)}
-        />
-      ) : null}
-
-      {!paymentsQuery.isLoading && !paymentsQuery.isError ? (
-        <PaymentHistoryCard items={paymentsQuery.data ?? []} />
+          {historyQuery.isLoading ? <SubscriptionHistorySkeleton /> : null}
+          {historyQuery.isError ? (
+            <ErrorMessage
+              title="Não foi possível carregar o histórico da assinatura"
+              message={getFriendlyErrorMessage(historyQuery.error)}
+            />
+          ) : null}
+          {!historyQuery.isLoading && !historyQuery.isError ? (
+            <SubscriptionHistoryCard items={historyQuery.data ?? []} />
+          ) : null}
+        </>
       ) : null}
 
       <SubscriptionFaqCard />

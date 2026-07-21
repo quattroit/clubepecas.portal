@@ -6,14 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { SellerSubscriptionDto } from "@/contracts/seller/subscription";
-import {
-  paymentMethodLabel,
-  paymentStatusLabel,
-} from "@/features/dashboard/components/subscription/payment-display";
-import {
-  subscriptionStatusBadgeVariant,
-  subscriptionStatusLabel,
-} from "@/features/dashboard/components/subscription/subscription-display";
+import { statusColorToBadgeVariant } from "@/features/dashboard/components/subscription/subscription-display";
 import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import { formatPlanPrice } from "@/features/plans/utils/plan-display";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -26,12 +19,10 @@ type SubscriptionSummaryCardProps = {
 function SubscriptionSummaryCard({
   subscription,
 }: SubscriptionSummaryCardProps) {
-  const billingCycle =
-    subscription.currentPaymentBillingCycle ?? subscription.billingCycle;
-  const billingAmount =
-    subscription.currentPaymentAmount != null
-      ? formatPlanPrice(subscription.currentPaymentAmount, billingCycle)
-      : formatPlanPrice(subscription.price, subscription.billingCycle);
+  const billingAmount = formatPlanPrice(
+    subscription.recurringAmount,
+    subscription.billingCycle,
+  );
 
   return (
     <Card>
@@ -39,27 +30,23 @@ function SubscriptionSummaryCard({
         <div className="min-w-0 flex-1 space-y-3">
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-              Resumo do plano
+              Resumo da assinatura
             </p>
-            <CardTitle className="text-h2">{subscription.planName}</CardTitle>
+            <CardTitle className="text-h2">{subscription.plan.name}</CardTitle>
           </div>
-          {subscription.planDescription ? (
+          {subscription.plan.description ? (
             <PlanDescription
-              description={subscription.planDescription}
+              description={subscription.plan.description}
               compact
             />
           ) : null}
         </div>
         <Badge
-          variant={subscriptionStatusBadgeVariant(
-            subscription.status,
-            subscription.gracePeriodUntilUtc,
+          variant={statusColorToBadgeVariant(
+            subscription.indicators.subscriptionStatusColor,
           )}
         >
-          {subscriptionStatusLabel(
-            subscription.status,
-            subscription.gracePeriodUntilUtc,
-          )}
+          {subscription.statusLabel}
         </Badge>
       </CardHeader>
 
@@ -72,70 +59,64 @@ function SubscriptionSummaryCard({
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-xs">
-              Equivalente mensal
-            </dt>
+            <dt className="text-muted-foreground text-xs">Valor da recorrência</dt>
+            <dd className="text-sm font-medium">{billingAmount}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-xs">Contratação</dt>
             <dd className="text-sm font-medium">
-              {formatCurrency(subscription.equivalentMonthlyPrice)} / mês
+              {formatDate(subscription.contractedAtUtc)}
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-xs">Data de início</dt>
+            <dt className="text-muted-foreground text-xs">Dias restantes</dt>
             <dd className="text-sm font-medium">
-              {formatDate(subscription.startDate)}
+              {subscription.remainingDays != null
+                ? `${subscription.remainingDays}`
+                : "—"}
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-xs">Data de término</dt>
+            <dt className="text-muted-foreground text-xs">Início do período</dt>
             <dd className="text-sm font-medium">
-              {subscription.endDate ? formatDate(subscription.endDate) : "—"}
+              {formatDate(subscription.periodStartUtc)}
             </dd>
           </div>
-        </dl>
-
-        <div className="border-border mt-5 border-t pt-4" data-slot="subscription-billing">
-          <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-            Status financeiro
-          </p>
-          <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt className="text-muted-foreground text-xs">Fim do período</dt>
+            <dd className="text-sm font-medium">
+              {subscription.periodEndUtc
+                ? formatDate(subscription.periodEndUtc)
+                : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-xs">Próxima cobrança</dt>
+            <dd className="text-sm font-medium">
+              {subscription.nextBillingDateUtc
+                ? formatDate(subscription.nextBillingDateUtc)
+                : "—"}
+            </dd>
+          </div>
+          {subscription.equivalentMonthlyPrice != null ? (
             <div>
               <dt className="text-muted-foreground text-xs">
-                Próxima renovação
+                Equivalente mensal
               </dt>
               <dd className="text-sm font-medium">
-                {subscription.nextBillingDateUtc
-                  ? formatDate(subscription.nextBillingDateUtc)
-                  : "—"}
+                {formatCurrency(subscription.equivalentMonthlyPrice)} / mês
               </dd>
             </div>
+          ) : null}
+          {subscription.isGracePeriod && subscription.gracePeriodUntilUtc ? (
             <div>
-              <dt className="text-muted-foreground text-xs">Valor</dt>
-              <dd className="text-sm font-medium">{billingAmount}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground text-xs">Método</dt>
+              <dt className="text-muted-foreground text-xs">Grace até</dt>
               <dd className="text-sm font-medium">
-                {paymentMethodLabel(subscription.currentPaymentMethod)}
+                {formatDate(subscription.gracePeriodUntilUtc)}
               </dd>
             </div>
-            <div>
-              <dt className="text-muted-foreground text-xs">Status da cobrança</dt>
-              <dd className="text-sm font-medium">
-                {paymentStatusLabel(subscription.currentPaymentStatus)}
-              </dd>
-            </div>
-            {subscription.gracePeriodUntilUtc ? (
-              <div>
-                <dt className="text-muted-foreground text-xs">
-                  Carência até
-                </dt>
-                <dd className="text-sm font-medium">
-                  {formatDate(subscription.gracePeriodUntilUtc)}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-        </div>
+          ) : null}
+        </dl>
       </CardContent>
     </Card>
   );

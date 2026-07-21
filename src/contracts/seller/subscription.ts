@@ -3,43 +3,200 @@ import type {
   PaymentMethod,
   PaymentProvider,
   PaymentStatus,
+  PaymentType,
   SellerSubscriptionStatus,
 } from "@/contracts/common/enums";
 
-/** GET/POST/DELETE /api/v1/seller/subscription */
+/** Cores semânticas retornadas pela API (Sprint 8.4). */
+export type SubscriptionStatusColor =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";
+
+export type SubscriptionPlanSummaryDto = {
+  id: number;
+  name: string;
+  description?: string | null;
+  advertisementLimit: number;
+  advertisementsUsed: number;
+  advertisementsRemaining: number;
+  quotaUsagePercent: number;
+  isUnlimited: boolean;
+};
+
+export type SubscriptionPaymentSnapshotDto = {
+  id: number;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  statusLabel: string;
+  billingCycle: BillingCycle;
+  dueDateUtc?: string | null;
+  paidAtUtc?: string | null;
+  method: PaymentMethod;
+};
+
+export type SubscriptionFinancialSummaryDto = {
+  lastPayment?: SubscriptionPaymentSnapshotDto | null;
+  nextPayment?: SubscriptionPaymentSnapshotDto | null;
+  amount?: number | null;
+  currency?: string | null;
+  paymentStatus?: PaymentStatus | null;
+  paymentStatusLabel?: string | null;
+  hasPendingPayment: boolean;
+  hasOverduePayment: boolean;
+};
+
+export type SubscriptionIndicatorsDto = {
+  quotaUsagePercent: number;
+  subscriptionStatus: SellerSubscriptionStatus;
+  subscriptionStatusColor: SubscriptionStatusColor;
+  paymentStatus?: PaymentStatus | null;
+  paymentStatusColor?: SubscriptionStatusColor | null;
+  remainingDays?: number | null;
+  isNearExpiration: boolean;
+  isGracePeriod: boolean;
+  hasPendingPayment: boolean;
+};
+
+export type SubscriptionTimelineItemDto = {
+  occurredAtUtc: string;
+  type: string;
+  description: string;
+  status: string;
+};
+
+export type SubscriptionAvailableActionsDto = {
+  canUpgrade: boolean;
+  canDowngrade: boolean;
+  canCancel: boolean;
+  canReactivate: boolean;
+  canRetryPayment: boolean;
+  canSyncPayment: boolean;
+};
+
+export type SubscriptionAvailablePlanCycleDto = {
+  billingCycle: BillingCycle;
+  billingCycleLabel: string;
+  price: number;
+  currency: string;
+  equivalentMonthlyPrice: number;
+  savingsAmount?: number | null;
+  savingsPercent?: number | null;
+  isRecommended: boolean;
+};
+
+export type SubscriptionAvailablePlanDto = {
+  id: number;
+  name: string;
+  description?: string | null;
+  advertisementLimit: number;
+  isUpgrade: boolean;
+  isDowngrade: boolean;
+  isAvailable: boolean;
+  isCurrent: boolean;
+  billingCycles: SubscriptionAvailablePlanCycleDto[];
+};
+
+/**
+ * GET /api/v1/seller/subscription — Central de Gestão (Sprint 8.4).
+ * Compat fields flat mantidos pelo backend para consumidores legados.
+ */
 export type SellerSubscriptionDto = {
+  id: number;
+  status: SellerSubscriptionStatus;
+  statusLabel: string;
+  billingCycle: BillingCycle;
+  billingCycleLabel: string;
+  recurringAmount: number;
+  currency: string;
+  equivalentMonthlyPrice?: number | null;
+  contractedAtUtc: string;
+  periodStartUtc: string;
+  periodEndUtc?: string | null;
+  nextBillingDateUtc?: string | null;
+  remainingDays?: number | null;
+  isGracePeriod: boolean;
+  gracePeriodUntilUtc?: string | null;
+  autoRenew: boolean;
+  plan: SubscriptionPlanSummaryDto;
+  financial: SubscriptionFinancialSummaryDto;
+  indicators: SubscriptionIndicatorsDto;
+  messages: string[];
+  timeline: SubscriptionTimelineItemDto[];
+  actions: SubscriptionAvailableActionsDto;
+  availablePlans: SubscriptionAvailablePlanDto[];
+
+  // Compatibilidade Sprint 8.3.1
+  subscriptionPlanId: number;
+  planName: string;
+  planDescription?: string | null;
+  price: number;
+  advertisementLimit: number;
+  advertisementsUsed: number;
+  advertisementsRemaining: number;
+  startDate: string;
+  endDate?: string | null;
+  currentPaymentId?: number | null;
+  activatedAtUtc?: string | null;
+  currentPaymentStatus?: PaymentStatus | null;
+  currentPaymentMethod?: PaymentMethod | null;
+  currentPaymentAmount?: number | null;
+  currentPaymentCurrency?: string | null;
+  currentPaymentBillingCycle?: BillingCycle | null;
+};
+
+/** GET /api/v1/seller/subscription/payments */
+export type SubscriptionPaymentDto = {
+  id: number;
+  createdAtUtc: string;
+  amount: number;
+  currency: string;
+  billingCycle: BillingCycle;
+  billingCycleLabel: string;
+  status: PaymentStatus;
+  statusLabel: string;
+  type: PaymentType;
+  dueDateUtc?: string | null;
+  paidAtUtc?: string | null;
+  method: PaymentMethod;
+  methodLabel: string;
+  invoiceUrl?: string | null;
+  receiptUrl?: string | null;
+  description?: string | null;
+};
+
+export type ListSellerSubscriptionPaymentsResponse = {
+  items: SubscriptionPaymentDto[];
+};
+
+/** GET /api/v1/seller/subscription/history */
+export type SubscriptionHistoryItemDto = {
+  occurredAtUtc: string;
+  type: string;
+  description: string;
+  source: string;
+  success: boolean;
+};
+
+export type ListSellerSubscriptionHistoryResponse = {
+  items: SubscriptionHistoryItemDto[];
+};
+
+/** GET /api/v1/seller/subscriptions — histórico de vínculos (contrato legado). */
+export type SellerSubscriptionListItemDto = {
   id: number;
   subscriptionPlanId: number;
   planName: string;
   planDescription?: string | null;
   price: number;
-  /** Ciclo de cobrança contratado (Sprint 8.3.1). */
-  billingCycle: BillingCycle;
-  billingCycleLabel: string;
-  /** Preço equivalente mensal para comparação entre ciclos. */
-  equivalentMonthlyPrice: number;
-  currency: string;
   advertisementLimit: number;
-  advertisementsUsed: number;
-  advertisementsRemaining: number;
   status: SellerSubscriptionStatus;
   startDate: string;
   endDate?: string | null;
-  currentPaymentId?: number | null;
-  nextBillingDateUtc?: string | null;
-  activatedAtUtc?: string | null;
-  autoRenew?: boolean;
-  gracePeriodUntilUtc?: string | null;
-  currentPaymentStatus?: PaymentStatus | null;
-  currentPaymentMethod?: PaymentMethod | null;
-  currentPaymentAmount?: number | null;
-  currentPaymentCurrency?: string | null;
-  /** Ciclo de cobrança do pagamento atual (pode diferir do ciclo vigente em trocas de plano). */
-  currentPaymentBillingCycle?: BillingCycle | null;
 };
-
-/** GET /api/v1/seller/subscriptions */
-export type SellerSubscriptionListItemDto = SellerSubscriptionDto;
 
 export type ListSellerSubscriptionsResponse = {
   items: SellerSubscriptionListItemDto[];
@@ -87,12 +244,9 @@ export type SubscriptionPlanPriceDto = {
   displayName?: string | null;
   description?: string | null;
   displayOrder: number;
-  /** Preço equivalente mensal, para comparação entre ciclos. */
   equivalentMonthlyPrice: number;
-  /** Economia em relação ao ciclo mensal — vem pronta da API, nunca calculada no cliente. */
   savingsAmount?: number | null;
   savingsPercent?: number | null;
-  /** Ciclo com melhor custo-benefício, sinalizado pela API. */
   isRecommended: boolean;
 };
 
@@ -104,7 +258,6 @@ export type SubscriptionPlanCatalogItemDto = {
   description?: string | null;
   advertisementLimit: number;
   displayOrder: number;
-  /** Menor preço entre os ciclos disponíveis — usado para "a partir de". */
   startingPrice: number;
   currency: string;
   prices: SubscriptionPlanPriceDto[];

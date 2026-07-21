@@ -7,17 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { SellerPaymentDto } from "@/contracts/seller/payments";
-import {
-  paymentMethodLabel,
-  paymentStatusLabel,
-  paymentTypeLabel,
-} from "@/features/dashboard/components/subscription/payment-display";
+import type { SubscriptionPaymentDto } from "@/contracts/seller/subscription";
 import { formatPlanPrice } from "@/features/plans/utils/plan-display";
 import { formatDate } from "@/utils/formatDate";
 
 type PaymentHistoryCardProps = {
-  items: SellerPaymentDto[];
+  items: SubscriptionPaymentDto[];
 };
 
 function PaymentHistoryCard({ items }: PaymentHistoryCardProps) {
@@ -35,35 +30,64 @@ function PaymentHistoryCard({ items }: PaymentHistoryCardProps) {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
+            <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="border-border text-muted-foreground border-b text-xs">
                   <th className="pb-2 pr-3 font-medium">Data</th>
-                  <th className="pb-2 pr-3 font-medium">Tipo</th>
                   <th className="pb-2 pr-3 font-medium">Valor</th>
-                  <th className="pb-2 pr-3 font-medium">Método</th>
+                  <th className="pb-2 pr-3 font-medium">Ciclo</th>
                   <th className="pb-2 pr-3 font-medium">Status</th>
-                  <th className="pb-2 font-medium">Descrição</th>
+                  <th className="pb-2 pr-3 font-medium">Vencimento</th>
+                  <th className="pb-2 pr-3 font-medium">Pago em</th>
+                  <th className="pb-2 pr-3 font-medium">Método</th>
+                  <th className="pb-2 font-medium">Links</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item) => (
-                  <tr key={item.id} className="border-border border-b last:border-0">
+                  <tr
+                    key={item.id}
+                    className="border-border border-b last:border-0"
+                  >
                     <td className="py-3 pr-3 whitespace-nowrap">
                       {formatDate(item.createdAtUtc)}
                     </td>
-                    <td className="py-3 pr-3">{paymentTypeLabel(item.type)}</td>
                     <td className="py-3 pr-3 whitespace-nowrap">
                       {formatPlanPrice(item.amount)}
                     </td>
-                    <td className="py-3 pr-3">
-                      {paymentMethodLabel(item.method)}
+                    <td className="py-3 pr-3">{item.billingCycleLabel}</td>
+                    <td className="py-3 pr-3">{item.statusLabel}</td>
+                    <td className="py-3 pr-3 whitespace-nowrap">
+                      {item.dueDateUtc ? formatDate(item.dueDateUtc) : "—"}
                     </td>
-                    <td className="py-3 pr-3">
-                      {paymentStatusLabel(item.status)}
+                    <td className="py-3 pr-3 whitespace-nowrap">
+                      {item.paidAtUtc ? formatDate(item.paidAtUtc) : "—"}
                     </td>
-                    <td className="text-muted-foreground py-3">
-                      {item.description ?? item.planName ?? "—"}
+                    <td className="py-3 pr-3">{item.methodLabel}</td>
+                    <td className="py-3">
+                      <div className="flex flex-col gap-1">
+                        {item.invoiceUrl ? (
+                          <a
+                            href={item.invoiceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary text-xs underline-offset-2 hover:underline"
+                          >
+                            Fatura
+                          </a>
+                        ) : null}
+                        {item.receiptUrl ? (
+                          <a
+                            href={item.receiptUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary text-xs underline-offset-2 hover:underline"
+                          >
+                            Recibo
+                          </a>
+                        ) : null}
+                        {!item.invoiceUrl && !item.receiptUrl ? "—" : null}
+                      </div>
                     </td>
                   </tr>
                 ))}

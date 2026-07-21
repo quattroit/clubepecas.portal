@@ -5,7 +5,8 @@ Documento de referência do domínio financeiro do ClubePeças.
 **Sprint 8.1:** domínio local + `NullPaymentProvider`.  
 **Sprint 8.2:** integração Asaas (Hosted Checkout, Sandbox) via `IPaymentProvider`.  
 **Sprint 8.3:** webhooks Asaas, ativação automática, grace period e reconciliação manual.  
-**Sprint 8.3.1:** modelo comercial com múltiplas recorrências (`SubscriptionPlanPrice` + `BillingCycle`).
+**Sprint 8.3.1:** modelo comercial com múltiplas recorrências (`SubscriptionPlanPrice` + `BillingCycle`).  
+**Sprint 8.4:** Central de Gestão da Assinatura (`SubscriptionSummaryService` + Meu Plano consolidado).
 
 ---
 
@@ -190,14 +191,38 @@ Nunca usar a API Key do Asaas como `WebhookToken`.
 
 ---
 
-## 8. API (Sprint 8.3)
+## 8. API (Sprint 8.3 / 8.4)
 
 | Método | Rota | Auth |
 |--------|------|------|
 | POST | `/api/v1/payments/webhooks/asaas` | Token Asaas |
 | GET | `/api/v1/admin/payments` | Admin |
 | POST | `/api/v1/admin/payments/{id}/sync` | Admin |
-| GET | `/api/v1/seller/subscription` | Seller (Active **ou** Pending) |
+| GET | `/api/v1/seller/subscription` | Seller — resumo consolidado (8.4) |
+| GET | `/api/v1/seller/subscription/payments` | Seller — histórico financeiro |
+| GET | `/api/v1/seller/subscription/history` | Seller — eventos (audit + webhooks) |
+
+### 8.1 Central de Gestão — `GET /seller/subscription`
+
+Retorno consolidado via `ISubscriptionSummaryService` / `SubscriptionSummaryService`:
+
+| Bloco | Conteúdo |
+|-------|----------|
+| Assinatura | Status, ciclo, valor, períodos, próxima cobrança, dias restantes, grace |
+| `Plan` | Nome, limite, usados, restantes, `%` cota |
+| `Financial` | Último/próximo pagamento, pendências, vencidos |
+| `Indicators` | Cores, flags (`IsNearExpiration`, `IsGracePeriod`, …) — **prontos para UI** |
+| `Messages` | Textos amigáveis (sem regra no frontend) |
+| `Timeline` | Criação, pagamentos, renovações, grace, próxima cobrança, expiração |
+| `Actions` | `CanUpgrade`, `CanDowngrade`, `CanCancel`, `CanReactivate`, `CanRetryPayment`, `CanSyncPayment` |
+| `AvailablePlans` | Planos + ciclos + economia da API (`IsUpgrade` / `IsDowngrade` / `IsAvailable`) — preparação 8.5 |
+
+Não altera estado financeiro. Não consulta Asaas nestas leituras. Uma chamada principal carrega a central; payments/history são sob demanda.
+
+### 8.2 Contratos auxiliares (8.4)
+
+- `SubscriptionPaymentItem` — pagamentos locais (InvoiceUrl/ReceiptUrl do `MetadataJson`)
+- `SubscriptionHistoryItem` — `AuditLog` filtrado + `WebhookEvent` correlacionado
 
 ---
 
@@ -228,7 +253,7 @@ Logs: evento, tempo, IDs internos — **sem** API Key, PII ou payload completo s
 ## 11. Frontend
 
 - **/planos:** opções Mensal / Trimestral / Anual com economia e selo “Melhor custo-benefício” (dados da API)
-- **Meu Plano:** recorrência, valor, equivalente mensal, próxima renovação; badges Pending / Active / Grace / Expired / Cancelled
+- **Meu Plano (`/painel/meu-plano`) — Sprint 8.4:** consome o resumo consolidado (mensagens, indicadores, timeline, ações, planos disponíveis) + endpoints de payments/history; **sem regras de negócio no cliente**
 - **Checkout (Meu Plano):** plano → recorrência → checkout com `billingCycle`
 - **Admin / Planos:** CRUD de recorrências e preços
 - **Admin / Pagamentos:** listagem + sync Asaas
@@ -254,6 +279,10 @@ Eventos recomendados: `PAYMENT_RECEIVED`, `PAYMENT_CONFIRMED`, `PAYMENT_OVERDUE`
 
 ---
 
-## 13. Fora de escopo (Épico 8)
+## 13. Próximo — Sprint 8.5
 
-Troca/upgrade/downgrade de plano, cupom, split, jobs de cobrança dedicados, mensageria, Redis, e-mail de cobrança.
+Upgrade, downgrade, alteração de ciclo e cancelamento operacional usando `AvailablePlans` / `Actions` já expostos na Central (8.4).
+
+## 14. Fora de escopo (Épico 8)
+
+Cupom, split, jobs de cobrança dedicados, mensageria, Redis, e-mail de cobrança.

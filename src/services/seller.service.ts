@@ -15,6 +15,8 @@ import type {
   CreateSellerSubscriptionCheckoutRequest,
   CreateSellerSubscriptionCheckoutResponse,
   CreateSellerSubscriptionRequest,
+  ListSellerSubscriptionHistoryResponse,
+  ListSellerSubscriptionPaymentsResponse,
   ListSellerSubscriptionsResponse,
   SellerSubscriptionDto,
 } from "@/contracts/seller/subscription";
@@ -59,17 +61,35 @@ export const sellerService = {
       .then((response) => response.data);
   },
 
-  /** GET /api/v1/seller/subscription — assinatura ACTIVE (404 se não houver). */
+  /** GET /api/v1/seller/subscription — Central de Gestão da Assinatura (Sprint 8.4). */
   getCurrentSubscription() {
     return api
       .get<SellerSubscriptionDto>("/api/v1/seller/subscription")
       .then((response) => response.data);
   },
 
-  /** GET /api/v1/seller/subscriptions — histórico. */
+  /** GET /api/v1/seller/subscriptions — histórico de vínculos com planos. */
   listSubscriptions() {
     return api
       .get<ListSellerSubscriptionsResponse>("/api/v1/seller/subscriptions")
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/subscription/payments — histórico financeiro da assinatura. */
+  listSubscriptionPayments() {
+    return api
+      .get<ListSellerSubscriptionPaymentsResponse>(
+        "/api/v1/seller/subscription/payments",
+      )
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/subscription/history — eventos (audit + webhooks). */
+  listSubscriptionHistory() {
+    return api
+      .get<ListSellerSubscriptionHistoryResponse>(
+        "/api/v1/seller/subscription/history",
+      )
       .then((response) => response.data);
   },
 
@@ -97,7 +117,7 @@ export const sellerService = {
       .then((response) => response.data);
   },
 
-  /** GET /api/v1/seller/payments — histórico financeiro. */
+  /** GET /api/v1/seller/payments — histórico financeiro legado. */
   listPayments() {
     return api
       .get<ListSellerPaymentsResponse>("/api/v1/seller/payments")
