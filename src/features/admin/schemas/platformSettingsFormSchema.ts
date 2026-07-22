@@ -108,6 +108,30 @@ export const platformSettingsFormSchema = z.object({
     .number({ error: "Informe um número válido" })
     .int("Informe um número inteiro")
     .min(1, "Deve ser pelo menos 1"),
+  representativeProgramEnabled: z.boolean(),
+  representativeFirstSaleCommissionPercentage: z
+    .number({ error: "Informe um número válido" })
+    .min(0, "Deve ser pelo menos 0")
+    .max(100, "Deve ser no máximo 100"),
+  representativeRecurringCommissionPercentage: z
+    .number({ error: "Informe um número válido" })
+    .min(0, "Deve ser pelo menos 0")
+    .max(100, "Deve ser no máximo 100"),
+  representativeCommissionCurrency: z.literal("BRL", {
+    error: "Apenas BRL é suportado no momento",
+  }),
+  representativeMinimumPayoutAmount: z
+    .number({ error: "Informe um número válido" })
+    .min(0, "Deve ser pelo menos 0"),
+  representativeDefaultPayoutDay: z
+    .number({ error: "Informe um número válido" })
+    .int("Informe um número inteiro")
+    .min(1, "Deve ser pelo menos 1")
+    .max(28, "Deve ser no máximo 28"),
+  representativeCommissionNotes: optionalText.max(
+    2000,
+    "Máximo de 2000 caracteres",
+  ),
 });
 
 export type PlatformSettingsFormValues = z.infer<
@@ -156,4 +180,11 @@ export const platformSettingsFormDefaultValues: PlatformSettingsFormValues = {
   defaultImagesPerAdvertisement: 3,
   maxImageSizeMb: 5,
   onlineTimeoutMinutes: 15,
+  representativeProgramEnabled: true,
+  representativeFirstSaleCommissionPercentage: 20,
+  representativeRecurringCommissionPercentage: 10,
+  representativeCommissionCurrency: "BRL",
+  representativeMinimumPayoutAmount: 100,
+  representativeDefaultPayoutDay: 10,
+  representativeCommissionNotes: "",
 };

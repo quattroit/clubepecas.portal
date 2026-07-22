@@ -4,7 +4,6 @@ import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdminStatusBadge } from "@/components/admin";
-import { PersonType } from "@/contracts/common/enums";
 import type { RepresentativeMeDto } from "@/contracts/representative/portal";
 import { isRepresentativeActive } from "@/contracts/admin/representatives";
 import { RepresentativeChangePasswordForm } from "@/features/representative/components/RepresentativeChangePasswordForm";
@@ -13,7 +12,11 @@ import type { RepresentativeProfileFormValues } from "@/features/representative/
 import { useRepresentativeMe } from "@/hooks/api/useRepresentativeMe";
 import { useUpdateRepresentativeMe } from "@/hooks/api/useUpdateRepresentativeMe";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { formatDocumentInput } from "@/utils/document";
+import {
+  documentLabel,
+  formatDocumentAuto,
+  inferPersonTypeFromDocument,
+} from "@/utils/document";
 import { formatPostalCodeInput, normalizePostalCode } from "@/utils/postalCode";
 
 function mapMeToFormValues(
@@ -101,11 +104,17 @@ function RepresentativeProfileView() {
                 <ReadOnlyField label="Código" value={meQuery.data.representativeCode} />
                 <ReadOnlyField label="E-mail" value={meQuery.data.email} />
                 <ReadOnlyField
-                  label="CPF"
-                  value={formatDocumentInput(
-                    meQuery.data.document,
-                    PersonType.Individual,
-                  )}
+                  label={
+                    (() => {
+                      const personType = inferPersonTypeFromDocument(
+                        meQuery.data.document,
+                      );
+                      return personType != null
+                        ? documentLabel(personType)
+                        : "CPF/CNPJ";
+                    })()
+                  }
+                  value={formatDocumentAuto(meQuery.data.document)}
                 />
                 <div className="flex flex-col gap-0.5">
                   <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">

@@ -61,6 +61,17 @@ export function mapPlatformSettingsToForm(
     defaultImagesPerAdvertisement: settings.defaultImagesPerAdvertisement,
     maxImageSizeMb: settings.maxImageSizeMb,
     onlineTimeoutMinutes: settings.onlineTimeoutMinutes,
+    representativeProgramEnabled: settings.representativeProgramEnabled,
+    representativeFirstSaleCommissionPercentage:
+      settings.representativeFirstSaleCommissionPercentage,
+    representativeRecurringCommissionPercentage:
+      settings.representativeRecurringCommissionPercentage,
+    representativeCommissionCurrency:
+      settings.representativeCommissionCurrency as "BRL",
+    representativeMinimumPayoutAmount:
+      settings.representativeMinimumPayoutAmount,
+    representativeDefaultPayoutDay: settings.representativeDefaultPayoutDay,
+    representativeCommissionNotes: settings.representativeCommissionNotes ?? "",
   };
 }
 
@@ -112,5 +123,16 @@ export function mapPlatformSettingsFormToRequest(
     defaultImagesPerAdvertisement: values.defaultImagesPerAdvertisement,
     maxImageSizeMb: values.maxImageSizeMb,
     onlineTimeoutMinutes: values.onlineTimeoutMinutes,
+    representativeProgramEnabled: values.representativeProgramEnabled,
+    representativeFirstSaleCommissionPercentage:
+      values.representativeFirstSaleCommissionPercentage,
+    representativeRecurringCommissionPercentage:
+      values.representativeRecurringCommissionPercentage,
+    representativeCommissionCurrency: values.representativeCommissionCurrency,
+    representativeMinimumPayoutAmount: values.representativeMinimumPayoutAmount,
+    representativeDefaultPayoutDay: values.representativeDefaultPayoutDay,
+    representativeCommissionNotes: emptyToNull(
+      values.representativeCommissionNotes,
+    ),
   };
 }

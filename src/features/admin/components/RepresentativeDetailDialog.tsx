@@ -31,8 +31,11 @@ import { RepresentativeQrCodeDialog } from "@/features/admin/components/Represen
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/formatDate";
-import { formatDocumentInput } from "@/utils/document";
-import { PersonType } from "@/contracts/common/enums";
+import {
+  documentLabel,
+  formatDocumentAuto,
+  inferPersonTypeFromDocument,
+} from "@/utils/document";
 import { formatPostalCodeInput } from "@/utils/postalCode";
 import {
   copyRepresentativePublicLink,
@@ -249,11 +252,17 @@ function RepresentativeDetailDialog({
                   <dl className="grid gap-3 sm:grid-cols-2">
                     <DetailRow label="Nome" value={data.name} />
                     <DetailRow
-                      label="CPF"
-                      value={formatDocumentInput(
-                        data.document,
-                        PersonType.Individual,
-                      )}
+                      label={
+                        (() => {
+                          const personType = inferPersonTypeFromDocument(
+                            data.document,
+                          );
+                          return personType != null
+                            ? documentLabel(personType)
+                            : "CPF/CNPJ";
+                        })()
+                      }
+                      value={formatDocumentAuto(data.document)}
                     />
                     <DetailRow label="E-mail" value={data.email} />
                     <DetailRow label="Telefone" value={data.phone} />

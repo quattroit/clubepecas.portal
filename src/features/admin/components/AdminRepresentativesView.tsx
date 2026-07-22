@@ -55,8 +55,7 @@ import { useUpdateAdminRepresentative } from "@/hooks/api/useUpdateAdminRepresen
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/formatDate";
-import { formatDocumentInput, onlyDigits } from "@/utils/document";
-import { PersonType } from "@/contracts/common/enums";
+import { formatDocumentAuto, onlyDigits } from "@/utils/document";
 import { formatPostalCodeInput, normalizePostalCode } from "@/utils/postalCode";
 import {
   adminRepresentativesHasActiveFilters,
@@ -96,7 +95,7 @@ function mapDetailToForm(
     name: detail.name,
     email: detail.email,
     phone: detail.phone,
-    document: formatDocumentInput(detail.document, PersonType.Individual),
+    document: formatDocumentAuto(detail.document),
     zipCode: formatPostalCodeInput(detail.zipCode),
     addressStreet: detail.addressStreet,
     addressNumber: detail.addressNumber,

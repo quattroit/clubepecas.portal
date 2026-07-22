@@ -46,6 +46,13 @@ export type PlatformSettingsResponse = {
   defaultImagesPerAdvertisement: number;
   maxImageSizeMb: number;
   onlineTimeoutMinutes: number;
+  representativeProgramEnabled: boolean;
+  representativeFirstSaleCommissionPercentage: number;
+  representativeRecurringCommissionPercentage: number;
+  representativeCommissionCurrency: string;
+  representativeMinimumPayoutAmount: number;
+  representativeDefaultPayoutDay: number;
+  representativeCommissionNotes: string | null;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -92,4 +99,11 @@ export type UpdatePlatformSettingsRequest = {
   defaultImagesPerAdvertisement: number;
   maxImageSizeMb: number;
   onlineTimeoutMinutes: number;
+  representativeProgramEnabled: boolean;
+  representativeFirstSaleCommissionPercentage: number;
+  representativeRecurringCommissionPercentage: number;
+  representativeCommissionCurrency: string;
+  representativeMinimumPayoutAmount: number;
+  representativeDefaultPayoutDay: number;
+  representativeCommissionNotes: string | null;
 };

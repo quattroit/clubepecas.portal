@@ -16,6 +16,7 @@ import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { PersonType } from "@/contracts/common/enums";
 import { ROUTES } from "@/constants/routes";
@@ -28,11 +29,18 @@ import {
 import { useAdminPlatformSettings } from "@/hooks/api/useAdminPlatformSettings";
 import { useUpdateAdminPlatformSettings } from "@/hooks/api/useUpdateAdminPlatformSettings";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import { cn } from "@/lib/utils";
 import {
   mapPlatformSettingsFormToRequest,
   mapPlatformSettingsToForm,
 } from "@/mappers/platform-settings-form.mapper";
 import { formatDocumentInput } from "@/utils/document";
+
+const selectClassName = cn(
+  "border-input bg-surface text-foreground h-10 w-full rounded-xl border px-3 text-sm outline-none",
+  "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+);
 
 /**
  * Painel de configurações globais da plataforma.
@@ -45,6 +53,10 @@ function AdminSettingsView() {
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const pendingHrefRef = useRef<string | null>(null);
   const allowNavigationRef = useRef(false);
+
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [pendingValues, setPendingValues] =
+    useState<PlatformSettingsFormValues | null>(null);
 
   const {
     register,
@@ -119,11 +131,8 @@ function AdminSettingsView() {
   const onSubmit = handleSubmit((values) => {
     if (isSubmitting) return;
 
-    updateMutation.mutate(mapPlatformSettingsFormToRequest(values), {
-      onSuccess: (data) => {
-        reset(mapPlatformSettingsToForm(data));
-      },
-    });
+    setPendingValues(values);
+    setSaveDialogOpen(true);
   });
 
   const confirmLeave = () => {
@@ -134,6 +143,18 @@ function AdminSettingsView() {
     if (href) {
       router.push(href);
     }
+  };
+
+  const confirmSave = () => {
+    if (!pendingValues || isSubmitting) return;
+
+    updateMutation.mutate(mapPlatformSettingsFormToRequest(pendingValues), {
+      onSuccess: (data) => {
+        reset(mapPlatformSettingsToForm(data));
+        setSaveDialogOpen(false);
+        setPendingValues(null);
+      },
+    });
   };
 
   if (settingsQuery.isLoading) {
@@ -441,6 +462,175 @@ function AdminSettingsView() {
           </AdminCard>
         </AdminSection>
 
+        <AdminSection
+          title="Programa de Representantes"
+          description="Regras de comissionamento aplicadas a novas indicações de representantes."
+        >
+          <AdminCard>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between gap-4 rounded-xl border p-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="representative-program-enabled">
+                    Programa ativo
+                  </Label>
+                  <p className="text-muted-foreground text-xs">
+                    Habilita o programa de representantes e a geração de novas
+                    comissões.
+                  </p>
+                </div>
+                <Controller
+                  name="representativeProgramEnabled"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="representative-program-enabled"
+                      checked={field.value}
+                      disabled={isSubmitting}
+                      onCheckedChange={field.onChange}
+                      onBlur={field.onBlur}
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field
+                  id="representative-first-sale-commission"
+                  label="Comissão da primeira venda (%)"
+                  error={
+                    errors.representativeFirstSaleCommissionPercentage?.message
+                  }
+                >
+                  <Input
+                    id="representative-first-sale-commission"
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    inputMode="decimal"
+                    disabled={isSubmitting}
+                    aria-invalid={Boolean(
+                      errors.representativeFirstSaleCommissionPercentage,
+                    )}
+                    {...register(
+                      "representativeFirstSaleCommissionPercentage",
+                      { valueAsNumber: true },
+                    )}
+                  />
+                </Field>
+                <Field
+                  id="representative-recurring-commission"
+                  label="Comissão recorrente (%)"
+                  error={
+                    errors.representativeRecurringCommissionPercentage
+                      ?.message
+                  }
+                >
+                  <Input
+                    id="representative-recurring-commission"
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={0.01}
+                    inputMode="decimal"
+                    disabled={isSubmitting}
+                    aria-invalid={Boolean(
+                      errors.representativeRecurringCommissionPercentage,
+                    )}
+                    {...register(
+                      "representativeRecurringCommissionPercentage",
+                      { valueAsNumber: true },
+                    )}
+                  />
+                </Field>
+                <div className="sm:col-span-2">
+                  <p className="text-muted-foreground text-xs">
+                    Este percentual será utilizado apenas para novas
+                    comissões. As comissões já geradas não serão alteradas.
+                  </p>
+                </div>
+
+                <Field
+                  id="representative-commission-currency"
+                  label="Moeda"
+                  error={errors.representativeCommissionCurrency?.message}
+                >
+                  <select
+                    id="representative-commission-currency"
+                    className={selectClassName}
+                    disabled
+                    aria-invalid={Boolean(
+                      errors.representativeCommissionCurrency,
+                    )}
+                    {...register("representativeCommissionCurrency")}
+                  >
+                    <option value="BRL">BRL</option>
+                  </select>
+                </Field>
+                <Field
+                  id="representative-minimum-payout-amount"
+                  label="Valor mínimo para pagamento"
+                  error={errors.representativeMinimumPayoutAmount?.message}
+                >
+                  <Input
+                    id="representative-minimum-payout-amount"
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    inputMode="decimal"
+                    disabled={isSubmitting}
+                    aria-invalid={Boolean(
+                      errors.representativeMinimumPayoutAmount,
+                    )}
+                    {...register("representativeMinimumPayoutAmount", {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </Field>
+                <Field
+                  id="representative-default-payout-day"
+                  label="Dia padrão de pagamento"
+                  error={errors.representativeDefaultPayoutDay?.message}
+                >
+                  <Input
+                    id="representative-default-payout-day"
+                    type="number"
+                    min={1}
+                    max={28}
+                    step={1}
+                    inputMode="numeric"
+                    disabled={isSubmitting}
+                    aria-invalid={Boolean(
+                      errors.representativeDefaultPayoutDay,
+                    )}
+                    {...register("representativeDefaultPayoutDay", {
+                      valueAsNumber: true,
+                    })}
+                  />
+                </Field>
+
+                <div className="sm:col-span-2">
+                  <Field
+                    id="representative-commission-notes"
+                    label="Observações internas"
+                    error={errors.representativeCommissionNotes?.message}
+                  >
+                    <Textarea
+                      id="representative-commission-notes"
+                      rows={3}
+                      disabled={isSubmitting}
+                      aria-invalid={Boolean(
+                        errors.representativeCommissionNotes,
+                      )}
+                      {...register("representativeCommissionNotes")}
+                    />
+                  </Field>
+                </div>
+              </div>
+            </div>
+          </AdminCard>
+        </AdminSection>
+
         <AdminSection title="Footer" description="Texto exibido no rodapé público.">
           <AdminCard>
             <Field id="footer-copyright" label="Copyright" error={errors.footerCopyright?.message}>
@@ -481,6 +671,23 @@ function AdminSettingsView() {
         cancelLabel="Continuar editando"
         confirmVariant="destructive"
         onConfirm={confirmLeave}
+      />
+
+      <ConfirmDialog
+        open={saveDialogOpen}
+        onOpenChange={(open) => {
+          setSaveDialogOpen(open);
+          if (!open && !isSubmitting) {
+            setPendingValues(null);
+          }
+        }}
+        title="Confirmar alterações"
+        description="Os percentuais de comissão de representantes serão aplicados apenas a novas comissões geradas a partir de agora — comissões já geradas não serão alteradas. Deseja salvar as alterações?"
+        confirmLabel="Salvar alterações"
+        cancelLabel="Continuar editando"
+        confirmVariant="primary"
+        loading={isSubmitting}
+        onConfirm={confirmSave}
       />
     </AdminPage>
   );

@@ -110,11 +110,11 @@ function AdminFilterBar({
     <div
       data-slot="admin-filter-bar"
       className={cn(
-        "border-border bg-card flex flex-col gap-3 rounded-xl border p-3 shadow-xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between",
+        "border-border bg-card flex flex-col gap-3 rounded-xl border p-3 shadow-xs sm:flex-row sm:flex-wrap sm:items-end sm:justify-between",
         className,
       )}
     >
-      <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         {search}
         {period}
         {filters}

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { PASSWORD_DIGIT_REGEX, PASSWORD_LETTER_REGEX, PASSWORD_MIN_LENGTH } from "@/lib/auth/passwordPolicy";
-import { isValidCpf, onlyDigits } from "@/utils/document";
+import { isValidDocumentAuto, onlyDigits } from "@/utils/document";
 import { isValidPostalCode } from "@/utils/postalCode";
 import { BRAZILIAN_STATES } from "@/utils/brazilianStates";
 
@@ -23,8 +23,8 @@ export const representativeFormSchema = z.object({
   document: z
     .string()
     .trim()
-    .min(1, "Informe o CPF")
-    .refine(isValidCpf, "Informe um CPF válido"),
+    .min(1, "Informe o CPF ou CNPJ")
+    .refine(isValidDocumentAuto, "Informe um CPF ou CNPJ válido"),
   zipCode: z
     .string()
     .trim()

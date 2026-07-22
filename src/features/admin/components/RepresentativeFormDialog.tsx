@@ -25,12 +25,10 @@ import {
   type RepresentativeFormValues,
 } from "@/features/admin/schemas/representativeFormSchema";
 import { useViaCepLookup } from "@/hooks/api/useViaCepLookup";
-import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { PersonType } from "@/contracts/common/enums";
 import { BRAZILIAN_STATES } from "@/utils/brazilianStates";
 import { cn } from "@/lib/utils";
 import {
-  formatDocumentInput,
+  formatDocumentAuto,
   onlyDigits,
 } from "@/utils/document";
 import {
@@ -127,7 +125,7 @@ function RepresentativeFormDialog({
           </DialogTitle>
           <DialogDescription>
             {mode === "edit"
-              ? "Atualize os dados do representante. Código e CPF não podem ser alterados."
+              ? "Atualize os dados do representante. Código e documento (CPF/CNPJ) não podem ser alterados."
               : "Cadastre um representante comercial. O código será gerado automaticamente."}
           </DialogDescription>
         </DialogHeader>
@@ -177,7 +175,7 @@ function RepresentativeFormDialog({
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="rep-document">CPF</Label>
+                <Label htmlFor="rep-document">CPF/CNPJ</Label>
                 <Controller
                   control={control}
                   name="document"
@@ -185,16 +183,11 @@ function RepresentativeFormDialog({
                     <Input
                       id="rep-document"
                       disabled={isSubmitting || mode === "edit"}
-                      placeholder="000.000.000-00"
+                      placeholder="000.000.000-00 ou 00.000.000/0000-00"
                       aria-invalid={Boolean(errors.document)}
                       value={field.value}
                       onChange={(event) =>
-                        field.onChange(
-                          formatDocumentInput(
-                            event.target.value,
-                            PersonType.Individual,
-                          ),
-                        )
+                        field.onChange(formatDocumentAuto(event.target.value))
                       }
                     />
                   )}
@@ -205,7 +198,7 @@ function RepresentativeFormDialog({
                   </p>
                 ) : mode === "edit" ? (
                   <p className="text-muted-foreground text-xs">
-                    CPF não pode ser alterado.
+                    Documento não pode ser alterado.
                   </p>
                 ) : null}
               </div>

@@ -38,7 +38,7 @@ type RepresentativeProfileFormProps = {
 
 /**
  * Formulário de dados editáveis do representante — nome, telefone e
- * endereço. E-mail, CPF, código e status são somente leitura (exibidos
+ * endereço. E-mail, documento (CPF/CNPJ), código e status são somente leitura (exibidos
  * em `RepresentativeProfileView`).
  */
 function RepresentativeProfileForm({
