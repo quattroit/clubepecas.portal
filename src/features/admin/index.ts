@@ -5,6 +5,7 @@ export { AdminAdvertisementsView } from "@/features/admin/components/AdminAdvert
 export { AdminAdvertisementDetailView } from "@/features/admin/components/AdminAdvertisementDetailView";
 export { AdminCategoriesView } from "@/features/admin/components/AdminCategoriesView";
 export { AdminCitiesView } from "@/features/admin/components/AdminCitiesView";
+export { AdminRepresentativesView } from "@/features/admin/components/AdminRepresentativesView";
 export { AdminVehicleBrandsView } from "@/features/admin/components/AdminVehicleBrandsView";
 export { AdminVehicleModelsView } from "@/features/admin/components/AdminVehicleModelsView";
 export { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsView";

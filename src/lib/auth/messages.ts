@@ -141,6 +141,28 @@ const CODE_MESSAGES: Record<string, string> = {
     "Informe um preço válido (zero ou maior) para o ciclo de cobrança.",
   "admin.subscription_plans.prices.billing_cycle.duplicate":
     "Cada ciclo de cobrança pode ser adicionado apenas uma vez.",
+  "admin.representatives.not_found": "Representante não encontrado.",
+  "admin.representatives.name.required": "Informe o nome.",
+  "admin.representatives.email.required": "Informe o e-mail.",
+  "admin.representatives.email.invalid": "Informe um e-mail válido.",
+  "admin.representatives.email.duplicate":
+    "Já existe um representante com este e-mail.",
+  "admin.representatives.phone.required": "Informe o telefone.",
+  "admin.representatives.phone.invalid": "Informe um telefone válido.",
+  "admin.representatives.document.required": "Informe o CPF.",
+  "admin.representatives.document.invalid": "Informe um CPF válido.",
+  "admin.representatives.document.duplicate":
+    "Já existe um representante com este CPF.",
+  "admin.representatives.zip_code.required": "Informe o CEP.",
+  "admin.representatives.zip_code.invalid":
+    "Informe um CEP válido com 8 dígitos.",
+  "admin.representatives.address_street.required": "Informe o logradouro.",
+  "admin.representatives.address_number.required": "Informe o número.",
+  "admin.representatives.neighborhood.required": "Informe o bairro.",
+  "admin.representatives.city.required": "Informe a cidade.",
+  "admin.representatives.state.required": "Informe a UF.",
+  "admin.representatives.state.invalid": "Informe uma UF válida.",
+  "admin.representatives.status.invalid": "Status inválido.",
   "seller.subscription.billing_cycle.required":
     "Selecione o ciclo de cobrança.",
   "seller.subscription.billing_cycle.invalid":

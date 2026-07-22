@@ -35,6 +35,13 @@ import type {
   UpdateAdminCityStatusResponse,
 } from "@/contracts/admin/cities";
 import type {
+  AdminRepresentativeDetailDto,
+  AdminRepresentativesListParams,
+  AdminRepresentativesListResponse,
+  CreateAdminRepresentativeRequest,
+  UpdateAdminRepresentativeRequest,
+} from "@/contracts/admin/representatives";
+import type {
   AdminVehicleBrandsListParams,
   CreateAdminVehicleBrandRequest,
   GetAdminVehicleBrandsResponse,
@@ -259,6 +266,57 @@ export const adminService = {
       .put<ReorderAdminCitiesResponse>(
         "/api/v1/admin/cities/reorder",
         payload,
+      )
+      .then((response) => response.data);
+  },
+
+  listRepresentatives(params: AdminRepresentativesListParams = {}) {
+    return api
+      .get<AdminRepresentativesListResponse>(
+        "/api/v1/admin/representatives",
+        { params },
+      )
+      .then((response) => response.data);
+  },
+
+  getRepresentative(id: number) {
+    return api
+      .get<AdminRepresentativeDetailDto>(
+        `/api/v1/admin/representatives/${id}`,
+      )
+      .then((response) => response.data);
+  },
+
+  createRepresentative(payload: CreateAdminRepresentativeRequest) {
+    return api
+      .post<AdminRepresentativeDetailDto>(
+        "/api/v1/admin/representatives",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  updateRepresentative(id: number, payload: UpdateAdminRepresentativeRequest) {
+    return api
+      .put<AdminRepresentativeDetailDto>(
+        `/api/v1/admin/representatives/${id}`,
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  activateRepresentative(id: number) {
+    return api
+      .patch<AdminRepresentativeDetailDto>(
+        `/api/v1/admin/representatives/${id}/activate`,
+      )
+      .then((response) => response.data);
+  },
+
+  deactivateRepresentative(id: number) {
+    return api
+      .patch<AdminRepresentativeDetailDto>(
+        `/api/v1/admin/representatives/${id}/deactivate`,
       )
       .then((response) => response.data);
   },

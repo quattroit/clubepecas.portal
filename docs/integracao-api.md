@@ -58,6 +58,7 @@ Base URL: `NEXT_PUBLIC_API_URL`
 | Anúncios | CRUD `/api/v1/advertisements`, público `GET /api/v1/advertisements/{slug}`, fotos |
 | Marketplace | `GET /api/v1/marketplace` (filtros: title, category, city, state) |
 | Seller | `POST/GET/PUT /api/v1/seller`, público `GET /api/v1/sellers/{slug}` |
+| Admin — Representantes | CRUD `/api/v1/admin/representatives` (+ activate/deactivate). UI: `/admin/representantes`. ViaCEP só no frontend. |
 
 **Importante:**
 

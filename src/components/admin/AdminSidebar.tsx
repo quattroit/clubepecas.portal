@@ -16,6 +16,7 @@ import {
   ScrollText,
   Settings,
   Store,
+  UserRound,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -60,6 +61,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_CITIES,
     label: "Cidades",
     icon: MapPin,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_REPRESENTATIVES,
+    label: "Representantes",
+    icon: UserRound,
     exact: false,
   },
   {

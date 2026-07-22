@@ -27,15 +27,21 @@ async function fetchViaCep(postalCode: string): Promise<ViaCepLookupResult | nul
 
   const data = (await response.json()) as ViaCepResponse;
 
-  if (data.erro || !data.logradouro || !data.bairro) {
+  if (data.erro) {
+    return null;
+  }
+
+  const city = data.localidade?.trim() ?? "";
+  const state = data.uf?.trim() ?? "";
+  if (!city || !state) {
     return null;
   }
 
   return {
-    street: data.logradouro,
-    neighborhood: data.bairro,
-    city: data.localidade ?? "",
-    state: data.uf ?? "",
+    street: data.logradouro?.trim() ?? "",
+    neighborhood: data.bairro?.trim() ?? "",
+    city,
+    state,
   };
 }
 
