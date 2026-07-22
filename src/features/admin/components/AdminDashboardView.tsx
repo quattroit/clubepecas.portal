@@ -16,6 +16,7 @@ import {
   Store,
   Trophy,
   Users,
+  Wallet,
 } from "lucide-react";
 
 import {
@@ -50,6 +51,7 @@ import { useAdminDashboard } from "@/hooks/api/useAdminDashboard";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { getStatusLabel } from "@/mappers/categoryMeta";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import {
   formatConversionRate,
@@ -283,7 +285,7 @@ function AdminDashboardView() {
       >
         {dashboardQuery.isLoading ? (
           <AdminStatsGrid aria-label="Carregando indicadores">
-            {Array.from({ length: 9 }).map((_, index) => (
+            {Array.from({ length: 14 }).map((_, index) => (
               <AdminMetricCardSkeleton key={index} />
             ))}
           </AdminStatsGrid>
@@ -342,6 +344,34 @@ function AdminDashboardView() {
               value={formatMetricCount(summary.onlineSellers)}
               icon={<Radio className="size-4" />}
               description="Atividade nos últimos 15 minutos"
+            />
+            <AdminMetricCard
+              title="Total de comissões"
+              value={formatCurrency(summary.totalCommissionsAmount ?? 0)}
+              icon={<Wallet className="size-4" />}
+              description="Soma registrada (histórico)"
+            />
+            <AdminMetricCard
+              title="Comissões pendentes"
+              value={formatCurrency(summary.pendingCommissionsAmount ?? 0)}
+              description="Aguardando aprovação"
+            />
+            <AdminMetricCard
+              title="Comissões aprovadas"
+              value={formatCurrency(summary.approvedCommissionsAmount ?? 0)}
+              description="Prontas para pagamento futuro"
+            />
+            <AdminMetricCard
+              title="Comissões pagas"
+              value={formatCurrency(summary.paidCommissionsAmount ?? 0)}
+              description="Já liquidadas"
+            />
+            <AdminMetricCard
+              title="Reps. com comissão"
+              value={formatMetricCount(
+                summary.representativesWithCommission ?? 0,
+              )}
+              description="Representantes com ao menos um registro"
             />
           </AdminStatsGrid>
         ) : null}

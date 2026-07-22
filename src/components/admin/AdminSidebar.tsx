@@ -70,6 +70,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     exact: false,
   },
   {
+    href: ROUTES.ADMIN_COMMISSIONS,
+    label: "Comissões",
+    icon: Wallet,
+    exact: false,
+  },
+  {
     href: ROUTES.ADMIN_VEHICLE_BRANDS,
     label: "Marcas",
     icon: Car,

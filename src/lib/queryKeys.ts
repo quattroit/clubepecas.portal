@@ -112,6 +112,12 @@ export const queryKeys = {
       detail: (id: number) =>
         ["admin", "representatives", "detail", id] as const,
     },
+    commissions: {
+      all: ["admin", "commissions"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "commissions", "list", params] as const,
+      detail: (id: number) => ["admin", "commissions", "detail", id] as const,
+    },
     vehicleBrands: {
       all: ["admin", "vehicleBrands"] as const,
       list: (params: Record<string, unknown>) =>

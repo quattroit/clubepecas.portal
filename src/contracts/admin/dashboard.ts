@@ -44,6 +44,11 @@ export type AdminDashboardSummaryDto = {
   conversionRate: number | null;
   citiesServed: number;
   onlineSellers: number;
+  totalCommissionsAmount: number;
+  pendingCommissionsAmount: number;
+  approvedCommissionsAmount: number;
+  paidCommissionsAmount: number;
+  representativesWithCommission: number;
 };
 
 export type AdminBestStoreDto = {

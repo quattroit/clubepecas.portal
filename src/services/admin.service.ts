@@ -42,6 +42,12 @@ import type {
   UpdateAdminRepresentativeRequest,
 } from "@/contracts/admin/representatives";
 import type {
+  AdminCommissionDetailDto,
+  AdminCommissionsListParams,
+  AdminCommissionsListResponse,
+  CancelAdminCommissionRequest,
+} from "@/contracts/admin/commissions";
+import type {
   AdminVehicleBrandsListParams,
   CreateAdminVehicleBrandRequest,
   GetAdminVehicleBrandsResponse,
@@ -290,6 +296,32 @@ export const adminService = {
         "/api/v1/admin/representatives",
         { params },
       )
+      .then((response) => response.data);
+  },
+
+  listCommissions(params: AdminCommissionsListParams = {}) {
+    return api
+      .get<AdminCommissionsListResponse>("/api/v1/admin/commissions", {
+        params,
+      })
+      .then((response) => response.data);
+  },
+
+  getCommission(id: number) {
+    return api
+      .get<AdminCommissionDetailDto>(`/api/v1/admin/commissions/${id}`)
+      .then((response) => response.data);
+  },
+
+  approveCommission(id: number) {
+    return api
+      .post(`/api/v1/admin/commissions/${id}/approve`)
+      .then((response) => response.data);
+  },
+
+  cancelCommission(id: number, payload: CancelAdminCommissionRequest) {
+    return api
+      .post(`/api/v1/admin/commissions/${id}/cancel`, payload)
       .then((response) => response.data);
   },
 
