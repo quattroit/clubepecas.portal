@@ -328,6 +328,17 @@ function AdminRepresentativesView() {
               <Button
                 type="button"
                 variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() =>
+                  openRepresentativePublicLink(row.representativeCode)
+                }
+              >
+                Testar Link
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
                 size="icon-sm"
                 className="size-7"
                 aria-label="Compartilhar"

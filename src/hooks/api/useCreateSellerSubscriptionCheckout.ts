@@ -48,7 +48,16 @@ export function useCreateSellerSubscriptionCheckout(
         ...urls,
       });
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result, variables) => {
+      if (variables.representativeCode?.trim()) {
+        const { ReferralService } = await import("@/services/referral.service");
+        ReferralService.clear();
+        ReferralService.trackEvent(
+          "cleared",
+          variables.representativeCode.trim().toUpperCase(),
+        );
+      }
+
       if (result.activatedWithoutCheckout) {
         await Promise.all([
           queryClient.invalidateQueries({

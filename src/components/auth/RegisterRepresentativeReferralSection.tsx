@@ -1,66 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
+import { ConfirmDialog } from "@/components/admin";
+import { useReferral } from "@/components/providers/ReferralProvider";
 import { IndicatedByRepresentativeCard } from "@/components/representatives/IndicatedByRepresentativeCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ValidateRepresentativeCodeResponse } from "@/contracts/admin/representatives";
 import { isRepresentativeActive } from "@/contracts/admin/representatives";
 import { useValidateRepresentativeCode } from "@/hooks/api/useValidateRepresentativeCode";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import {
-  clearRepresentativeReferral,
-  getRepresentativeReferral,
-  saveRepresentativeReferral,
-} from "@/utils/representativeReferral";
 
 /**
- * Exibe / edita indicação salva no LocalStorage durante o cadastro.
+ * Exibe / edita indicação via ReferralProvider durante o cadastro.
  */
 function RegisterRepresentativeReferralSection() {
+  const referral = useReferral();
   const validateMutation = useValidateRepresentativeCode();
-  const [validated, setValidated] =
-    useState<ValidateRepresentativeCodeResponse | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    if (hydrated) return;
-    const referral = getRepresentativeReferral();
-    if (!referral) {
-      setHydrated(true);
-      return;
-    }
-
-    setDraft(referral.representativeCode);
-    validateMutation.mutate(
-      { representativeCode: referral.representativeCode },
-      {
-        onSuccess: (data) => {
-          if (isRepresentativeActive(data.status)) {
-            setValidated(data);
-            setIsEditing(false);
-          } else {
-            setValidated(null);
-            setIsEditing(true);
-          }
-          setHydrated(true);
-        },
-        onError: () => {
-          clearRepresentativeReferral();
-          setValidated(null);
-          setIsEditing(false);
-          setDraft("");
-          setHydrated(true);
-        },
-      },
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot hydrate
-  }, [hydrated]);
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
   const handleValidate = () => {
     const code = draft.trim().toUpperCase();
@@ -70,27 +31,26 @@ function RegisterRepresentativeReferralSection() {
       {
         onSuccess: (data) => {
           if (!isRepresentativeActive(data.status)) {
-            setValidated(null);
             return;
           }
-          setValidated(data);
-          setDraft(data.representativeCode);
-          saveRepresentativeReferral(data.representativeCode);
-          setIsEditing(false);
+          void referral.save(data.representativeCode).then((result) => {
+            if (result.status === "blocked") {
+              setDraft(result.pendingCode);
+              return;
+            }
+            setDraft(data.representativeCode);
+            setIsEditing(false);
+          });
         },
-        onError: () => setValidated(null),
       },
     );
   };
 
   const handleChangeCode = () => {
-    clearRepresentativeReferral();
-    setValidated(null);
-    setIsEditing(true);
-    validateMutation.reset();
+    setConfirmClearOpen(true);
   };
 
-  if (!hydrated) {
+  if (!referral.isReady) {
     return (
       <div className="border-border bg-muted/30 flex items-center gap-2 rounded-xl border p-3 text-sm">
         <Loader2 className="size-4 animate-spin" />
@@ -99,20 +59,36 @@ function RegisterRepresentativeReferralSection() {
     );
   }
 
-  if (validated && !isEditing) {
+  if (referral.hasActiveReferral && !isEditing && referral.representativeCode) {
     return (
-      <div className="border-border bg-muted/30 flex flex-col gap-2 rounded-xl border p-3">
-        <p className="text-sm font-medium">Código do representante</p>
-        <IndicatedByRepresentativeCard
-          name={validated.name}
-          representativeCode={validated.representativeCode}
-          onChangeCode={handleChangeCode}
+      <>
+        <div className="border-border bg-muted/30 flex flex-col gap-2 rounded-xl border p-3">
+          <p className="text-sm font-medium">Código do representante</p>
+          <IndicatedByRepresentativeCard
+            name={referral.representativeName ?? "Representante"}
+            representativeCode={referral.representativeCode}
+            onChangeCode={handleChangeCode}
+          />
+        </div>
+        <ConfirmDialog
+          open={confirmClearOpen}
+          onOpenChange={setConfirmClearOpen}
+          title="Trocar indicação?"
+          description="A indicação atual será removida para você informar outro código."
+          confirmLabel="Trocar Indicação"
+          onConfirm={() => {
+            referral.clear();
+            setIsEditing(true);
+            setDraft("");
+            setConfirmClearOpen(false);
+            validateMutation.reset();
+          }}
         />
-      </div>
+      </>
     );
   }
 
-  if (!isEditing && !validated) {
+  if (!isEditing && !referral.hasActiveReferral) {
     return null;
   }
 
@@ -135,7 +111,6 @@ function RegisterRepresentativeReferralSection() {
             disabled={validateMutation.isPending}
             onChange={(event) => {
               setDraft(event.target.value.toUpperCase());
-              setValidated(null);
               validateMutation.reset();
             }}
           />

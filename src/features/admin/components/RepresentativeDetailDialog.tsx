@@ -161,31 +161,42 @@ function RepresentativeDetailDialog({
                   <Copy className="size-3.5" />
                   Copiar Link
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    openRepresentativePublicLink(data.representativeCode)
-                  }
-                >
-                  <ExternalLink className="size-3.5" />
-                  Abrir Link
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    void shareRepresentativePublicLink(
-                      data.representativeCode,
-                      data.name,
-                    )
-                  }
-                >
-                  <Share2 className="size-3.5" />
-                  Compartilhar
-                </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      openRepresentativePublicLink(data.representativeCode)
+                    }
+                  >
+                    <ExternalLink className="size-3.5" />
+                    Abrir Link
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      openRepresentativePublicLink(data.representativeCode)
+                    }
+                  >
+                    <ExternalLink className="size-3.5" />
+                    Testar Link
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      void shareRepresentativePublicLink(
+                        data.representativeCode,
+                        data.name,
+                      )
+                    }
+                  >
+                    <Share2 className="size-3.5" />
+                    Compartilhar
+                  </Button>
                 <Button
                   type="button"
                   variant="outline"

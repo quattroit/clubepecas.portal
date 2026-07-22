@@ -1,5 +1,6 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { PublicReferralSlot } from "@/components/representatives/PublicReferralSlot";
 
 type PublicLayoutProps = {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ function PublicLayout({ children }: PublicLayoutProps) {
         id="conteudo-principal"
         className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6 sm:py-14"
       >
+        <PublicReferralSlot />
         {children}
       </main>
       <Footer />

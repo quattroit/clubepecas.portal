@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { AuthQuerySync } from "@/components/providers/AuthQuerySync";
 import { ErrorBoundary } from "@/components/providers/ErrorBoundary";
+import { ReferralProvider } from "@/components/providers/ReferralProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { makeQueryClient } from "@/lib/query-client";
@@ -24,11 +25,13 @@ function Providers({ children }: ProvidersProps) {
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AuthQuerySync />
-          <ErrorBoundary>
-            {children}
-            <Toaster position="top-right" richColors closeButton />
-          </ErrorBoundary>
+          <ReferralProvider>
+            <AuthQuerySync />
+            <ErrorBoundary>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+            </ErrorBoundary>
+          </ReferralProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

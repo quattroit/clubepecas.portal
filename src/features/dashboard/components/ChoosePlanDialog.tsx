@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 import { IndicatedByRepresentativeCard } from "@/components/representatives/IndicatedByRepresentativeCard";
+import { useReferral } from "@/components/providers/ReferralProvider";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -37,11 +38,6 @@ import {
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { hasCompleteSellerAddress } from "@/utils/sellerAddress";
-import {
-  clearRepresentativeReferral,
-  getRepresentativeReferral,
-  saveRepresentativeReferral,
-} from "@/utils/representativeReferral";
 
 type ChoosePlanDialogProps = {
   open: boolean;
@@ -50,6 +46,7 @@ type ChoosePlanDialogProps = {
 
 function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   const sellerQuery = useSeller();
+  const referral = useReferral();
   const plansQuery = useActiveSubscriptionPlans(open);
   const checkoutMutation = useCreateSellerSubscriptionCheckout({
     onActivatedWithoutCheckout: () => {
@@ -101,40 +98,55 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   }
 
   useEffect(() => {
-    if (!open || alreadyLinked || referralHydrated) return;
+    if (!open || alreadyLinked || referralHydrated || !referral.isReady) return;
 
-    const referral = getRepresentativeReferral();
-    if (!referral) {
+    if (
+      referral.hasActiveReferral &&
+      referral.representativeCode &&
+      referral.representativeName
+    ) {
+      setRepresentativeCodeDraft(referral.representativeCode);
+      setValidatedRepresentative({
+        name: referral.representativeName,
+        representativeCode: referral.representativeCode,
+        status: referral.status ?? "Active",
+        statusLabel: referral.statusLabel ?? "Ativo",
+      });
+      setIsEditingCode(false);
       setReferralHydrated(true);
       return;
     }
 
-    setRepresentativeCodeDraft(referral.representativeCode);
-    validateMutation.mutate(
-      { representativeCode: referral.representativeCode },
-      {
-        onSuccess: (data) => {
-          if (!isRepresentativeActive(data.status)) {
+    if (referral.hasActiveReferral && referral.representativeCode) {
+      setRepresentativeCodeDraft(referral.representativeCode);
+      validateMutation.mutate(
+        { representativeCode: referral.representativeCode },
+        {
+          onSuccess: (data) => {
+            if (!isRepresentativeActive(data.status)) {
+              setValidatedRepresentative(null);
+              setIsEditingCode(true);
+            } else {
+              setValidatedRepresentative(data);
+              setRepresentativeCodeDraft(data.representativeCode);
+              setIsEditingCode(false);
+            }
+            setReferralHydrated(true);
+          },
+          onError: () => {
+            referral.clear({ silent: true });
             setValidatedRepresentative(null);
             setIsEditingCode(true);
-          } else {
-            setValidatedRepresentative(data);
-            setRepresentativeCodeDraft(data.representativeCode);
-            setIsEditingCode(false);
-          }
-          setReferralHydrated(true);
+            setReferralHydrated(true);
+          },
         },
-        onError: () => {
-          clearRepresentativeReferral();
-          setValidatedRepresentative(null);
-          setIsEditingCode(true);
-          setReferralHydrated(true);
-        },
-      },
-    );
-    // hydrate once per dialog open
+      );
+      return;
+    }
+
+    setReferralHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional one-shot
-  }, [open, alreadyLinked, referralHydrated]);
+  }, [open, alreadyLinked, referralHydrated, referral.isReady]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && checkoutMutation.isPending) {
@@ -164,10 +176,15 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
             setValidatedRepresentative(null);
             return;
           }
-          setValidatedRepresentative(data);
-          setRepresentativeCodeDraft(data.representativeCode);
-          saveRepresentativeReferral(data.representativeCode);
-          setIsEditingCode(false);
+          void referral.save(data.representativeCode).then((result) => {
+            if (result.status === "blocked") {
+              setRepresentativeCodeDraft(result.pendingCode);
+              return;
+            }
+            setValidatedRepresentative(data);
+            setRepresentativeCodeDraft(data.representativeCode);
+            setIsEditingCode(false);
+          });
         },
         onError: () => setValidatedRepresentative(null),
       },
@@ -175,7 +192,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   };
 
   const handleChangeCode = () => {
-    clearRepresentativeReferral();
+    referral.clear();
     setValidatedRepresentative(null);
     setIsEditingCode(true);
     validateMutation.reset();
