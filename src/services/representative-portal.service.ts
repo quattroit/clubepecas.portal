@@ -4,6 +4,9 @@ import type {
   RepresentativeCommissionsListResponse,
   RepresentativeDashboardResponse,
   RepresentativeMeDto,
+  RepresentativePayoutDetailDto,
+  RepresentativePayoutsListParams,
+  RepresentativePayoutsListResponse,
   RepresentativeReferralLinkResponse,
   RepresentativeSellerDetailDto,
   RepresentativeSellersListParams,
@@ -88,6 +91,24 @@ export const representativePortalService = {
     return api
       .get<RepresentativeReferralLinkResponse>(
         "/api/v1/representative/referral-link",
+      )
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/representative/payouts (Sprint 10.7) */
+  listPayouts(params: RepresentativePayoutsListParams = {}) {
+    return api
+      .get<RepresentativePayoutsListResponse>(
+        "/api/v1/representative/payouts",
+        { params },
+      )
+      .then((response) => response.data);
+  },
+
+  getPayout(id: number) {
+    return api
+      .get<RepresentativePayoutDetailDto>(
+        `/api/v1/representative/payouts/${id}`,
       )
       .then((response) => response.data);
   },

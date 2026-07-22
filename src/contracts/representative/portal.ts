@@ -1,6 +1,9 @@
 import type { CommissionStatus, CommissionType } from "@/contracts/admin/commissions";
+import type {
+  AdminPayoutCommissionItemDto,
+} from "@/contracts/admin/payouts";
 import type { RepresentativeStatus } from "@/contracts/admin/representatives";
-import type { PersonType } from "@/contracts/common/enums";
+import type { PersonType, PayoutPaymentMethod, PayoutStatus } from "@/contracts/common/enums";
 
 export type { CommissionStatus, CommissionType, RepresentativeStatus };
 
@@ -105,6 +108,16 @@ export type RepresentativeDashboardResponse = {
   latestCommissions: RepresentativeDashboardCommissionItemDto[];
   latestSellers: RepresentativeDashboardSellerItemDto[];
   monthlySummary: RepresentativeDashboardMonthlySummaryItemDto[];
+  /** Valor estimado do próximo pagamento (comissões aprovadas ainda não pagas). Sprint 10.7. */
+  nextPayoutAmount: number;
+  /** Total já recebido em pagamentos liquidados (Sprint 10.7). */
+  totalReceivedFromPayouts: number;
+  /** Quantidade de pagamentos com status Pago (Sprint 10.7). */
+  paidPayoutsCount: number;
+  /** Data do último pagamento recebido, ou null se nenhum (Sprint 10.7). */
+  lastPayoutAt: string | null;
+  /** Valor líquido do último pagamento recebido (Sprint 10.7). */
+  lastPayoutAmount: number | null;
 };
 
 /** GET /api/v1/representative/sellers */
@@ -257,4 +270,44 @@ export type RepresentativeReferralLinkResponse = {
   /** Caminho relativo — o front-end monta a URL completa com o domínio atual. */
   publicPath: string;
   name: string;
+};
+
+/** GET /api/v1/representative/payouts (Sprint 10.7) */
+export type RepresentativePayoutsListParams = {
+  page?: number;
+  pageSize?: number;
+};
+
+export type RepresentativePayoutListItemDto = {
+  id: number;
+  referenceStart: string;
+  referenceEnd: string;
+  grossAmount: number;
+  discountAmount: number;
+  netAmount: number;
+  currency: string;
+  paymentMethod: PayoutPaymentMethod;
+  paymentMethodLabel: string;
+  status: PayoutStatus;
+  statusLabel: string;
+  paidAt: string | null;
+  createdAt: string;
+  itemCount: number;
+};
+
+export type RepresentativePayoutsListResponse = {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  items: RepresentativePayoutListItemDto[];
+};
+
+/** GET /api/v1/representative/payouts/{id} */
+export type RepresentativePayoutDetailDto = RepresentativePayoutListItemDto & {
+  notes: string | null;
+  transactionReference: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+  commissions: AdminPayoutCommissionItemDto[];
 };

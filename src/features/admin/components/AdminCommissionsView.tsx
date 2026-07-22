@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, Wallet } from "lucide-react";
+import { Eye, HandCoins, Wallet } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   AdminEmptyState,
@@ -45,6 +46,7 @@ import {
   useAdminCommission,
   useAdminCommissions,
 } from "@/hooks/api/useAdminCommissions";
+import { useCreateAdminPayout } from "@/hooks/api/useAdminPayoutActions";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -62,6 +64,16 @@ function statusBadgeVariant(
   if (isCommissionStatus(status, "Paid")) return "default";
   if (isCommissionStatus(status, "Cancelled")) return "destructive";
   return "secondary";
+}
+
+/** Apenas comissões Pendentes ou Aprovadas podem compor um novo pagamento. */
+function isCommissionSelectableForPayout(
+  status: AdminCommissionListItemDto["commissionStatus"],
+): boolean {
+  return (
+    isCommissionStatus(status, "Pending") ||
+    isCommissionStatus(status, "Approved")
+  );
 }
 
 function AdminCommissionsView() {
@@ -95,13 +107,79 @@ function AdminCommissionsView() {
   const listQuery = useAdminCommissions(params);
   const approveMutation = useApproveAdminCommission();
   const cancelMutation = useCancelAdminCommission();
+  const createPayoutMutation = useCreateAdminPayout();
 
   const [viewId, setViewId] = useState<number | null>(null);
   const [approveId, setApproveId] = useState<number | null>(null);
   const [cancelId, setCancelId] = useState<number | null>(null);
   const [cancelReason, setCancelReason] = useState("");
 
+  const [selected, setSelected] = useState<
+    Map<number, AdminCommissionListItemDto>
+  >(new Map());
+  const [createPayoutOpen, setCreatePayoutOpen] = useState(false);
+  const [payoutDiscount, setPayoutDiscount] = useState("");
+  const [payoutNotes, setPayoutNotes] = useState("");
+
   const detailQuery = useAdminCommission(viewId ?? 0, viewId != null);
+
+  const selectedList = useMemo(() => Array.from(selected.values()), [selected]);
+  const selectedTotal = useMemo(
+    () => selectedList.reduce((sum, row) => sum + row.commissionAmount, 0),
+    [selectedList],
+  );
+  const selectedRepresentativeName = selectedList[0]?.representativeName ?? "";
+
+  const toggleCommissionSelection = (row: AdminCommissionListItemDto) => {
+    setSelected((prev) => {
+      const next = new Map(prev);
+      if (next.has(row.id)) {
+        next.delete(row.id);
+        return next;
+      }
+      const [firstSelected] = next.values();
+      if (firstSelected && firstSelected.representativeId !== row.representativeId) {
+        toast.warning(
+          "Selecione comissões de apenas um representante por pagamento.",
+        );
+        return prev;
+      }
+      next.set(row.id, row);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelected(new Map());
+
+  const openCreatePayout = () => {
+    setPayoutDiscount("");
+    setPayoutNotes("");
+    setCreatePayoutOpen(true);
+  };
+
+  const handleCreatePayout = () => {
+    if (selectedList.length === 0) return;
+    const discountAmount = payoutDiscount.trim()
+      ? Number(payoutDiscount.replace(",", "."))
+      : undefined;
+    createPayoutMutation.mutate(
+      {
+        commissionIds: selectedList.map((row) => row.id),
+        discountAmount:
+          discountAmount != null && !Number.isNaN(discountAmount)
+            ? discountAmount
+            : undefined,
+        notes: payoutNotes.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setCreatePayoutOpen(false);
+          clearSelection();
+          router.push(ROUTES.ADMIN_PAYOUTS);
+        },
+      },
+    );
+  };
 
   const patch = (next: Record<string, string | undefined>) => {
     const sp = new URLSearchParams(searchParams.toString());
@@ -119,6 +197,24 @@ function AdminCommissionsView() {
   const totalPages = Math.max(1, listQuery.data?.totalPages ?? 1);
 
   const columns: AdminTableColumn<AdminCommissionListItemDto>[] = [
+    {
+      id: "select",
+      header: "",
+      headerClassName: "w-10",
+      cell: (row) => {
+        const selectable = isCommissionSelectableForPayout(row.commissionStatus);
+        return (
+          <input
+            type="checkbox"
+            className="size-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+            checked={selected.has(row.id)}
+            disabled={!selectable}
+            aria-label={`Selecionar comissão #${row.id} para pagamento`}
+            onChange={() => toggleCommissionSelection(row)}
+          />
+        );
+      },
+    },
     {
       id: "representative",
       header: "Representante",
@@ -330,6 +426,39 @@ function AdminCommissionsView() {
         }
       />
 
+      {selectedList.length > 0 ? (
+        <div className="border-primary/30 bg-primary/5 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 shadow-xs">
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <span>
+              <strong>{selectedList.length}</strong>{" "}
+              {selectedList.length === 1
+                ? "comissão selecionada"
+                : "comissões selecionadas"}
+            </span>
+            <span>
+              Total: <strong>{formatCurrency(selectedTotal)}</strong>
+            </span>
+            <span>
+              Representante: <strong>{selectedRepresentativeName}</strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
+              Limpar seleção
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={openCreatePayout}
+            >
+              <HandCoins className="size-3.5" />
+              Criar Pagamento
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <AdminSection title="Listagem">
         {listQuery.isError ? (
           <AdminEmptyState
@@ -501,6 +630,59 @@ function AdminCommissionsView() {
               }}
             >
               Cancelar comissão
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={createPayoutOpen}
+        onOpenChange={(open) => {
+          if (!open) setCreatePayoutOpen(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Criar pagamento</DialogTitle>
+            <DialogDescription>
+              {selectedList.length} comissão
+              {selectedList.length === 1 ? "" : "ões"} de{" "}
+              {selectedRepresentativeName} — total de{" "}
+              {formatCurrency(selectedTotal)}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="payout-discount">Desconto (opcional)</Label>
+              <Input
+                id="payout-discount"
+                inputMode="decimal"
+                placeholder="0,00"
+                value={payoutDiscount}
+                onChange={(event) => setPayoutDiscount(event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="payout-notes">Observações (opcional)</Label>
+              <Textarea
+                id="payout-notes"
+                value={payoutNotes}
+                onChange={(event) => setPayoutNotes(event.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose render={<Button type="button" variant="outline" />}>
+              Voltar
+            </DialogClose>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={selectedList.length === 0 || createPayoutMutation.isPending}
+              onClick={handleCreatePayout}
+            >
+              Criar pagamento
             </Button>
           </DialogFooter>
         </DialogContent>

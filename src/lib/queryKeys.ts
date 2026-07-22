@@ -140,6 +140,12 @@ export const queryKeys = {
       list: (params: Record<string, unknown>) =>
         ["admin", "payments", "list", params] as const,
     },
+    payouts: {
+      all: ["admin", "payouts"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "payouts", "list", params] as const,
+      detail: (id: number) => ["admin", "payouts", "detail", id] as const,
+    },
     financial: {
       dashboard: ["admin", "financial", "dashboard"] as const,
     },
@@ -170,5 +176,12 @@ export const queryKeys = {
     },
     statement: ["representative", "statement"] as const,
     referralLink: ["representative", "referralLink"] as const,
+    payouts: {
+      all: ["representative", "payouts"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["representative", "payouts", "list", params] as const,
+      detail: (id: number) =>
+        ["representative", "payouts", "detail", id] as const,
+    },
   },
 } as const;

@@ -108,3 +108,20 @@ export enum BillingCycle {
   Quarterly = 2,
   Yearly = 3,
 }
+
+/** Status do pagamento de comissões a representantes (Sprint 10.7). */
+export enum PayoutStatus {
+  Pending = 1,
+  Paid = 2,
+  Cancelled = 3,
+}
+
+/**
+ * Meio de pagamento usado para liquidar comissões de representantes (Sprint 10.7).
+ * Não confundir com `PaymentMethod` (pagamentos de vendedores).
+ */
+export enum PayoutPaymentMethod {
+  Manual = 1,
+  Pix = 2,
+  BankTransfer = 3,
+}

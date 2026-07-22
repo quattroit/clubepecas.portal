@@ -48,6 +48,14 @@ import type {
   CancelAdminCommissionRequest,
 } from "@/contracts/admin/commissions";
 import type {
+  AdminPayoutDetailDto,
+  AdminPayoutsListParams,
+  AdminPayoutsListResponse,
+  CancelAdminPayoutRequest,
+  CreateAdminPayoutRequest,
+  PayAdminPayoutRequest,
+} from "@/contracts/admin/payouts";
+import type {
   AdminVehicleBrandsListParams,
   CreateAdminVehicleBrandRequest,
   GetAdminVehicleBrandsResponse,
@@ -322,6 +330,40 @@ export const adminService = {
   cancelCommission(id: number, payload: CancelAdminCommissionRequest) {
     return api
       .post(`/api/v1/admin/commissions/${id}/cancel`, payload)
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/admin/payouts (Sprint 10.7) */
+  listPayouts(params: AdminPayoutsListParams = {}) {
+    return api
+      .get<AdminPayoutsListResponse>("/api/v1/admin/payouts", { params })
+      .then((response) => response.data);
+  },
+
+  getPayout(id: number) {
+    return api
+      .get<AdminPayoutDetailDto>(`/api/v1/admin/payouts/${id}`)
+      .then((response) => response.data);
+  },
+
+  createPayout(payload: CreateAdminPayoutRequest) {
+    return api
+      .post<AdminPayoutDetailDto>("/api/v1/admin/payouts", payload)
+      .then((response) => response.data);
+  },
+
+  payPayout(id: number, payload: PayAdminPayoutRequest = {}) {
+    return api
+      .post<AdminPayoutDetailDto>(`/api/v1/admin/payouts/${id}/pay`, payload)
+      .then((response) => response.data);
+  },
+
+  cancelPayout(id: number, payload: CancelAdminPayoutRequest = {}) {
+    return api
+      .post<AdminPayoutDetailDto>(
+        `/api/v1/admin/payouts/${id}/cancel`,
+        payload,
+      )
       .then((response) => response.data);
   },
 

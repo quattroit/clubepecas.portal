@@ -9,6 +9,7 @@ import {
   CreditCard,
   FolderTree,
   FolderOpen,
+  HandCoins,
   LayoutDashboard,
   LineChart,
   MapPin,
@@ -73,6 +74,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_COMMISSIONS,
     label: "Comissões",
     icon: Wallet,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_PAYOUTS,
+    label: "Pagamentos de comissões",
+    icon: HandCoins,
     exact: false,
   },
   {

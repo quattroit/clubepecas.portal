@@ -2,7 +2,9 @@
 
 import {
   BarChart3,
+  CalendarCheck,
   DollarSign,
+  HandCoins,
   Percent,
   Store,
   Users,
@@ -154,6 +156,54 @@ function RepresentativeDashboardView() {
               <AdminMetricCard
                 title="Paga"
                 value={formatCurrency(data?.totalPaidCommission ?? 0)}
+              />
+            </>
+          )}
+        </AdminStatsGrid>
+      </AdminSection>
+
+      <AdminSection
+        title="Pagamentos"
+        description="Liquidações financeiras das suas comissões aprovadas."
+      >
+        <AdminStatsGrid aria-label="Resumo de pagamentos">
+          {dashboardQuery.isLoading ? (
+            <>
+              <AdminMetricCardSkeleton />
+              <AdminMetricCardSkeleton />
+              <AdminMetricCardSkeleton />
+              <AdminMetricCardSkeleton />
+            </>
+          ) : (
+            <>
+              <AdminMetricCard
+                title="Próximo pagamento"
+                value={formatCurrency(data?.nextPayoutAmount ?? 0)}
+                description="Comissões aprovadas aguardando pagamento"
+                icon={<HandCoins aria-hidden />}
+              />
+              <AdminMetricCard
+                title="Total recebido"
+                value={formatCurrency(data?.totalReceivedFromPayouts ?? 0)}
+                icon={<Wallet aria-hidden />}
+              />
+              <AdminMetricCard
+                title="Pagamentos realizados"
+                value={formatMetricCount(data?.paidPayoutsCount ?? 0)}
+                icon={<CalendarCheck aria-hidden />}
+              />
+              <AdminMetricCard
+                title="Último pagamento"
+                value={
+                  data?.lastPayoutAmount != null
+                    ? formatCurrency(data.lastPayoutAmount)
+                    : "—"
+                }
+                description={
+                  data?.lastPayoutAt
+                    ? `Recebido em ${formatDate(data.lastPayoutAt)}`
+                    : "Nenhum pagamento recebido ainda"
+                }
               />
             </>
           )}

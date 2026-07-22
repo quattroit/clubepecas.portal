@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  HandCoins,
   LayoutDashboard,
   Link2,
   Receipt,
@@ -40,6 +41,12 @@ export const REPRESENTATIVE_NAV_ITEMS: RepresentativeNavItem[] = [
     href: ROUTES.REPRESENTATIVE_COMMISSIONS,
     label: "Comissões",
     icon: Receipt,
+    exact: false,
+  },
+  {
+    href: ROUTES.REPRESENTATIVE_PAYOUTS,
+    label: "Pagamentos",
+    icon: HandCoins,
     exact: false,
   },
   {
