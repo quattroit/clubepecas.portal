@@ -41,6 +41,15 @@ export const ROUTES = {
   ADMIN_FILES: "/admin/arquivos",
   ADMIN_AUDIT: "/admin/auditoria",
   ADMIN_SETTINGS: "/admin/configuracoes",
+  REPRESENTATIVE: "/representante",
+  REPRESENTATIVE_LOGIN: "/representante/login",
+  REPRESENTATIVE_FORGOT_PASSWORD: "/representante/esqueci-senha",
+  REPRESENTATIVE_RESET_PASSWORD: "/representante/reset-password",
+  REPRESENTATIVE_PROFILE: "/representante/perfil",
+  REPRESENTATIVE_LINK: "/representante/link",
+  REPRESENTATIVE_SELLERS: "/representante/vendedores",
+  REPRESENTATIVE_COMMISSIONS: "/representante/comissoes",
+  REPRESENTATIVE_STATEMENT: "/representante/extrato",
 } as const;
 
 /** Helper para rota pública de detalhe do anúncio (slug) */
@@ -85,6 +94,11 @@ export function categoryPath(slug: string) {
 /** Helper para link público de indicação do representante */
 export function representativeReferralPath(code: string) {
   return `${ROUTES.REFERRAL}/${encodeURIComponent(code.trim().toUpperCase())}` as const;
+}
+
+/** Helper para detalhe de vendedor no portal do representante */
+export function representativeSellerPath(id: number) {
+  return `${ROUTES.REPRESENTATIVE_SELLERS}/${id}` as const;
 }
 
 /** Páginas acessíveis sem autenticação (área pública). */
@@ -138,8 +152,29 @@ export const ADMIN_ROUTES = {
   ADMIN_SETTINGS: ROUTES.ADMIN_SETTINGS,
 } as const;
 
+/** Páginas de autenticação do portal do representante. */
+export const REPRESENTATIVE_AUTH_ROUTES = {
+  LOGIN: ROUTES.REPRESENTATIVE_LOGIN,
+  FORGOT_PASSWORD: ROUTES.REPRESENTATIVE_FORGOT_PASSWORD,
+  RESET_PASSWORD: ROUTES.REPRESENTATIVE_RESET_PASSWORD,
+} as const;
+
+/** Páginas do portal do representante (protegidas por RepresentativeAuthGuard). */
+export const REPRESENTATIVE_ROUTES = {
+  REPRESENTATIVE: ROUTES.REPRESENTATIVE,
+  REPRESENTATIVE_PROFILE: ROUTES.REPRESENTATIVE_PROFILE,
+  REPRESENTATIVE_LINK: ROUTES.REPRESENTATIVE_LINK,
+  REPRESENTATIVE_SELLERS: ROUTES.REPRESENTATIVE_SELLERS,
+  REPRESENTATIVE_COMMISSIONS: ROUTES.REPRESENTATIVE_COMMISSIONS,
+  REPRESENTATIVE_STATEMENT: ROUTES.REPRESENTATIVE_STATEMENT,
+} as const;
+
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
 export type PublicRoute = (typeof PUBLIC_ROUTES)[keyof typeof PUBLIC_ROUTES];
 export type AuthRoute = (typeof AUTH_ROUTES)[keyof typeof AUTH_ROUTES];
 export type PrivateRoute = (typeof PRIVATE_ROUTES)[keyof typeof PRIVATE_ROUTES];
 export type AdminRoute = (typeof ADMIN_ROUTES)[keyof typeof ADMIN_ROUTES];
+export type RepresentativeAuthRoute =
+  (typeof REPRESENTATIVE_AUTH_ROUTES)[keyof typeof REPRESENTATIVE_AUTH_ROUTES];
+export type RepresentativeRoute =
+  (typeof REPRESENTATIVE_ROUTES)[keyof typeof REPRESENTATIVE_ROUTES];

@@ -95,6 +95,8 @@ export type CreateAdminRepresentativeRequest = {
   city: string;
   state: string;
   status?: number;
+  /** Senha inicial opcional para acesso ao portal do representante. */
+  password?: string | null;
 };
 
 export type UpdateAdminRepresentativeRequest = {

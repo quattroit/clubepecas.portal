@@ -4,12 +4,19 @@ import { toast } from "sonner";
 import { ROUTES } from "@/constants/routes";
 import { buildLoginPathWithNext } from "@/lib/announce-flow";
 import { clearAuthSession, getAccessToken } from "@/lib/auth/storage";
+import {
+  clearRepresentativeAuthSession,
+  getRepresentativeAccessToken,
+} from "@/lib/auth/representative-storage";
 import { mapAxiosError, UnauthorizedError, isCanceledError } from "@/lib/errors";
 
 /**
  * Cliente HTTP centralizado.
  * Anexa JWT quando disponível.
  * Em 401 autenticado: limpa sessão e redireciona para login.
+ *
+ * Sessão do representante (Sprint 10.6) é separada da sessão de
+ * vendedor/admin — token e fluxo de expiração escolhidos pela rota atual.
  */
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -19,9 +26,32 @@ export const api = axios.create({
   },
 });
 
+/** `/representante` e subrotas usam a sessão própria do representante. */
+function isRepresentativePathname(pathname: string): boolean {
+  return (
+    pathname === ROUTES.REPRESENTATIVE ||
+    pathname.startsWith(`${ROUTES.REPRESENTATIVE}/`)
+  );
+}
+
+function isRepresentativeAuthPathname(pathname: string): boolean {
+  return (
+    pathname.startsWith(ROUTES.REPRESENTATIVE_LOGIN) ||
+    pathname.startsWith(ROUTES.REPRESENTATIVE_FORGOT_PASSWORD) ||
+    pathname.startsWith(ROUTES.REPRESENTATIVE_RESET_PASSWORD)
+  );
+}
+
 api.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
+    const useRepresentativeSession =
+      typeof window !== "undefined" &&
+      isRepresentativePathname(window.location.pathname);
+
+    const token = useRepresentativeSession
+      ? getRepresentativeAccessToken()
+      : getAccessToken();
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -46,24 +76,42 @@ api.interceptors.response.use(
     }
 
     const mapped = mapAxiosError(error);
-    const hadToken = Boolean(getAccessToken());
 
-    if (mapped instanceof UnauthorizedError && hadToken) {
-      clearAuthSession();
+    if (mapped instanceof UnauthorizedError && typeof window !== "undefined") {
+      const path = window.location.pathname;
 
-      if (typeof window !== "undefined") {
-        toast.error("Sua sessão expirou. Faça login novamente.");
-        const path = window.location.pathname;
-        const isAuthPage =
-          path.startsWith(ROUTES.LOGIN) ||
-          path.startsWith(ROUTES.LOGIN_ADMIN) ||
-          path.startsWith(ROUTES.REGISTER) ||
-          path.startsWith(ROUTES.FORGOT_PASSWORD) ||
-          path.startsWith(ROUTES.RESET_PASSWORD);
+      if (isRepresentativePathname(path)) {
+        const hadToken = Boolean(getRepresentativeAccessToken());
 
-        if (!isAuthPage) {
-          const currentPath = `${path}${window.location.search}`;
-          window.location.assign(buildLoginPathWithNext(currentPath));
+        if (hadToken) {
+          clearRepresentativeAuthSession();
+          toast.error("Sua sessão expirou. Faça login novamente.");
+
+          if (!isRepresentativeAuthPathname(path)) {
+            const currentPath = `${path}${window.location.search}`;
+            window.location.assign(
+              `${ROUTES.REPRESENTATIVE_LOGIN}?next=${encodeURIComponent(currentPath)}`,
+            );
+          }
+        }
+      } else {
+        const hadToken = Boolean(getAccessToken());
+
+        if (hadToken) {
+          clearAuthSession();
+          toast.error("Sua sessão expirou. Faça login novamente.");
+
+          const isAuthPage =
+            path.startsWith(ROUTES.LOGIN) ||
+            path.startsWith(ROUTES.LOGIN_ADMIN) ||
+            path.startsWith(ROUTES.REGISTER) ||
+            path.startsWith(ROUTES.FORGOT_PASSWORD) ||
+            path.startsWith(ROUTES.RESET_PASSWORD);
+
+          if (!isAuthPage) {
+            const currentPath = `${path}${window.location.search}`;
+            window.location.assign(buildLoginPathWithNext(currentPath));
+          }
         }
       }
     }

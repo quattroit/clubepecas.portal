@@ -105,6 +105,7 @@ function mapDetailToForm(
     city: detail.city,
     state: detail.state,
     status: isRepresentativeActive(detail.status) ? "active" : "inactive",
+    password: "",
   };
 }
 
@@ -217,6 +218,7 @@ function AdminRepresentativesView() {
         {
           ...payload,
           document: onlyDigits(values.document),
+          password: values.password.trim() || null,
         },
         { onSuccess: () => setFormOpen(false) },
       );

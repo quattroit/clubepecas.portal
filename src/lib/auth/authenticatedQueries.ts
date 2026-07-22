@@ -25,3 +25,19 @@ export function removeAuthenticatedQueries(queryClient: QueryClient): void {
   queryClient.removeQueries({ queryKey: queryKeys.auth.me });
   queryClient.removeQueries({ queryKey: queryKeys.admin.all });
 }
+
+/**
+ * Sessão do representante é independente — invalidação/limpeza própria
+ * evita misturar cache com vendedor/admin (Sprint 10.6).
+ */
+export async function invalidateRepresentativeAuthenticatedQueries(
+  queryClient: QueryClient,
+): Promise<void> {
+  await queryClient.invalidateQueries({ queryKey: queryKeys.representative.all });
+}
+
+export function removeRepresentativeAuthenticatedQueries(
+  queryClient: QueryClient,
+): void {
+  queryClient.removeQueries({ queryKey: queryKeys.representative.all });
+}

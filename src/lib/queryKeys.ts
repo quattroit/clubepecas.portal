@@ -153,4 +153,22 @@ export const queryKeys = {
     },
     settings: ["admin", "settings"] as const,
   },
+  representative: {
+    all: ["representative"] as const,
+    me: ["representative", "me"] as const,
+    dashboard: ["representative", "dashboard"] as const,
+    sellers: {
+      list: (params: Record<string, unknown>) =>
+        ["representative", "sellers", "list", params] as const,
+      detail: (id: number) => ["representative", "sellers", "detail", id] as const,
+    },
+    commissions: {
+      list: (params: Record<string, unknown>) =>
+        ["representative", "commissions", "list", params] as const,
+      detail: (id: number) =>
+        ["representative", "commissions", "detail", id] as const,
+    },
+    statement: ["representative", "statement"] as const,
+    referralLink: ["representative", "referralLink"] as const,
+  },
 } as const;

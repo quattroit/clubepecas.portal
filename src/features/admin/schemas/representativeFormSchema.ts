@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { PASSWORD_DIGIT_REGEX, PASSWORD_LETTER_REGEX, PASSWORD_MIN_LENGTH } from "@/lib/auth/passwordPolicy";
 import { isValidCpf, onlyDigits } from "@/utils/document";
 import { isValidPostalCode } from "@/utils/postalCode";
 import { BRAZILIAN_STATES } from "@/utils/brazilianStates";
@@ -43,6 +44,18 @@ export const representativeFormSchema = z.object({
       "Informe uma UF válida",
     ),
   status: z.enum(["active", "inactive"]),
+  /** Somente na criação — opcional. Habilita login imediato no portal. */
+  password: z
+    .string()
+    .refine((value) => value.length === 0 || value.length >= PASSWORD_MIN_LENGTH, {
+      message: "A senha deve possuir pelo menos 8 caracteres",
+    })
+    .refine((value) => value.length === 0 || PASSWORD_LETTER_REGEX.test(value), {
+      message: "A senha deve conter pelo menos uma letra",
+    })
+    .refine((value) => value.length === 0 || PASSWORD_DIGIT_REGEX.test(value), {
+      message: "A senha deve conter pelo menos um número",
+    }),
 });
 
 export type RepresentativeFormValues = z.infer<typeof representativeFormSchema>;
@@ -60,4 +73,5 @@ export const representativeFormDefaultValues: RepresentativeFormValues = {
   city: "",
   state: "",
   status: "active",
+  password: "",
 };

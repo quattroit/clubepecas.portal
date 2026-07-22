@@ -18,6 +18,7 @@ import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   representativeFormDefaultValues,
   representativeFormSchema,
@@ -242,6 +243,29 @@ function RepresentativeFormDialog({
                   </p>
                 ) : null}
               </div>
+
+              {mode === "create" ? (
+                <div className="flex flex-col gap-2 sm:col-span-2">
+                  <Label htmlFor="rep-password">Senha inicial (opcional)</Label>
+                  <PasswordInput
+                    id="rep-password"
+                    autoComplete="new-password"
+                    disabled={isSubmitting}
+                    aria-invalid={Boolean(errors.password)}
+                    {...register("password")}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    Se informada, o representante já poderá acessar o portal
+                    com esta senha. Deixe em branco para definir depois via
+                    &quot;Esqueci minha senha&quot;.
+                  </p>
+                  {errors.password ? (
+                    <p className="text-destructive text-xs">
+                      {errors.password.message}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </section>
 
