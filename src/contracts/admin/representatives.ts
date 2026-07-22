@@ -128,3 +128,6 @@ export type ValidateRepresentativeCodeResponse = {
   status: RepresentativeStatus;
   statusLabel: string;
 };
+
+/** GET /api/v1/representatives/{code} — dados públicos (link de indicação) */
+export type PublicRepresentativeResponse = ValidateRepresentativeCodeResponse;

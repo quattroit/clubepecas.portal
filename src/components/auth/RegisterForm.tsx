@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
+import { RegisterRepresentativeReferralSection } from "@/components/auth/RegisterRepresentativeReferralSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -109,6 +110,8 @@ function RegisterForm() {
           message={getFriendlyErrorMessage(registerMutation.error)}
         />
       ) : null}
+
+      <RegisterRepresentativeReferralSection />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">

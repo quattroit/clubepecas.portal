@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
+import { IndicatedByRepresentativeCard } from "@/components/representatives/IndicatedByRepresentativeCard";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -36,6 +37,11 @@ import {
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { hasCompleteSellerAddress } from "@/utils/sellerAddress";
+import {
+  clearRepresentativeReferral,
+  getRepresentativeReferral,
+  saveRepresentativeReferral,
+} from "@/utils/representativeReferral";
 
 type ChoosePlanDialogProps = {
   open: boolean;
@@ -61,6 +67,8 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   const [representativeCodeDraft, setRepresentativeCodeDraft] = useState("");
   const [validatedRepresentative, setValidatedRepresentative] =
     useState<ValidateRepresentativeCodeResponse | null>(null);
+  const [isEditingCode, setIsEditingCode] = useState(false);
+  const [referralHydrated, setReferralHydrated] = useState(false);
 
   const seller = sellerQuery.data ?? null;
   const addressComplete = hasCompleteSellerAddress(seller);
@@ -86,9 +94,47 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
     setSelectedCycle(null);
     setRepresentativeCodeDraft("");
     setValidatedRepresentative(null);
+    setIsEditingCode(false);
+    setReferralHydrated(false);
     validateMutation.reset();
     checkoutMutation.reset();
   }
+
+  useEffect(() => {
+    if (!open || alreadyLinked || referralHydrated) return;
+
+    const referral = getRepresentativeReferral();
+    if (!referral) {
+      setReferralHydrated(true);
+      return;
+    }
+
+    setRepresentativeCodeDraft(referral.representativeCode);
+    validateMutation.mutate(
+      { representativeCode: referral.representativeCode },
+      {
+        onSuccess: (data) => {
+          if (!isRepresentativeActive(data.status)) {
+            setValidatedRepresentative(null);
+            setIsEditingCode(true);
+          } else {
+            setValidatedRepresentative(data);
+            setRepresentativeCodeDraft(data.representativeCode);
+            setIsEditingCode(false);
+          }
+          setReferralHydrated(true);
+        },
+        onError: () => {
+          clearRepresentativeReferral();
+          setValidatedRepresentative(null);
+          setIsEditingCode(true);
+          setReferralHydrated(true);
+        },
+      },
+    );
+    // hydrate once per dialog open
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional one-shot
+  }, [open, alreadyLinked, referralHydrated]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && checkoutMutation.isPending) {
@@ -120,10 +166,19 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
           }
           setValidatedRepresentative(data);
           setRepresentativeCodeDraft(data.representativeCode);
+          saveRepresentativeReferral(data.representativeCode);
+          setIsEditingCode(false);
         },
         onError: () => setValidatedRepresentative(null),
       },
     );
+  };
+
+  const handleChangeCode = () => {
+    clearRepresentativeReferral();
+    setValidatedRepresentative(null);
+    setIsEditingCode(true);
+    validateMutation.reset();
   };
 
   const handlePickPlan = (plan: SubscriptionPlanCatalogItemDto) => {
@@ -176,6 +231,9 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   const addressBlockedForSelection =
     needsAddressForSelection && sellerQuery.isSuccess && seller !== null;
 
+  const showValidatedCard =
+    !alreadyLinked && validatedRepresentative && !isEditingCode;
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
@@ -218,6 +276,12 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
                 Este vendedor já possui um representante vinculado.
               </p>
             </div>
+          ) : showValidatedCard ? (
+            <IndicatedByRepresentativeCard
+              name={validatedRepresentative.name}
+              representativeCode={validatedRepresentative.representativeCode}
+              onChangeCode={handleChangeCode}
+            />
           ) : (
             <>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
@@ -261,23 +325,6 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
                 <p className="text-destructive text-xs">
                   {getFriendlyErrorMessage(validateMutation.error)}
                 </p>
-              ) : null}
-              {validatedRepresentative ? (
-                <div className="bg-background flex items-start gap-2 rounded-lg border px-3 py-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
-                  <div>
-                    <p className="text-xs font-medium tracking-wide uppercase">
-                      Representante
-                    </p>
-                    <p className="font-medium">{validatedRepresentative.name}</p>
-                    <p className="font-mono text-xs">
-                      {validatedRepresentative.representativeCode}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      ✓ Código válido
-                    </p>
-                  </div>
-                </div>
               ) : null}
             </>
           )}

@@ -2,7 +2,16 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Copy, Eye, Pencil, Plus, UserRound } from "lucide-react";
+import {
+  Copy,
+  ExternalLink,
+  Eye,
+  Pencil,
+  Plus,
+  QrCode,
+  Share2,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -29,7 +38,14 @@ import {
 } from "@/contracts/admin/representatives";
 import { RepresentativeDetailDialog } from "@/features/admin/components/RepresentativeDetailDialog";
 import { RepresentativeFormDialog } from "@/features/admin/components/RepresentativeFormDialog";
+import { RepresentativeQrCodeDialog } from "@/features/admin/components/RepresentativeQrCodeDialog";
 import type { RepresentativeFormValues } from "@/features/admin/schemas/representativeFormSchema";
+import {
+  copyRepresentativePublicLink,
+  getRepresentativePublicUrl,
+  openRepresentativePublicLink,
+  shareRepresentativePublicLink,
+} from "@/utils/representativePublicLink";
 import { useActivateAdminRepresentative } from "@/hooks/api/useActivateAdminRepresentative";
 import { useAdminRepresentative } from "@/hooks/api/useAdminRepresentative";
 import { useAdminRepresentatives } from "@/hooks/api/useAdminRepresentatives";
@@ -114,6 +130,8 @@ function AdminRepresentativesView() {
   const [viewId, setViewId] = useState<number | null>(null);
   const [sellersPage, setSellersPage] = useState(1);
   const [statusTarget, setStatusTarget] =
+    useState<AdminRepresentativeListItemDto | null>(null);
+  const [qrTarget, setQrTarget] =
     useState<AdminRepresentativeListItemDto | null>(null);
 
   const editQuery = useAdminRepresentative(editingId ?? 0, formOpen && formMode === "edit" && editingId != null);
@@ -271,6 +289,71 @@ function AdminRepresentativesView() {
       id: "totalSellers",
       header: "Vendedores",
       accessor: (row) => String(row.totalSellers ?? 0),
+    },
+    {
+      id: "publicLink",
+      header: "Link Público",
+      cell: (row) => {
+        const url = getRepresentativePublicUrl(row.representativeCode);
+        return (
+          <div className="flex max-w-[14rem] flex-col gap-1">
+            <span className="truncate font-mono text-xs" title={url}>
+              {url}
+            </span>
+            <div className="flex flex-wrap gap-0.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="size-7"
+                aria-label="Copiar link"
+                onClick={() =>
+                  void copyRepresentativePublicLink(row.representativeCode)
+                }
+              >
+                <Copy className="size-3.5" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="size-7"
+                aria-label="Abrir link"
+                onClick={() =>
+                  openRepresentativePublicLink(row.representativeCode)
+                }
+              >
+                <ExternalLink className="size-3.5" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="size-7"
+                aria-label="Compartilhar"
+                onClick={() =>
+                  void shareRepresentativePublicLink(
+                    row.representativeCode,
+                    row.name,
+                  )
+                }
+              >
+                <Share2 className="size-3.5" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="size-7"
+                aria-label="Gerar QR Code"
+                onClick={() => setQrTarget(row)}
+              >
+                <QrCode className="size-3.5" />
+              </Button>
+            </div>
+          </div>
+        );
+      },
     },
     {
       id: "createdAt",
@@ -571,6 +654,15 @@ function AdminRepresentativesView() {
         error={viewQuery.error}
         sellersPage={sellersPage}
         onSellersPageChange={setSellersPage}
+      />
+
+      <RepresentativeQrCodeDialog
+        open={qrTarget != null}
+        onOpenChange={(open) => {
+          if (!open) setQrTarget(null);
+        }}
+        representativeCode={qrTarget?.representativeCode ?? ""}
+        representativeName={qrTarget?.name}
       />
 
       <ConfirmDialog

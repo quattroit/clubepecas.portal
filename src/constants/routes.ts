@@ -9,6 +9,8 @@ export const ROUTES = {
   ADVERTISEMENTS: "/anuncios",
   STORES: "/lojas",
   PLANS: "/planos",
+  /** Prefixo do link público de indicação — usar com `representativeReferralPath`. */
+  REFERRAL: "/r",
   ABOUT: "/sobre",
   CONTACT: "/contato",
   TERMS: "/termos",
@@ -77,6 +79,11 @@ export function storePath(slug: string) {
 /** Helper para rota dinâmica de categoria */
 export function categoryPath(slug: string) {
   return `${ROUTES.CATEGORIES}/${slug}` as const;
+}
+
+/** Helper para link público de indicação do representante */
+export function representativeReferralPath(code: string) {
+  return `${ROUTES.REFERRAL}/${encodeURIComponent(code.trim().toUpperCase())}` as const;
 }
 
 /** Páginas acessíveis sem autenticação (área pública). */

@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Copy, Loader2 } from "lucide-react";
+import {
+  Copy,
+  ExternalLink,
+  Loader2,
+  QrCode,
+  Share2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -21,12 +27,19 @@ import { Pagination } from "@/components/navigation/Pagination";
 import type { AdminRepresentativeDetailDto } from "@/contracts/admin/representatives";
 import { isRepresentativeActive } from "@/contracts/admin/representatives";
 import { adminSellerPath } from "@/constants/routes";
+import { RepresentativeQrCodeDialog } from "@/features/admin/components/RepresentativeQrCodeDialog";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/formatDate";
 import { formatDocumentInput } from "@/utils/document";
 import { PersonType } from "@/contracts/common/enums";
 import { formatPostalCodeInput } from "@/utils/postalCode";
+import {
+  copyRepresentativePublicLink,
+  getRepresentativePublicUrl,
+  openRepresentativePublicLink,
+  shareRepresentativePublicLink,
+} from "@/utils/representativePublicLink";
 
 type RepresentativeDetailDialogProps = {
   open: boolean;
@@ -74,8 +87,13 @@ function RepresentativeDetailDialog({
   onSellersPageChange,
 }: RepresentativeDetailDialogProps) {
   const [tab, setTab] = useState<"dados" | "vendedores">("dados");
+  const [qrOpen, setQrOpen] = useState(false);
+  const publicUrl = data
+    ? getRepresentativePublicUrl(data.representativeCode)
+    : "";
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -120,6 +138,62 @@ function RepresentativeDetailDialog({
                 >
                   <Copy className="size-3.5" />
                   Copiar Código
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-muted/30 rounded-xl border px-4 py-3">
+              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                Link Público
+              </p>
+              <p className="mt-1 truncate font-mono text-sm" title={publicUrl}>
+                {publicUrl}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    void copyRepresentativePublicLink(data.representativeCode)
+                  }
+                >
+                  <Copy className="size-3.5" />
+                  Copiar Link
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    openRepresentativePublicLink(data.representativeCode)
+                  }
+                >
+                  <ExternalLink className="size-3.5" />
+                  Abrir Link
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    void shareRepresentativePublicLink(
+                      data.representativeCode,
+                      data.name,
+                    )
+                  }
+                >
+                  <Share2 className="size-3.5" />
+                  Compartilhar
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setQrOpen(true)}
+                >
+                  <QrCode className="size-3.5" />
+                  Gerar QR Code
                 </Button>
               </div>
             </div>
@@ -288,6 +362,16 @@ function RepresentativeDetailDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {data ? (
+      <RepresentativeQrCodeDialog
+        open={qrOpen}
+        onOpenChange={setQrOpen}
+        representativeCode={data.representativeCode}
+        representativeName={data.name}
+      />
+    ) : null}
+    </>
   );
 }
 
