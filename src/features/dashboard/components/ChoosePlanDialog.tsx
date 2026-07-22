@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { Badge } from "@/components/ui/badge";
@@ -14,12 +14,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ROUTES } from "@/constants/routes";
+import type { ValidateRepresentativeCodeResponse } from "@/contracts/admin/representatives";
+import { isRepresentativeActive } from "@/contracts/admin/representatives";
 import { BillingCycle } from "@/contracts/common/enums";
 import type { SubscriptionPlanCatalogItemDto } from "@/contracts/seller/subscription";
 import { useActiveSubscriptionPlans } from "@/hooks/api/useActiveSubscriptionPlans";
 import { useCreateSellerSubscriptionCheckout } from "@/hooks/api/useCreateSellerSubscriptionCheckout";
 import { useSeller } from "@/hooks/api/useSeller";
+import { useValidateRepresentativeCode } from "@/hooks/api/useValidateRepresentativeCode";
 import { BillingCycleTabs } from "@/features/plans/components/BillingCycleTabs";
 import { PlanDescription } from "@/features/plans/components/PlanDescription";
 import {
@@ -46,15 +51,24 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
       onOpenChange(false);
     },
   });
+  const validateMutation = useValidateRepresentativeCode();
 
   const [selectedPlan, setSelectedPlan] =
     useState<SubscriptionPlanCatalogItemDto | null>(null);
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle | null>(
     null,
   );
+  const [representativeCodeDraft, setRepresentativeCodeDraft] = useState("");
+  const [validatedRepresentative, setValidatedRepresentative] =
+    useState<ValidateRepresentativeCodeResponse | null>(null);
 
   const seller = sellerQuery.data ?? null;
   const addressComplete = hasCompleteSellerAddress(seller);
+  const alreadyLinked = Boolean(seller?.representativeId);
+  const linkedCodeForCheckout =
+    !alreadyLinked && validatedRepresentative
+      ? validatedRepresentative.representativeCode
+      : undefined;
 
   const pendingVariables = checkoutMutation.isPending
     ? checkoutMutation.variables
@@ -70,6 +84,9 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   function handleReset() {
     setSelectedPlan(null);
     setSelectedCycle(null);
+    setRepresentativeCodeDraft("");
+    setValidatedRepresentative(null);
+    validateMutation.reset();
     checkoutMutation.reset();
   }
 
@@ -90,6 +107,25 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
     checkoutMutation.reset();
   };
 
+  const handleValidateCode = () => {
+    const code = representativeCodeDraft.trim().toUpperCase();
+    if (!code) return;
+    validateMutation.mutate(
+      { representativeCode: code },
+      {
+        onSuccess: (data) => {
+          if (!isRepresentativeActive(data.status)) {
+            setValidatedRepresentative(null);
+            return;
+          }
+          setValidatedRepresentative(data);
+          setRepresentativeCodeDraft(data.representativeCode);
+        },
+        onError: () => setValidatedRepresentative(null),
+      },
+    );
+  };
+
   const handlePickPlan = (plan: SubscriptionPlanCatalogItemDto) => {
     if (checkoutMutation.isPending) return;
 
@@ -97,6 +133,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
       checkoutMutation.mutate({
         subscriptionPlanId: plan.id,
         billingCycle: BillingCycle.Monthly,
+        representativeCode: linkedCodeForCheckout,
       });
       return;
     }
@@ -118,6 +155,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
     checkoutMutation.mutate({
       subscriptionPlanId: selectedPlan.id,
       billingCycle: selectedCycle,
+      representativeCode: linkedCodeForCheckout,
     });
   };
 
@@ -164,6 +202,86 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
               : "Selecione um plano. Planos pagos abrem o checkout seguro do Asaas. Planos gratuitos são ativados imediatamente."}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="border-border bg-muted/30 flex flex-col gap-3 rounded-xl border p-3">
+          <div>
+            <p className="text-sm font-medium">Código do representante</p>
+            <p className="text-muted-foreground text-xs">
+              Opcional. Informe se um representante comercial indicou sua loja.
+            </p>
+          </div>
+          {alreadyLinked ? (
+            <div className="bg-background rounded-lg border px-3 py-2 text-sm">
+              <p className="font-medium">{seller?.representativeName}</p>
+              <p className="font-mono text-xs">{seller?.representativeCode}</p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Este vendedor já possui um representante vinculado.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <Label htmlFor="checkout-rep-code">Código</Label>
+                  <Input
+                    id="checkout-rep-code"
+                    className="font-mono"
+                    placeholder="Ex: REP000123"
+                    value={representativeCodeDraft}
+                    disabled={
+                      checkoutMutation.isPending || validateMutation.isPending
+                    }
+                    onChange={(event) => {
+                      setRepresentativeCodeDraft(
+                        event.target.value.toUpperCase(),
+                      );
+                      setValidatedRepresentative(null);
+                      validateMutation.reset();
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={
+                    !representativeCodeDraft.trim() ||
+                    checkoutMutation.isPending ||
+                    validateMutation.isPending
+                  }
+                  onClick={handleValidateCode}
+                >
+                  {validateMutation.isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    "Validar"
+                  )}
+                </Button>
+              </div>
+              {validateMutation.isError ? (
+                <p className="text-destructive text-xs">
+                  {getFriendlyErrorMessage(validateMutation.error)}
+                </p>
+              ) : null}
+              {validatedRepresentative ? (
+                <div className="bg-background flex items-start gap-2 rounded-lg border px-3 py-2">
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                  <div>
+                    <p className="text-xs font-medium tracking-wide uppercase">
+                      Representante
+                    </p>
+                    <p className="font-medium">{validatedRepresentative.name}</p>
+                    <p className="font-mono text-xs">
+                      {validatedRepresentative.representativeCode}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      ✓ Código válido
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
 
         {plansQuery.isLoading ? (
           <div className="flex items-center justify-center gap-2 py-10">

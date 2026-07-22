@@ -69,6 +69,8 @@ import type {
   AdminSellerDetailResponse,
   AdminSellersListParams,
   AdminSellersListResponse,
+  UpdateAdminSellerRepresentativeRequest,
+  UpdateAdminSellerRepresentativeResponse,
   UpdateAdminSellerStatusRequest,
   UpdateAdminSellerStatusResponse,
 } from "@/contracts/admin/sellers";
@@ -145,6 +147,18 @@ export const adminService = {
     return api
       .put<UpdateAdminSellerStatusResponse>(
         `/api/v1/admin/sellers/${id}/status`,
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  updateSellerRepresentative(
+    sellerId: number,
+    payload: UpdateAdminSellerRepresentativeRequest,
+  ) {
+    return api
+      .put<UpdateAdminSellerRepresentativeResponse>(
+        `/api/v1/admin/sellers/${sellerId}/representative`,
         payload,
       )
       .then((response) => response.data);
@@ -279,10 +293,14 @@ export const adminService = {
       .then((response) => response.data);
   },
 
-  getRepresentative(id: number) {
+  getRepresentative(
+    id: number,
+    params: { sellersPage?: number; sellersPageSize?: number } = {},
+  ) {
     return api
       .get<AdminRepresentativeDetailDto>(
         `/api/v1/admin/representatives/${id}`,
+        { params },
       )
       .then((response) => response.data);
   },

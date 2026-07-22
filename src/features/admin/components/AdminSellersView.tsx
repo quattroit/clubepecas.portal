@@ -151,6 +151,21 @@ function AdminSellersView() {
       ),
     },
     {
+      id: "representative",
+      header: "Representante",
+      cell: (row) =>
+        row.representativeCode ? (
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate text-sm">{row.representativeName}</span>
+            <span className="text-muted-foreground font-mono text-xs">
+              {row.representativeCode}
+            </span>
+          </div>
+        ) : (
+          "—"
+        ),
+    },
+    {
       id: "personType",
       header: "Tipo",
       accessor: (row) =>

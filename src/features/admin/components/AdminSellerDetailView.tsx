@@ -40,6 +40,7 @@ import type {
 } from "@/contracts/admin/sellers";
 import { AdvertisementStatus } from "@/contracts/common/enums";
 import { useAdminSeller } from "@/hooks/api/useAdminSeller";
+import { useUpdateAdminSellerRepresentative } from "@/hooks/api/useUpdateAdminSellerRepresentative";
 import { useUpdateAdminSellerStatus } from "@/hooks/api/useUpdateAdminSellerStatus";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,17 @@ import {
   formatMetricCount,
 } from "@/utils/formatMetrics";
 import { parseRouteId } from "@/utils/parseRouteId";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const PERIOD_OPTIONS: { value: MetricsPeriodParam; label: string }[] = [
   { value: "7d", label: "7 dias" },
@@ -107,7 +119,10 @@ function AdminSellerDetailView() {
 
   const sellerQuery = useAdminSeller(sellerId ?? 0, period);
   const updateStatus = useUpdateAdminSellerStatus();
+  const updateRepresentative = useUpdateAdminSellerRepresentative();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [repCodeDraft, setRepCodeDraft] = useState("");
+  const [repDialogOpen, setRepDialogOpen] = useState(false);
 
   const data = sellerQuery.data;
 
@@ -348,6 +363,65 @@ function AdminSellerDetailView() {
         ) : null}
       </AdminSection>
 
+      <AdminSection title="Representante">
+        {sellerQuery.isLoading ? (
+          <AdminCard>
+            <div className="bg-muted h-24 animate-pulse rounded-lg" />
+          </AdminCard>
+        ) : data ? (
+          <AdminCard>
+            <div className="flex flex-col gap-4 p-1">
+              {data.representativeId ? (
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div>
+                    <dt className="text-muted-foreground text-xs">Nome</dt>
+                    <dd className="text-sm font-medium">
+                      {data.representativeName}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">Código</dt>
+                    <dd className="font-mono text-sm">
+                      {data.representativeCode}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">Status</dt>
+                    <dd className="mt-1">
+                      <AdminStatusBadge
+                        status={
+                          data.representativeStatus === 1 ||
+                          data.representativeStatusLabel === "Ativo"
+                            ? "active"
+                            : "inactive"
+                        }
+                        label={data.representativeStatusLabel ?? undefined}
+                      />
+                    </dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  Nenhum representante vinculado.
+                </p>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="self-start"
+                onClick={() => {
+                  setRepCodeDraft(data.representativeCode ?? "");
+                  setRepDialogOpen(true);
+                }}
+              >
+                Alterar representante
+              </Button>
+            </div>
+          </AdminCard>
+        ) : null}
+      </AdminSection>
+
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <AdminSection title="Dados do usuário">
           {sellerQuery.isLoading ? (
@@ -567,6 +641,57 @@ function AdminSellerDetailView() {
           }}
         />
       ) : null}
+
+      <Dialog open={repDialogOpen} onOpenChange={setRepDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar representante</DialogTitle>
+            <DialogDescription>
+              Informe o código do representante ou deixe em branco para remover
+              o vínculo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="admin-seller-rep-code">Código</Label>
+            <Input
+              id="admin-seller-rep-code"
+              className="font-mono"
+              placeholder="REP000001"
+              value={repCodeDraft}
+              onChange={(event) =>
+                setRepCodeDraft(event.target.value.toUpperCase())
+              }
+            />
+            {updateRepresentative.isError ? (
+              <p className="text-destructive text-xs">
+                {getFriendlyErrorMessage(updateRepresentative.error)}
+              </p>
+            ) : null}
+          </div>
+          <DialogFooter>
+            <DialogClose render={<Button type="button" variant="outline" />}>
+              Cancelar
+            </DialogClose>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={updateRepresentative.isPending || !data}
+              onClick={() => {
+                if (!data) return;
+                updateRepresentative.mutate(
+                  {
+                    sellerId: data.id,
+                    representativeCode: repCodeDraft.trim() || null,
+                  },
+                  { onSuccess: () => setRepDialogOpen(false) },
+                );
+              }}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminPage>
   );
 }

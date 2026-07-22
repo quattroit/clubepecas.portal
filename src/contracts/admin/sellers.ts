@@ -74,6 +74,9 @@ export type AdminSellerListItemDto = {
   plan: AdminSellerPlanValue;
   planLabel: string;
   isActive: boolean;
+  representativeId?: number | null;
+  representativeCode?: string | null;
+  representativeName?: string | null;
 };
 
 export type AdminSellerDetailResponse = {
@@ -96,6 +99,11 @@ export type AdminSellerDetailResponse = {
   isActive: boolean;
   plan: AdminSellerPlanValue;
   planLabel: string;
+  representativeId?: number | null;
+  representativeCode?: string | null;
+  representativeName?: string | null;
+  representativeStatus?: number | null;
+  representativeStatusLabel?: string | null;
   period: number;
   fromUtc: string | null;
   toUtc: string;
@@ -137,4 +145,16 @@ export type UpdateAdminSellerStatusResponse = {
   id: number;
   isActive: boolean;
   storeName: string;
+};
+
+export type UpdateAdminSellerRepresentativeRequest = {
+  representativeCode?: string | null;
+};
+
+export type UpdateAdminSellerRepresentativeResponse = {
+  sellerId: number;
+  representativeId: number | null;
+  representativeCode: string | null;
+  representativeName: string | null;
+  representativeStatus: number | null;
 };

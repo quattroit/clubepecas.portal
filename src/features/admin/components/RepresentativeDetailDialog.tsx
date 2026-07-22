@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,11 +15,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AdminStatusBadge } from "@/components/admin";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
+import { Pagination } from "@/components/navigation/Pagination";
 import type { AdminRepresentativeDetailDto } from "@/contracts/admin/representatives";
 import { isRepresentativeActive } from "@/contracts/admin/representatives";
+import { adminSellerPath } from "@/constants/routes";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/formatDate";
 import { formatDocumentInput } from "@/utils/document";
 import { PersonType } from "@/contracts/common/enums";
@@ -29,6 +34,8 @@ type RepresentativeDetailDialogProps = {
   data?: AdminRepresentativeDetailDto;
   isLoading?: boolean;
   error?: unknown;
+  sellersPage?: number;
+  onSellersPageChange?: (page: number) => void;
 };
 
 async function copyCode(code: string) {
@@ -63,14 +70,18 @@ function RepresentativeDetailDialog({
   data,
   isLoading = false,
   error,
+  sellersPage = 1,
+  onSellersPageChange,
 }: RepresentativeDetailDialogProps) {
+  const [tab, setTab] = useState<"dados" | "vendedores">("dados");
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Detalhes do representante</DialogTitle>
           <DialogDescription>
-            Dados cadastrais e endereço completo.
+            Dados cadastrais, resumo e vendedores indicados.
           </DialogDescription>
         </DialogHeader>
 
@@ -85,7 +96,7 @@ function RepresentativeDetailDialog({
             message={getFriendlyErrorMessage(error)}
           />
         ) : data ? (
-          <div className="flex max-h-[65vh] flex-col gap-6 overflow-y-auto">
+          <div className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto">
             <div className="bg-muted/40 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
               <div>
                 <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
@@ -113,64 +124,160 @@ function RepresentativeDetailDialog({
               </div>
             </div>
 
-            <section>
-              <h3 className="text-foreground mb-3 text-sm font-semibold">
-                Dados pessoais
-              </h3>
-              <dl className="grid gap-3 sm:grid-cols-2">
-                <DetailRow label="Nome" value={data.name} />
-                <DetailRow
-                  label="CPF"
-                  value={formatDocumentInput(
-                    data.document,
-                    PersonType.Individual,
-                  )}
-                />
-                <DetailRow label="E-mail" value={data.email} />
-                <DetailRow label="Telefone" value={data.phone} />
-              </dl>
-            </section>
+            <div className="bg-muted/30 rounded-xl border px-4 py-3">
+              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                Resumo
+              </p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums">
+                {data.totalSellers}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                vendedores vinculados
+              </p>
+            </div>
 
-            <section>
-              <h3 className="text-foreground mb-3 text-sm font-semibold">
-                Endereço
-              </h3>
-              <dl className="grid gap-3 sm:grid-cols-2">
-                <DetailRow
-                  label="CEP"
-                  value={formatPostalCodeInput(data.zipCode)}
-                />
-                <DetailRow label="Número" value={data.addressNumber} />
-                <DetailRow label="Logradouro" value={data.addressStreet} />
-                <DetailRow
-                  label="Complemento"
-                  value={data.addressComplement}
-                />
-                <DetailRow label="Bairro" value={data.neighborhood} />
-                <DetailRow
-                  label="Cidade / UF"
-                  value={`${data.city} / ${data.state}`}
-                />
-              </dl>
-            </section>
+            <div className="flex gap-2 border-b pb-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={tab === "dados" ? "primary" : "ghost"}
+                onClick={() => setTab("dados")}
+              >
+                Dados
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={tab === "vendedores" ? "primary" : "ghost"}
+                onClick={() => setTab("vendedores")}
+              >
+                Vendedores Indicados
+              </Button>
+            </div>
 
-            <section>
-              <h3 className="text-foreground mb-3 text-sm font-semibold">
-                Datas
-              </h3>
-              <dl className="grid gap-3 sm:grid-cols-2">
-                <DetailRow
-                  label="Cadastro"
-                  value={formatDate(data.createdAt)}
-                />
-                <DetailRow
-                  label="Atualização"
-                  value={
-                    data.updatedAt ? formatDate(data.updatedAt) : null
-                  }
-                />
-              </dl>
-            </section>
+            {tab === "dados" ? (
+              <>
+                <section>
+                  <h3 className="text-foreground mb-3 text-sm font-semibold">
+                    Dados pessoais
+                  </h3>
+                  <dl className="grid gap-3 sm:grid-cols-2">
+                    <DetailRow label="Nome" value={data.name} />
+                    <DetailRow
+                      label="CPF"
+                      value={formatDocumentInput(
+                        data.document,
+                        PersonType.Individual,
+                      )}
+                    />
+                    <DetailRow label="E-mail" value={data.email} />
+                    <DetailRow label="Telefone" value={data.phone} />
+                  </dl>
+                </section>
+
+                <section>
+                  <h3 className="text-foreground mb-3 text-sm font-semibold">
+                    Endereço
+                  </h3>
+                  <dl className="grid gap-3 sm:grid-cols-2">
+                    <DetailRow
+                      label="CEP"
+                      value={formatPostalCodeInput(data.zipCode)}
+                    />
+                    <DetailRow label="Número" value={data.addressNumber} />
+                    <DetailRow label="Logradouro" value={data.addressStreet} />
+                    <DetailRow
+                      label="Complemento"
+                      value={data.addressComplement}
+                    />
+                    <DetailRow label="Bairro" value={data.neighborhood} />
+                    <DetailRow
+                      label="Cidade / UF"
+                      value={`${data.city} / ${data.state}`}
+                    />
+                  </dl>
+                </section>
+
+                <section>
+                  <h3 className="text-foreground mb-3 text-sm font-semibold">
+                    Datas
+                  </h3>
+                  <dl className="grid gap-3 sm:grid-cols-2">
+                    <DetailRow
+                      label="Cadastro"
+                      value={formatDate(data.createdAt)}
+                    />
+                    <DetailRow
+                      label="Atualização"
+                      value={
+                        data.updatedAt ? formatDate(data.updatedAt) : null
+                      }
+                    />
+                  </dl>
+                </section>
+              </>
+            ) : (
+              <section className="flex flex-col gap-3">
+                {(data.sellers?.length ?? 0) === 0 ? (
+                  <p className="text-muted-foreground text-sm">
+                    Nenhum vendedor vinculado a este representante.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto rounded-xl border">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-muted/40 text-muted-foreground text-xs">
+                        <tr>
+                          <th className="px-3 py-2 font-medium">Nome</th>
+                          <th className="px-3 py-2 font-medium">E-mail</th>
+                          <th className="px-3 py-2 font-medium">Plano</th>
+                          <th className="px-3 py-2 font-medium">Status</th>
+                          <th className="px-3 py-2 font-medium">Cadastro</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.sellers.map((seller) => (
+                          <tr key={seller.id} className="border-t">
+                            <td className="px-3 py-2">
+                              <Link
+                                href={adminSellerPath(seller.id)}
+                                className={cn(
+                                  buttonVariants({
+                                    variant: "link",
+                                    size: "sm",
+                                  }),
+                                  "h-auto px-0",
+                                )}
+                              >
+                                {seller.storeName || seller.displayName}
+                              </Link>
+                            </td>
+                            <td className="px-3 py-2">{seller.email || "—"}</td>
+                            <td className="px-3 py-2">{seller.planLabel}</td>
+                            <td className="px-3 py-2">
+                              <AdminStatusBadge
+                                status={
+                                  seller.isActive ? "active" : "inactive"
+                                }
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              {formatDate(seller.createdAt)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {(data.sellersTotalPages ?? 0) > 1 && onSellersPageChange ? (
+                  <Pagination
+                    currentPage={data.sellersCurrentPage ?? sellersPage}
+                    totalPages={data.sellersTotalPages}
+                    onPageChange={onSellersPageChange}
+                  />
+                ) : null}
+              </section>
+            )}
           </div>
         ) : null}
 

@@ -257,6 +257,7 @@ export type CreateSellerSubscriptionCheckoutRequest = {
   successUrl: string;
   cancelUrl: string;
   expiredUrl?: string;
+  representativeCode?: string | null;
 };
 
 export type CreateSellerSubscriptionCheckoutResponse = {

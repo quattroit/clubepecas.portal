@@ -11,6 +11,7 @@ import { sellerService } from "@/services/seller.service";
 type CreateCheckoutVariables = {
   subscriptionPlanId: number;
   billingCycle: BillingCycle;
+  representativeCode?: string | null;
 };
 
 function isProviderError(error: unknown): boolean {
@@ -36,12 +37,14 @@ export function useCreateSellerSubscriptionCheckout(
     mutationFn: async ({
       subscriptionPlanId,
       billingCycle,
+      representativeCode,
     }: CreateCheckoutVariables) => {
       const urls = buildSubscriptionCheckoutUrls();
 
       return sellerService.createSubscriptionCheckout({
         subscriptionPlanId,
         billingCycle,
+        representativeCode: representativeCode?.trim() || undefined,
         ...urls,
       });
     },
@@ -56,6 +59,9 @@ export function useCreateSellerSubscriptionCheckout(
           }),
           queryClient.invalidateQueries({
             queryKey: queryKeys.seller.payments,
+          }),
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.seller.me,
           }),
         ]);
         options?.onActivatedWithoutCheckout?.();

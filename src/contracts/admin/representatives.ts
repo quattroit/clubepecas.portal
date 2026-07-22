@@ -35,6 +35,7 @@ export type AdminRepresentativeListItemDto = {
   status: RepresentativeStatus;
   statusLabel: string;
   createdAt: string;
+  totalSellers: number;
 };
 
 export type AdminRepresentativesListResponse = {
@@ -43,6 +44,17 @@ export type AdminRepresentativesListResponse = {
   currentPage: number;
   pageSize: number;
   items: AdminRepresentativeListItemDto[];
+};
+
+export type AdminRepresentativeLinkedSellerDto = {
+  id: number;
+  storeName: string;
+  displayName: string;
+  email: string;
+  planLabel: string;
+  isActive: boolean;
+  createdAt: string;
+  subscriptionStatus?: number | null;
 };
 
 export type AdminRepresentativeDetailDto = {
@@ -63,6 +75,11 @@ export type AdminRepresentativeDetailDto = {
   state: string;
   createdAt: string;
   updatedAt: string | null;
+  totalSellers: number;
+  sellersTotalPages: number;
+  sellersCurrentPage: number;
+  sellersPageSize: number;
+  sellers: AdminRepresentativeLinkedSellerDto[];
 };
 
 export type CreateAdminRepresentativeRequest = {
@@ -99,3 +116,15 @@ export function isRepresentativeActive(
 ): boolean {
   return status === "Active" || status === 1;
 }
+
+/** POST /api/v1/representatives/validate-code */
+export type ValidateRepresentativeCodeRequest = {
+  representativeCode: string;
+};
+
+export type ValidateRepresentativeCodeResponse = {
+  name: string;
+  representativeCode: string;
+  status: RepresentativeStatus;
+  statusLabel: string;
+};

@@ -112,11 +112,16 @@ function AdminRepresentativesView() {
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [viewId, setViewId] = useState<number | null>(null);
+  const [sellersPage, setSellersPage] = useState(1);
   const [statusTarget, setStatusTarget] =
     useState<AdminRepresentativeListItemDto | null>(null);
 
   const editQuery = useAdminRepresentative(editingId ?? 0, formOpen && formMode === "edit" && editingId != null);
-  const viewQuery = useAdminRepresentative(viewId ?? 0, viewId != null);
+  const viewQuery = useAdminRepresentative(
+    viewId ?? 0,
+    viewId != null,
+    sellersPage,
+  );
 
   useEffect(() => {
     setNameDraft(filters.name ?? "");
@@ -261,6 +266,11 @@ function AdminRepresentativesView() {
           status={isRepresentativeActive(row.status) ? "active" : "inactive"}
         />
       ),
+    },
+    {
+      id: "totalSellers",
+      header: "Vendedores",
+      accessor: (row) => String(row.totalSellers ?? 0),
     },
     {
       id: "createdAt",
@@ -551,11 +561,16 @@ function AdminRepresentativesView() {
       <RepresentativeDetailDialog
         open={viewId != null}
         onOpenChange={(open) => {
-          if (!open) setViewId(null);
+          if (!open) {
+            setViewId(null);
+            setSellersPage(1);
+          }
         }}
         data={viewQuery.data}
         isLoading={viewQuery.isLoading}
         error={viewQuery.error}
+        sellersPage={sellersPage}
+        onSellersPageChange={setSellersPage}
       />
 
       <ConfirmDialog

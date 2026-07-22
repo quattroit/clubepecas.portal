@@ -163,6 +163,12 @@ const CODE_MESSAGES: Record<string, string> = {
   "admin.representatives.state.required": "Informe a UF.",
   "admin.representatives.state.invalid": "Informe uma UF válida.",
   "admin.representatives.status.invalid": "Status inválido.",
+  "representative.code.required": "Informe o código do representante.",
+  "representative.code.not_found": "Código de representante inválido.",
+  "representative.code.inactive":
+    "Este representante está inativo e não pode ser vinculado.",
+  "seller.representative.already_linked":
+    "Este vendedor já possui um representante vinculado.",
   "seller.subscription.billing_cycle.required":
     "Selecione o ciclo de cobrança.",
   "seller.subscription.billing_cycle.invalid":

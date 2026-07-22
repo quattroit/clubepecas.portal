@@ -65,6 +65,11 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     number: dto.number,
     complement: dto.complement,
     neighborhood: dto.neighborhood,
+    representativeId: dto.representativeId,
+    representativeCode: dto.representativeCode,
+    representativeName: dto.representativeName,
+    representativeStatus: dto.representativeStatus,
+    representativeStatusLabel: dto.representativeStatusLabel,
   };
 }
 

@@ -32,10 +32,13 @@ import { useCurrentSellerSubscription } from "@/hooks/api/useCurrentSellerSubscr
 import { useDowngradeSellerSubscription } from "@/hooks/api/useDowngradeSellerSubscription";
 import { useReactivateSellerSubscription } from "@/hooks/api/useReactivateSellerSubscription";
 import { useRetrySellerSubscriptionPayment } from "@/hooks/api/useRetrySellerSubscriptionPayment";
+import { useSeller } from "@/hooks/api/useSeller";
 import { useSellerSubscriptionHistory } from "@/hooks/api/useSellerSubscriptionHistory";
 import { useSellerSubscriptionPayments } from "@/hooks/api/useSellerSubscriptionPayments";
 import { useUpgradeSellerSubscription } from "@/hooks/api/useUpgradeSellerSubscription";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import { AdminStatusBadge } from "@/components/admin";
+import { AdminCard } from "@/components/admin/AdminCard";
 
 type PlanPriceDialogMode = "upgrade" | "downgrade" | "change-cycle" | null;
 
@@ -44,6 +47,7 @@ type PlanPriceDialogMode = "upgrade" | "downgrade" | "change-cycle" | null;
  * Renderiza exclusivamente dados da API — sem regras de negócio no cliente.
  */
 function MyPlanView() {
+  const sellerQuery = useSeller();
   const subscriptionQuery = useCurrentSellerSubscription();
   const paymentsQuery = useSellerSubscriptionPayments(
     Boolean(subscriptionQuery.data),
@@ -135,6 +139,53 @@ function MyPlanView() {
           title="Não foi possível carregar o plano"
           message={getFriendlyErrorMessage(subscriptionQuery.error)}
         />
+      ) : null}
+
+      {sellerQuery.data?.representativeId ? (
+        <AdminCard>
+          <div className="flex flex-col gap-3 p-4">
+            <div>
+              <h2 className="text-h3">Representante</h2>
+              <p className="text-muted-foreground text-xs">
+                Somente leitura — vínculo permanente da sua conta.
+              </p>
+            </div>
+            <dl className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <dt className="text-muted-foreground text-xs uppercase">Nome</dt>
+                <dd className="text-sm font-medium">
+                  {sellerQuery.data.representativeName}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground text-xs uppercase">
+                  Código
+                </dt>
+                <dd className="font-mono text-sm">
+                  {sellerQuery.data.representativeCode}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-muted-foreground text-xs uppercase">
+                  Status
+                </dt>
+                <dd className="mt-1">
+                  <AdminStatusBadge
+                    status={
+                      sellerQuery.data.representativeStatus === 1 ||
+                      sellerQuery.data.representativeStatusLabel === "Ativo"
+                        ? "active"
+                        : "inactive"
+                    }
+                    label={
+                      sellerQuery.data.representativeStatusLabel ?? undefined
+                    }
+                  />
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </AdminCard>
       ) : null}
 
       {subscriptionQuery.isLoading ? (

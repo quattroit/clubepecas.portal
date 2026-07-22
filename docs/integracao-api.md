@@ -59,6 +59,7 @@ Base URL: `NEXT_PUBLIC_API_URL`
 | Marketplace | `GET /api/v1/marketplace` (filtros: title, category, city, state) |
 | Seller | `POST/GET/PUT /api/v1/seller`, público `GET /api/v1/sellers/{slug}` |
 | Admin — Representantes | CRUD `/api/v1/admin/representatives` (+ activate/deactivate). UI: `/admin/representantes`. ViaCEP só no frontend. |
+| Representantes — vínculo | `POST /api/v1/representatives/validate-code` (público). Checkout aceita `representativeCode`. Admin: `PUT /api/v1/admin/sellers/{id}/representative`. |
 
 **Importante:**
 

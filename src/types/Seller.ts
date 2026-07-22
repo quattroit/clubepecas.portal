@@ -25,4 +25,9 @@ export type Seller = {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
+  representativeId?: number | null;
+  representativeCode?: string | null;
+  representativeName?: string | null;
+  representativeStatus?: number | null;
+  representativeStatusLabel?: string | null;
 };

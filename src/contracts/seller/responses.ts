@@ -28,6 +28,11 @@ export type SellerMeDto = {
   neighborhood: string | null;
   isActive: boolean;
   createdAt: string;
+  representativeId?: number | null;
+  representativeCode?: string | null;
+  representativeName?: string | null;
+  representativeStatus?: number | null;
+  representativeStatusLabel?: string | null;
 };
 
 export type PublicSellerAdvertisementDto = {
