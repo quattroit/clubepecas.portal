@@ -23,10 +23,12 @@ type SubscriptionActionsCardProps = {
   onReactivate?: () => void;
   onRetryPayment?: () => void;
   onNewCharge?: () => void;
+  onSyncPayment?: () => void;
   cancelLoading?: boolean;
   reactivateLoading?: boolean;
   retryLoading?: boolean;
   newChargeLoading?: boolean;
+  syncLoading?: boolean;
 };
 
 function SubscriptionActionsCard({
@@ -41,10 +43,12 @@ function SubscriptionActionsCard({
   onReactivate,
   onRetryPayment,
   onNewCharge,
+  onSyncPayment,
   cancelLoading = false,
   reactivateLoading = false,
   retryLoading = false,
   newChargeLoading = false,
+  syncLoading = false,
 }: SubscriptionActionsCardProps) {
   if (!hasSubscription) {
     return (
@@ -167,8 +171,10 @@ function SubscriptionActionsCard({
         <Button
           type="button"
           variant="outline"
-          disabled={!actions?.canSyncPayment}
-          title="Sincronização manual disponível no admin"
+          onClick={onSyncPayment}
+          disabled={!actions?.canSyncPayment || syncLoading || !onSyncPayment}
+          aria-busy={syncLoading}
+          title="Consulta o status do pagamento no Asaas"
         >
           Sincronizar
         </Button>

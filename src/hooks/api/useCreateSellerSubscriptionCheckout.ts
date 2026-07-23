@@ -86,9 +86,26 @@ export function useCreateSellerSubscriptionCheckout(
 
       window.location.href = result.checkoutUrl;
     },
+    onError: async () => {
+      // Vínculo de representante / pending abortado no backend — atualiza UI.
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.seller.subscription,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.seller.subscriptions,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.seller.payments,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.seller.me,
+        }),
+      ]);
+    },
     retry: (failureCount, error) => {
       if (isCanceledError(error)) return false;
-      if (failureCount >= 2) return false;
+      if (failureCount >= 1) return false;
       return isProviderError(error);
     },
   });

@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const s3PublicHost = process.env.NEXT_PUBLIC_S3_PUBLIC_HOST;
 
-function apiRemotePattern():
+function parseRemotePattern(urlOrHost: string | undefined):
   | {
       protocol: "http" | "https";
       hostname: string;
@@ -10,9 +11,12 @@ function apiRemotePattern():
       pathname: string;
     }
   | null {
-  if (!apiUrl) return null;
+  if (!urlOrHost) return null;
   try {
-    const parsed = new URL(apiUrl);
+    const withProtocol = urlOrHost.includes("://")
+      ? urlOrHost
+      : `https://${urlOrHost}`;
+    const parsed = new URL(withProtocol);
     const protocol = parsed.protocol.replace(":", "") as "http" | "https";
     return {
       protocol,
@@ -25,12 +29,20 @@ function apiRemotePattern():
   }
 }
 
-const apiPattern = apiRemotePattern();
+const apiPattern = parseRemotePattern(apiUrl);
+const s3Pattern = parseRemotePattern(s3PublicHost);
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       ...(apiPattern ? [apiPattern] : []),
+      ...(s3Pattern ? [s3Pattern] : []),
+      {
+        protocol: "https",
+        hostname: "clubepecas-dev.s3.sa-east-1.amazonaws.com",
+        pathname: "/**",
+      },
       {
         protocol: "http",
         hostname: "localhost",

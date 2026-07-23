@@ -76,6 +76,7 @@ function SellerProfileForm({
     control,
     reset,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm<SellerProfileFormValues>({
     resolver: zodResolver(sellerProfileFormSchema) as Resolver<SellerProfileFormValues>,
@@ -317,7 +318,12 @@ function SellerProfileForm({
             maxResults={30}
             onChange={(next) => {
               setSelectedState(next);
-              setValue("cityId", 0, { shouldValidate: true, shouldDirty: true });
+              // Não validar cityId=0 agora — só exige cidade no submit / ao escolher.
+              setValue("cityId", 0, {
+                shouldValidate: false,
+                shouldDirty: true,
+              });
+              clearErrors("cityId");
             }}
           />
         </div>
@@ -360,8 +366,12 @@ function SellerProfileForm({
                       : "seller-city-hint"
                 }
                 onBlur={field.onBlur}
-                onChange={(cityId) => {
-                  field.onChange(cityId ? Number(cityId) : 0);
+                onChange={(nextCityId) => {
+                  const parsed = nextCityId ? Number(nextCityId) : 0;
+                  field.onChange(parsed);
+                  if (parsed > 0) {
+                    clearErrors("cityId");
+                  }
                 }}
               />
             )}

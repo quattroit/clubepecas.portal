@@ -105,6 +105,15 @@ export type PaymentRecoveryResponse = {
   message: string;
 };
 
+/** POST /api/v1/seller/subscription/sync-payment */
+export type SyncSellerSubscriptionPaymentResponse = {
+  paymentId: number;
+  paymentStatus: string;
+  subscriptionId?: number | null;
+  subscriptionStatus?: string | null;
+  message?: string | null;
+};
+
 export type SubscriptionPendingChangeDto = {
   planId: number;
   planName: string;

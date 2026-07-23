@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { SellerOnboardingGuard } from "@/components/auth/SellerOnboardingGuard";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export default function DashboardRouteLayout({
@@ -10,7 +11,9 @@ export default function DashboardRouteLayout({
 }>) {
   return (
     <AuthGuard>
-      <DashboardLayout>{children}</DashboardLayout>
+      <SellerOnboardingGuard>
+        <DashboardLayout>{children}</DashboardLayout>
+      </SellerOnboardingGuard>
     </AuthGuard>
   );
 }

@@ -6,6 +6,8 @@ import { CreditCard, Home, LayoutDashboard, Package, UserRound } from "lucide-re
 
 import { Logo } from "@/components/layout/Logo";
 import { ROUTES } from "@/constants/routes";
+import { useCurrentSellerSubscription } from "@/hooks/api/useCurrentSellerSubscription";
+import { useSeller } from "@/hooks/api/useSeller";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -14,29 +16,42 @@ const NAV_ITEMS = [
     label: "Dashboard",
     icon: LayoutDashboard,
     exact: true,
+    requiresSeller: true,
+    requiresPlan: true,
   },
   {
     href: ROUTES.MY_ADVERTISEMENTS,
     label: "Meus anúncios",
     icon: Package,
     exact: false,
+    requiresSeller: true,
+    requiresPlan: true,
   },
   {
     href: ROUTES.MY_PLAN,
     label: "Meu Plano",
     icon: CreditCard,
     exact: true,
+    requiresSeller: true,
+    requiresPlan: false,
   },
   {
     href: ROUTES.PROFILE,
     label: "Meu perfil",
     icon: UserRound,
     exact: true,
+    requiresSeller: false,
+    requiresPlan: false,
   },
 ] as const;
 
 function Sidebar() {
   const pathname = usePathname();
+  const sellerQuery = useSeller();
+  const subscriptionQuery = useCurrentSellerSubscription();
+
+  const hasSeller = sellerQuery.data != null;
+  const hasPlan = subscriptionQuery.data != null;
 
   return (
     <aside
@@ -59,28 +74,46 @@ function Sidebar() {
                 : pathname === item.href ||
                   pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
+              const locked =
+                (item.requiresSeller && !hasSeller) ||
+                (item.requiresPlan && !hasPlan);
 
               return (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "text-small focus-visible:ring-sidebar-ring flex min-h-9 items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors outline-none focus-visible:ring-2",
-                      isActive
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium shadow-xs"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    )}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    <Icon
+                  {locked ? (
+                    <span
+                      className="text-small text-muted-foreground flex min-h-9 cursor-not-allowed items-center gap-2.5 rounded-lg px-2.5 py-2 opacity-50"
+                      title={
+                        !hasSeller
+                          ? "Complete seu perfil da loja para continuar"
+                          : "Assine um plano para continuar"
+                      }
+                      aria-disabled
+                    >
+                      <Icon className="size-4 shrink-0 opacity-70" aria-hidden />
+                      {item.label}
+                    </span>
+                  ) : (
+                    <Link
+                      href={item.href}
                       className={cn(
-                        "size-4 shrink-0 transition-opacity",
-                        isActive ? "opacity-100" : "opacity-70",
+                        "text-small focus-visible:ring-sidebar-ring flex min-h-9 items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors outline-none focus-visible:ring-2",
+                        isActive
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium shadow-xs"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                       )}
-                      aria-hidden
-                    />
-                    {item.label}
-                  </Link>
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      <Icon
+                        className={cn(
+                          "size-4 shrink-0 transition-opacity",
+                          isActive ? "opacity-100" : "opacity-70",
+                        )}
+                        aria-hidden
+                      />
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               );
             })}

@@ -23,7 +23,7 @@ type FilterSidebarProps = {
   categories?: FilterOption[];
   brands?: FilterOption[];
   cities?: FilterOption[];
-  states?: FilterOption[];
+  states?: readonly FilterOption[];
   className?: string;
   /** Exibe título interno do card (ocultar no drawer se o Sheet já tiver título) */
   showTitle?: boolean;

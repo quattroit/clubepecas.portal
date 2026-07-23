@@ -2,21 +2,18 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Store } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { SellerProfileForm } from "@/features/dashboard/components/SellerProfileForm";
 import { ChangePasswordForm } from "@/features/dashboard/components/ChangePasswordForm";
 import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 import type { SellerProfileFormValues } from "@/features/dashboard/schemas/sellerProfileFormSchema";
-import { ROUTES } from "@/constants/routes";
 import { useCreateSeller } from "@/hooks/api/useCreateSeller";
 import { useCurrentUser } from "@/hooks/api/useCurrentUser";
 import { useSeller } from "@/hooks/api/useSeller";
 import { useUpdateSeller } from "@/hooks/api/useUpdateSeller";
 import { ANNOUNCE_PROFILE_PARAM } from "@/lib/announce-flow";
+import { SELLER_ONBOARDING_PLAN_PATH } from "@/lib/seller-onboarding";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import {
   mapSellerProfileFormToCreateRequest,
@@ -38,8 +35,6 @@ function SellerProfileView() {
   const currentUserQuery = useCurrentUser();
   const createMutation = useCreateSeller();
   const updateMutation = useUpdateSeller();
-  const [isCreating, setIsCreating] = useState(false);
-  const [dismissedAnnounceForm, setDismissedAnnounceForm] = useState(false);
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
 
   const createDefaults = useMemo(() => {
@@ -60,8 +55,7 @@ function SellerProfileView() {
   const showCreateForm =
     !sellerQuery.isLoading &&
     !sellerQuery.isError &&
-    sellerQuery.data === null &&
-    (isCreating || (fromAnnounce && !dismissedAnnounceForm));
+    sellerQuery.data === null;
 
   const editDefaults = useMemo(() => {
     if (!sellerQuery.data) return undefined;
@@ -79,11 +73,8 @@ function SellerProfileView() {
       },
       {
         onSuccess: () => {
-          setIsCreating(false);
           setPendingPhotoFile(null);
-          if (fromAnnounce) {
-            router.replace(ROUTES.NEW_ADVERTISEMENT);
-          }
+          router.replace(SELLER_ONBOARDING_PLAN_PATH);
         },
       },
     );
@@ -102,14 +93,15 @@ function SellerProfileView() {
         </p>
       </div>
 
-      {fromAnnounce && sellerQuery.data === null ? (
+      {showCreateForm ? (
         <div
           role="status"
           className="border-border bg-secondary text-secondary-foreground rounded-lg border px-4 py-3"
         >
           <p className="text-small">
-            Antes de publicar sua primeira peça, complete seu perfil de
-            vendedor.
+            {fromAnnounce
+              ? "Antes de publicar peças, complete o perfil da loja e assine um plano."
+              : "Complete o perfil da sua loja para continuar. Em seguida você poderá escolher um plano."}
           </p>
         </div>
       ) : null}
@@ -120,26 +112,6 @@ function SellerProfileView() {
         <ErrorMessage
           title="Não foi possível carregar o perfil"
           message={getFriendlyErrorMessage(sellerQuery.error)}
-        />
-      ) : null}
-
-      {!sellerQuery.isLoading &&
-      !sellerQuery.isError &&
-      sellerQuery.data === null &&
-      !showCreateForm ? (
-        <EmptyState
-          title="Você ainda não tem perfil de vendedor"
-          description="Crie seu perfil de loja para poder publicar anúncios de peças no ClubePeças."
-          icon={<Store aria-hidden />}
-          action={
-            <Button
-              type="button"
-              variant="primary"
-              onClick={() => setIsCreating(true)}
-            >
-              Criar perfil
-            </Button>
-          }
         />
       ) : null}
 
@@ -154,12 +126,6 @@ function SellerProfileView() {
           pendingPhotoFile={pendingPhotoFile}
           onPendingPhotoFileChange={setPendingPhotoFile}
           onSubmit={handleCreate}
-          onCancel={() => {
-            setIsCreating(false);
-            setDismissedAnnounceForm(true);
-            setPendingPhotoFile(null);
-            createMutation.reset();
-          }}
           submittingLabel={
             pendingPhotoFile ? "Criando e enviando foto…" : undefined
           }

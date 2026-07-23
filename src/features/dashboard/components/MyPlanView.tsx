@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
@@ -35,6 +36,7 @@ import { useRetrySellerSubscriptionPayment } from "@/hooks/api/useRetrySellerSub
 import { useSeller } from "@/hooks/api/useSeller";
 import { useSellerSubscriptionHistory } from "@/hooks/api/useSellerSubscriptionHistory";
 import { useSellerSubscriptionPayments } from "@/hooks/api/useSellerSubscriptionPayments";
+import { useSyncSellerSubscriptionPayment } from "@/hooks/api/useSyncSellerSubscriptionPayment";
 import { useUpgradeSellerSubscription } from "@/hooks/api/useUpgradeSellerSubscription";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { AdminStatusBadge } from "@/components/admin";
@@ -47,6 +49,8 @@ type PlanPriceDialogMode = "upgrade" | "downgrade" | "change-cycle" | null;
  * Renderiza exclusivamente dados da API — sem regras de negócio no cliente.
  */
 function MyPlanView() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const sellerQuery = useSeller();
   const subscriptionQuery = useCurrentSellerSubscription();
   const paymentsQuery = useSellerSubscriptionPayments(
@@ -60,6 +64,7 @@ function MyPlanView() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [planPriceMode, setPlanPriceMode] =
     useState<PlanPriceDialogMode>(null);
+  const checkoutSyncAttempted = useRef(false);
 
   const closePlanPriceDialog = () => setPlanPriceMode(null);
 
@@ -74,9 +79,33 @@ function MyPlanView() {
   const reactivateMutation = useReactivateSellerSubscription();
   const retryPaymentMutation = useRetrySellerSubscriptionPayment();
   const newChargeMutation = useCreateSellerSubscriptionNewCharge();
+  const syncPaymentMutation = useSyncSellerSubscriptionPayment();
+  const syncAfterCheckoutMutation = useSyncSellerSubscriptionPayment({
+    silent: true,
+  });
+  const syncAfterCheckoutMutate = syncAfterCheckoutMutation.mutate;
+  const syncAfterCheckoutPending = syncAfterCheckoutMutation.isPending;
 
   const subscription = subscriptionQuery.data ?? null;
   const openChoosePlan = () => setChooseOpen(true);
+
+  useEffect(() => {
+    if (searchParams.get("checkout") !== "success") {
+      return;
+    }
+
+    if (checkoutSyncAttempted.current || syncAfterCheckoutPending) {
+      return;
+    }
+
+    checkoutSyncAttempted.current = true;
+    syncAfterCheckoutMutate(undefined, {
+      onSettled: () => {
+        router.replace("/painel/meu-plano");
+      },
+    });
+  }, [searchParams, syncAfterCheckoutMutate, syncAfterCheckoutPending, router]);
+
   const retryPaymentLabel =
     subscription?.financial.hasOverduePayment ||
     subscription?.financial.hasPendingPayment
@@ -233,10 +262,12 @@ function MyPlanView() {
             onReactivate={() => reactivateMutation.mutate()}
             onRetryPayment={() => retryPaymentMutation.mutate()}
             onNewCharge={() => newChargeMutation.mutate()}
+            onSyncPayment={() => syncPaymentMutation.mutate()}
             cancelLoading={cancelRenewalMutation.isPending}
             reactivateLoading={reactivateMutation.isPending}
             retryLoading={retryPaymentMutation.isPending}
             newChargeLoading={newChargeMutation.isPending}
+            syncLoading={syncPaymentMutation.isPending}
           />
           <AvailablePlansCard
             plans={subscription.availablePlans}

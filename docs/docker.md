@@ -1,38 +1,9 @@
-# Docker local (Sprint 9.1)
+# Docker (frontend)
 
-A orquestração completa (API + Postgres + Nginx + este frontend) vive no repositório **ClubePecas**.
+O portal **não** possui `docker-compose` próprio.
 
-## Como subir
+A orquestração completa (nginx + frontend + backend + postgres) fica em:
 
-1. Clone/mantenha as pastas irmãs:
+[`ClubePecas/docs/docker.md`](../../ClubePecas/docs/docker.md)
 
-```text
-Projetos/
-├── ClubePecas/
-└── CluebPecas.Portal/   ← este repo
-```
-
-2. No backend:
-
-```bash
-cd ../ClubePecas
-cp .env.example .env
-docker compose up -d --build
-```
-
-Documentação completa: `ClubePecas/docs/docker.md`.
-
-## Dockerfile deste repositório
-
-O arquivo `Dockerfile` na raiz do Portal é usado pelo Compose do backend (`FRONTEND_CONTEXT=../CluebPecas.Portal`).
-
-Build multi-stage: `npm ci` → `next build` → `next start` (sem `output: 'standalone'` nesta sprint).
-
-## Variáveis de build
-
-| Variável | Uso |
-|----------|-----|
-| `NEXT_PUBLIC_API_URL` | Base da API no browser (via Nginx: `http://localhost`) |
-| `NEXT_PUBLIC_SITE_URL` | URL canônica do site |
-
-Após `docker compose up`, acesse http://localhost.
+Build do frontend: `output: "standalone"` + `Dockerfile` multi-stage nesta pasta, consumido pelo Compose do backend via `FRONTEND_CONTEXT=../CluebPecas.Portal`.

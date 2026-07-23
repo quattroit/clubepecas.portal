@@ -27,6 +27,7 @@ import type {
   PaymentRecoveryResponse,
   ReactivateSellerSubscriptionResponse,
   SellerSubscriptionDto,
+  SyncSellerSubscriptionPaymentResponse,
 } from "@/contracts/seller/subscription";
 import type { ListSellerPaymentsResponse } from "@/contracts/seller/payments";
 import { api } from "@/lib/api";
@@ -183,6 +184,15 @@ export const sellerService = {
     return api
       .post<PaymentRecoveryResponse>(
         "/api/v1/seller/subscription/new-charge",
+      )
+      .then((response) => response.data);
+  },
+
+  /** POST /api/v1/seller/subscription/sync-payment — sincroniza com Asaas após checkout. */
+  syncSubscriptionPayment() {
+    return api
+      .post<SyncSellerSubscriptionPaymentResponse>(
+        "/api/v1/seller/subscription/sync-payment",
       )
       .then((response) => response.data);
   },

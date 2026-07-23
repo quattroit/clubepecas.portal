@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
+import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
