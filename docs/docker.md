@@ -6,4 +6,6 @@ A orquestração completa (nginx + frontend + backend + postgres) fica em:
 
 [`ClubePecas/docs/docker.md`](../../ClubePecas/docs/docker.md)
 
-Build do frontend: `output: "standalone"` + `Dockerfile` multi-stage nesta pasta, consumido pelo Compose do backend via `FRONTEND_CONTEXT=../CluebPecas.Portal`.
+Build do frontend: `output: "standalone"` + `Dockerfile` multi-stage nesta pasta, consumido pelo Compose do backend via `FRONTEND_CONTEXT=../ClubePecas.Portal`.
+
+Deploy EC2 / HTTPS: ver `ClubePecas/docs/deploy.md` e `ClubePecas/docs/infraestrutura.md`.

@@ -1,7 +1,7 @@
 # Auditoria de Performance — Sprint 7.1
 
 **Data:** 2026-07-17  
-**Escopo:** Backend (`ClubePecas`) + Frontend (`CluebPecas.Portal`)  
+**Escopo:** Backend (`ClubePecas`) + Frontend (`ClubePecas.Portal`)  
 **Premissa:** melhorias transparentes, sem alteração de regras de negócio nem breaking changes em contratos públicos.
 
 ---

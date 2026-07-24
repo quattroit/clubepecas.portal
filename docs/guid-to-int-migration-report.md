@@ -1,7 +1,7 @@
 # Relatório — Refatoração GUID → INT
 
 **Data:** 2026-07-20  
-**Escopo:** Backend (`ClubePecas`) + Frontend (`CluebPecas.Portal`)
+**Escopo:** Backend (`ClubePecas`) + Frontend (`ClubePecas.Portal`)
 
 ---
 

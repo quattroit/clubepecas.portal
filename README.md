@@ -15,7 +15,7 @@ Abra [http://localhost:3000](http://localhost:3000). Configure `NEXT_PUBLIC_API_
 
 O portal **não** sobe sozinho. Use o Compose do backend:
 
-1. Repositórios irmãos: `ClubePecas/` e `CluebPecas.Portal/`
+1. Repositórios irmãos: `ClubePecas/` e `ClubePecas.Portal/`
 2. Em `ClubePecas`: `cp .env.example .env` e `docker compose up -d --build`
 3. Acesse [http://localhost](http://localhost)
 
