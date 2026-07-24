@@ -19,6 +19,7 @@ import { ROUTES } from "@/constants/routes";
 import type { AdminSubscriptionPlanListItemDto } from "@/contracts/admin/subscription-plans";
 import { SubscriptionPlanFormDialog } from "@/features/admin/components/SubscriptionPlanFormDialog";
 import type { SubscriptionPlanFormValues } from "@/features/admin/schemas/subscriptionPlanFormSchema";
+import { useAdminSubscriptionPlan } from "@/hooks/api/useAdminSubscriptionPlan";
 import { useAdminSubscriptionPlans } from "@/hooks/api/useAdminSubscriptionPlans";
 import { useCreateAdminSubscriptionPlan } from "@/hooks/api/useCreateAdminSubscriptionPlan";
 import { useDeleteAdminSubscriptionPlan } from "@/hooks/api/useDeleteAdminSubscriptionPlan";
@@ -99,17 +100,24 @@ function AdminSubscriptionPlansView() {
     setFormOpen(true);
   };
 
-  const formDefaultValues: SubscriptionPlanFormValues | undefined = useMemo(
-    () =>
-      editingPlan ? mapAdminSubscriptionPlanToForm(editingPlan) : undefined,
-    [editingPlan],
+  const planDetailQuery = useAdminSubscriptionPlan(
+    formOpen && formMode === "edit" ? editingPlan?.id : undefined,
   );
+
+  const formDefaultValues: SubscriptionPlanFormValues | undefined = useMemo(() => {
+    if (formMode !== "edit") return undefined;
+    // Preferir detalhe (displayName/description dos ciclos); listagem não traz esses campos.
+    const source = planDetailQuery.data ?? editingPlan;
+    return source ? mapAdminSubscriptionPlanToForm(source) : undefined;
+  }, [editingPlan, formMode, planDetailQuery.data]);
 
   const submitError = createMutation.isError
     ? createMutation.error
     : updateMutation.isError
       ? updateMutation.error
-      : undefined;
+      : planDetailQuery.isError
+        ? planDetailQuery.error
+        : undefined;
 
   const handleFormSubmit = (values: SubscriptionPlanFormValues) => {
     if (formMode === "create") {
@@ -336,7 +344,11 @@ function AdminSubscriptionPlansView() {
         onOpenChange={setFormOpen}
         mode={formMode}
         defaultValues={formDefaultValues}
-        isSubmitting={createMutation.isPending || updateMutation.isPending}
+        isSubmitting={
+          createMutation.isPending ||
+          updateMutation.isPending ||
+          (formMode === "edit" && planDetailQuery.isFetching)
+        }
         submitError={submitError}
         onSubmit={handleFormSubmit}
       />

@@ -28,7 +28,7 @@ export const subscriptionPlanPriceFormSchema = z.object({
     .int("Informe um número inteiro")
     .min(0, "Deve ser zero ou maior"),
   isActive: z.boolean(),
-  isRecommended: z.boolean(),
+  isRecommended: z.boolean().default(false),
 });
 
 export type SubscriptionPlanPriceFormValues = z.infer<

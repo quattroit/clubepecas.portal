@@ -37,7 +37,7 @@ export function mapAdminSubscriptionPlanToForm(
         description: price.description ?? "",
         displayOrder: price.displayOrder,
         isActive: price.isActive,
-        isRecommended: price.isRecommended,
+        isRecommended: price.isRecommended ?? false,
       })),
   };
 }

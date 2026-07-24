@@ -16,10 +16,11 @@ export type AdminSubscriptionPlanPriceDto = {
   description?: string | null;
   displayOrder: number;
   isActive: boolean;
-  equivalentMonthlyPrice: number;
+  equivalentMonthlyPrice?: number;
   savingsAmount?: number | null;
   savingsPercent?: number | null;
-  isRecommended: boolean;
+  /** Calculado no catálogo público; listagem admin pode omitir. */
+  isRecommended?: boolean;
 };
 
 export type AdminSubscriptionPlanListItemDto = {
@@ -55,7 +56,8 @@ export type AdminSubscriptionPlanPriceRequest = {
   description?: string;
   displayOrder: number;
   isActive: boolean;
-  isRecommended: boolean;
+  /** Calculado no catálogo público; listagem admin pode omitir. */
+  isRecommended?: boolean;
 };
 
 /** POST /api/v1/admin/subscription-plans */
