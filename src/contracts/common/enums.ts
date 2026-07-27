@@ -10,6 +10,8 @@ export enum UserRole {
   Seller = 2,
   /** Representante comercial — portal próprio (Sprint 10.6). */
   Representative = 3,
+  /** Comprador profissional — área /comprador (Sprint 9.1). */
+  ProfessionalBuyer = 4,
 }
 
 export enum AdvertisementCategory {
@@ -124,4 +126,23 @@ export enum PayoutPaymentMethod {
   Manual = 1,
   Pix = 2,
   BankTransfer = 3,
+}
+
+/** Segmento de atuação do comprador profissional (Sprint 9.1). */
+export enum ProfessionalBuyerSegment {
+  MechanicalWorkshop = 1,
+  BodyShop = 2,
+  AutoElectric = 3,
+  AutomotiveCenter = 4,
+  Dealership = 5,
+  Fleet = 6,
+  RentalCompany = 7,
+  Other = 8,
+}
+
+/** Status do perfil de comprador profissional (Sprint 9.1). */
+export enum ProfessionalBuyerStatus {
+  Pending = 1,
+  Active = 2,
+  Suspended = 3,
 }

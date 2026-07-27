@@ -10,14 +10,16 @@ import { ROUTES } from "@/constants/routes";
 import { UserRole } from "@/contracts/common/enums";
 import { buildLoginPathWithNext } from "@/lib/announce-flow";
 
-type AuthGuardProps = {
+type ProfessionalBuyerAuthGuardProps = {
   children: React.ReactNode;
 };
 
 /**
- * Protege a área do vendedor — exige autenticação e Role = Seller.
+ * Protege a área do comprador profissional — exige Role = ProfessionalBuyer.
  */
-function AuthGuard({ children }: AuthGuardProps) {
+function ProfessionalBuyerAuthGuard({
+  children,
+}: ProfessionalBuyerAuthGuardProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
@@ -39,9 +41,15 @@ function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
-    if (user?.role === UserRole.ProfessionalBuyer) {
-      toast.message("Acesse a área do comprador profissional para continuar.");
-      router.replace(ROUTES.PROFESSIONAL_BUYER);
+    if (user?.role === UserRole.Seller) {
+      toast.message("Acesse o painel do vendedor para continuar.");
+      router.replace(ROUTES.DASHBOARD);
+      return;
+    }
+
+    if (user?.role !== UserRole.ProfessionalBuyer) {
+      toast.error("Acesso restrito a compradores profissionais.");
+      router.replace(ROUTES.LOGIN);
     }
   }, [isAuthenticated, isLoading, router, user?.role]);
 
@@ -49,14 +57,11 @@ function AuthGuard({ children }: AuthGuardProps) {
     return <PageLoader label="Verificando sessão…" />;
   }
 
-  if (
-    user?.role === UserRole.Administrator ||
-    user?.role === UserRole.ProfessionalBuyer
-  ) {
+  if (user?.role !== UserRole.ProfessionalBuyer) {
     return <PageLoader label="Redirecionando…" />;
   }
 
   return children;
 }
 
-export { AuthGuard };
+export { ProfessionalBuyerAuthGuard };

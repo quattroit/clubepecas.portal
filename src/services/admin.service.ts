@@ -42,6 +42,12 @@ import type {
   UpdateAdminRepresentativeRequest,
 } from "@/contracts/admin/representatives";
 import type {
+  CreateProfessionalBuyerRequest,
+  ListProfessionalBuyersParams,
+  ListProfessionalBuyersResponse,
+  ProfessionalBuyerDto,
+} from "@/contracts/professional-buyers";
+import type {
   AdminCommissionDetailDto,
   AdminCommissionsListParams,
   AdminCommissionsListResponse,
@@ -411,6 +417,49 @@ export const adminService = {
         `/api/v1/admin/representatives/${id}/deactivate`,
       )
       .then((response) => response.data);
+  },
+
+  /** GET /api/v1/professional-buyers (admin — Sprint 9.1) */
+  listProfessionalBuyers(params: ListProfessionalBuyersParams = {}) {
+    return api
+      .get<ListProfessionalBuyersResponse>("/api/v1/professional-buyers", {
+        params,
+      })
+      .then((response) => response.data);
+  },
+
+  getProfessionalBuyer(id: number) {
+    return api
+      .get<ProfessionalBuyerDto>(`/api/v1/professional-buyers/${id}`)
+      .then((response) => response.data);
+  },
+
+  createProfessionalBuyer(payload: CreateProfessionalBuyerRequest) {
+    return api
+      .post<ProfessionalBuyerDto>("/api/v1/professional-buyers", payload)
+      .then((response) => response.data);
+  },
+
+  activateProfessionalBuyer(id: number) {
+    return api
+      .patch<ProfessionalBuyerDto>(
+        `/api/v1/professional-buyers/${id}/activate`,
+      )
+      .then((response) => response.data);
+  },
+
+  suspendProfessionalBuyer(id: number) {
+    return api
+      .patch<ProfessionalBuyerDto>(
+        `/api/v1/professional-buyers/${id}/suspend`,
+      )
+      .then((response) => response.data);
+  },
+
+  deleteProfessionalBuyer(id: number) {
+    return api
+      .delete(`/api/v1/professional-buyers/${id}`)
+      .then(() => undefined);
   },
 
   listVehicleBrands(params: AdminVehicleBrandsListParams = {}) {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
+  BriefcaseBusiness,
   Car,
   CarFront,
   CreditCard,
@@ -68,6 +69,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: ROUTES.ADMIN_REPRESENTATIVES,
     label: "Representantes",
     icon: UserRound,
+    exact: false,
+  },
+  {
+    href: ROUTES.ADMIN_PROFESSIONAL_BUYERS,
+    label: "Compradores Profissionais",
+    icon: BriefcaseBusiness,
     exact: false,
   },
   {

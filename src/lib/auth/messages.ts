@@ -163,6 +163,26 @@ const CODE_MESSAGES: Record<string, string> = {
   "admin.representatives.state.required": "Informe a UF.",
   "admin.representatives.state.invalid": "Informe uma UF válida.",
   "admin.representatives.status.invalid": "Status inválido.",
+  "professional_buyer.not_found": "Comprador profissional não encontrado.",
+  "professional_buyer.email.already_exists":
+    "Já existe um comprador com este e-mail.",
+  "professional_buyer.document.already_exists":
+    "Já existe um comprador com este documento.",
+  "professional_buyer.company_name.required": "Informe o nome fantasia.",
+  "professional_buyer.corporate_name.required": "Informe a razão social.",
+  "professional_buyer.document.required": "Informe o CPF ou CNPJ.",
+  "professional_buyer.contact_name.required": "Informe o nome do contato.",
+  "professional_buyer.email.required": "Informe o e-mail.",
+  "professional_buyer.phone.required": "Informe o telefone.",
+  "professional_buyer.whatsapp.required": "Informe o WhatsApp.",
+  "professional_buyer.city_id.required": "Selecione a cidade.",
+  "professional_buyer.address.required": "Informe o endereço.",
+  "professional_buyer.number.required": "Informe o número.",
+  "professional_buyer.neighborhood.required": "Informe o bairro.",
+  "professional_buyer.zip_code.required": "Informe o CEP.",
+  "professional_buyer.zip_code.invalid":
+    "Informe um CEP válido com 8 dígitos.",
+  "professional_buyer.segment.invalid": "Segmento inválido.",
   "representative.code.required": "Informe o código do representante.",
   "representative.code.not_found": "Código de representante inválido.",
   "representative.code.inactive":

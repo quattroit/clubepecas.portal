@@ -42,7 +42,8 @@ export function resolveAuthenticatedAnnouncePath(hasSellerProfile: boolean): str
 export function getSafeAuthNextPath(next: string | null | undefined): string | null {
   if (!next) return null;
   if (!next.startsWith("/") || next.startsWith("//")) return null;
-  if (next.startsWith("/painel") || next.startsWith("/admin")) return next;
+  if (next.startsWith("/painel") || next.startsWith("/admin") || next.startsWith("/comprador"))
+    return next;
   return null;
 }
 

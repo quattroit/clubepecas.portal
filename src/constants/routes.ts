@@ -31,6 +31,7 @@ export const ROUTES = {
   ADMIN_CATEGORIES: "/admin/categorias",
   ADMIN_CITIES: "/admin/cidades",
   ADMIN_REPRESENTATIVES: "/admin/representantes",
+  ADMIN_PROFESSIONAL_BUYERS: "/admin/compradores-profissionais",
   ADMIN_COMMISSIONS: "/admin/comissoes",
   ADMIN_VEHICLE_BRANDS: "/admin/marcas",
   ADMIN_VEHICLE_MODELS: "/admin/modelos",
@@ -52,6 +53,8 @@ export const ROUTES = {
   REPRESENTATIVE_COMMISSIONS: "/representante/comissoes",
   REPRESENTATIVE_PAYOUTS: "/representante/pagamentos",
   REPRESENTATIVE_STATEMENT: "/representante/extrato",
+  /** Área do comprador profissional (Sprint 9.1). */
+  PROFESSIONAL_BUYER: "/comprador",
 } as const;
 
 /** Helper para rota pública de detalhe do anúncio (slug) */
@@ -142,6 +145,7 @@ export const ADMIN_ROUTES = {
   ADMIN_CATEGORIES: ROUTES.ADMIN_CATEGORIES,
   ADMIN_CITIES: ROUTES.ADMIN_CITIES,
   ADMIN_REPRESENTATIVES: ROUTES.ADMIN_REPRESENTATIVES,
+  ADMIN_PROFESSIONAL_BUYERS: ROUTES.ADMIN_PROFESSIONAL_BUYERS,
   ADMIN_COMMISSIONS: ROUTES.ADMIN_COMMISSIONS,
   ADMIN_VEHICLE_BRANDS: ROUTES.ADMIN_VEHICLE_BRANDS,
   ADMIN_VEHICLE_MODELS: ROUTES.ADMIN_VEHICLE_MODELS,
@@ -173,6 +177,11 @@ export const REPRESENTATIVE_ROUTES = {
   REPRESENTATIVE_STATEMENT: ROUTES.REPRESENTATIVE_STATEMENT,
 } as const;
 
+/** Páginas do comprador profissional (protegidas por ProfessionalBuyerAuthGuard). */
+export const PROFESSIONAL_BUYER_ROUTES = {
+  PROFESSIONAL_BUYER: ROUTES.PROFESSIONAL_BUYER,
+} as const;
+
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
 export type PublicRoute = (typeof PUBLIC_ROUTES)[keyof typeof PUBLIC_ROUTES];
 export type AuthRoute = (typeof AUTH_ROUTES)[keyof typeof AUTH_ROUTES];
@@ -182,3 +191,5 @@ export type RepresentativeAuthRoute =
   (typeof REPRESENTATIVE_AUTH_ROUTES)[keyof typeof REPRESENTATIVE_AUTH_ROUTES];
 export type RepresentativeRoute =
   (typeof REPRESENTATIVE_ROUTES)[keyof typeof REPRESENTATIVE_ROUTES];
+export type ProfessionalBuyerRoute =
+  (typeof PROFESSIONAL_BUYER_ROUTES)[keyof typeof PROFESSIONAL_BUYER_ROUTES];

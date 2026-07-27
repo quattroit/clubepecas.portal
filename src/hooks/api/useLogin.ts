@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/providers/AuthProvider";
 import type { LoginRequest } from "@/contracts/authentication/requests";
+import { UserRole } from "@/contracts/common/enums";
 import { ROUTES } from "@/constants/routes";
 import { readAuthNextFromLocation } from "@/lib/announce-flow";
 import { mapLoginResponseToSession } from "@/mappers/authentication.mapper";
@@ -13,6 +14,7 @@ import { authenticationService } from "@/services/authentication.service";
 /**
  * Login real via API + persistência de sessão.
  * Respeita `?next=` (fluxo Anunciar → /painel/anuncios/novo).
+ * Redireciona por role: ProfessionalBuyer → /comprador, Admin → /admin, Seller → painel.
  * Invalidação de queries fica a cargo do AuthQuerySync.
  */
 export function useLogin() {
@@ -27,9 +29,20 @@ export function useLogin() {
     onSuccess: (session) => {
       login(session);
       const next = readAuthNextFromLocation();
-      router.replace(
-        next?.startsWith("/painel") ? next : ROUTES.DASHBOARD,
-      );
+
+      if (session.role === UserRole.ProfessionalBuyer) {
+        router.replace(
+          next?.startsWith("/comprador") ? next : ROUTES.PROFESSIONAL_BUYER,
+        );
+        return;
+      }
+
+      if (session.role === UserRole.Administrator) {
+        router.replace(next?.startsWith("/admin") ? next : ROUTES.ADMIN);
+        return;
+      }
+
+      router.replace(next?.startsWith("/painel") ? next : ROUTES.DASHBOARD);
     },
   });
 }

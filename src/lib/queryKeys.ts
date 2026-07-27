@@ -112,6 +112,14 @@ export const queryKeys = {
       detail: (id: number) =>
         ["admin", "representatives", "detail", id] as const,
     },
+    professionalBuyers: {
+      all: ["admin", "professionalBuyers"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "professionalBuyers", "list", params] as const,
+      detail: (id: number) =>
+        ["admin", "professionalBuyers", "detail", id] as const,
+    },
+
     commissions: {
       all: ["admin", "commissions"] as const,
       list: (params: Record<string, unknown>) =>
@@ -158,6 +166,10 @@ export const queryKeys = {
       integrity: ["admin", "files", "integrity"] as const,
     },
     settings: ["admin", "settings"] as const,
+  },
+  professionalBuyers: {
+    all: ["professionalBuyers"] as const,
+    me: ["professionalBuyers", "me"] as const,
   },
   representative: {
     all: ["representative"] as const,
