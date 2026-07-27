@@ -61,6 +61,31 @@ export type PartRequestsSummaryDto = {
   cancelled: number;
   completed: number;
   draft: number;
+  suppliersFound: number;
+};
+
+export type PartRequestSupplierDto = {
+  sellerId: number;
+  storeName: string;
+  cityName: string;
+  cityState: string;
+  compatibleAdvertisementCount: number;
+  phone: string | null;
+  whatsApp: string;
+  photoUrl: string | null;
+  selected: boolean;
+  sameCityAsRequest: boolean;
+};
+
+export type PartRequestSuppliersDto = {
+  partRequestId: number;
+  maximumSuppliers: number;
+  selectedCount: number;
+  items: PartRequestSupplierDto[];
+};
+
+export type UpdatePartRequestSuppliersRequest = {
+  selectedSellerIds: number[];
 };
 
 export type ListMyPartRequestsResponse = {

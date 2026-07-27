@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ClipboardList } from "lucide-react";
+import { ArrowRight, ClipboardList, Users } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { PageLoader } from "@/components/feedback/PageLoader";
@@ -54,36 +54,56 @@ function ProfessionalBuyerDashboardView() {
       ) : null}
 
       {summary ? (
-        <Card className="shadow-xs">
-          <CardHeader className="flex flex-row items-start justify-between gap-4">
-            <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-4">
+          <Card className="shadow-xs">
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <ClipboardList className="text-primary size-5" aria-hidden />
+                  Solicitações
+                </CardTitle>
+                <CardDescription>
+                  Acompanhe suas solicitações de peças abertas e canceladas.
+                </CardDescription>
+              </div>
+              <Link
+                href={ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "shrink-0",
+                )}
+              >
+                Ver todas
+                <ArrowRight aria-hidden />
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <SummaryMetric label="Total" value={summary.total} />
+                <SummaryMetric label="Abertas" value={summary.open} />
+                <SummaryMetric label="Canceladas" value={summary.cancelled} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-xs">
+            <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <ClipboardList className="text-primary size-5" aria-hidden />
-                Solicitações
+                <Users className="text-primary size-5" aria-hidden />
+                Fornecedores encontrados
               </CardTitle>
               <CardDescription>
-                Acompanhe suas solicitações de peças abertas e canceladas.
+                Total de fornecedores compatíveis com suas solicitações.
               </CardDescription>
-            </div>
-            <Link
-              href={ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "shrink-0",
-              )}
-            >
-              Ver todas
-              <ArrowRight aria-hidden />
-            </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <SummaryMetric label="Total" value={summary.total} />
-              <SummaryMetric label="Abertas" value={summary.open} />
-              <SummaryMetric label="Canceladas" value={summary.cancelled} />
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+              <SummaryMetric
+                label="Quantidade"
+                value={summary.suppliersFound}
+              />
+            </CardContent>
+          </Card>
+        </div>
       ) : null}
     </div>
   );

@@ -176,6 +176,7 @@ export const queryKeys = {
     me: (params: Record<string, unknown>) =>
       ["partRequests", "me", params] as const,
     detail: (id: number) => ["partRequests", "detail", id] as const,
+    suppliers: (id: number) => ["partRequests", "suppliers", id] as const,
   },
   representative: {
     all: ["representative"] as const,

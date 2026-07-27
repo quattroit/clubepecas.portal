@@ -5,4 +5,5 @@ export { PartRequestDetailView } from "./components/PartRequestDetailView";
 export { PartRequestForm } from "./components/PartRequestForm";
 export { PartRequestsListView } from "./components/PartRequestsListView";
 export { PartRequestStatusBadge } from "./components/PartRequestStatusBadge";
+export { PartRequestSuppliersSection } from "./components/PartRequestSuppliersSection";
 export { ProfessionalBuyerDashboardView } from "./components/ProfessionalBuyerDashboardView";

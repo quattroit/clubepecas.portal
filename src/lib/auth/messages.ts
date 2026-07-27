@@ -214,6 +214,14 @@ const CODE_MESSAGES: Record<string, string> = {
     "A quantidade de fornecedores deve ser entre 1 e 10.",
   "part_request.status.invalid": "Status inválido.",
   "part_request.invalid": "Dados da solicitação inválidos.",
+  "part_request.suppliers.limit_exceeded":
+    "Você atingiu o limite de fornecedores selecionados para esta solicitação.",
+  "part_request.suppliers.invalid":
+    "Não foi possível atualizar a seleção de fornecedores.",
+  "part_request.suppliers.duplicate":
+    "A lista de fornecedores selecionados contém duplicatas.",
+  "part_request.suppliers.seller_id.invalid":
+    "Um ou mais fornecedores selecionados são inválidos.",
   "representative.code.required": "Informe o código do representante.",
   "representative.code.not_found": "Código de representante inválido.",
   "representative.code.inactive":

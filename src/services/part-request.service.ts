@@ -3,6 +3,7 @@ import type {
   ListMyPartRequestsParams,
   ListMyPartRequestsResponse,
   PartRequestDto,
+  PartRequestSuppliersDto,
   UpdatePartRequestRequest,
 } from "@/contracts/part-requests";
 import { api } from "@/lib/api";
@@ -39,6 +40,20 @@ export const partRequestService = {
   cancel(id: number) {
     return api
       .delete<PartRequestDto>(`/api/v1/part-requests/${id}`)
+      .then((response) => response.data);
+  },
+
+  getSuppliers(id: number) {
+    return api
+      .get<PartRequestSuppliersDto>(`/api/v1/part-requests/${id}/suppliers`)
+      .then((response) => response.data);
+  },
+
+  updateSuppliers(id: number, selectedSellerIds: number[]) {
+    return api
+      .put<PartRequestSuppliersDto>(`/api/v1/part-requests/${id}/suppliers`, {
+        selectedSellerIds,
+      })
       .then((response) => response.data);
   },
 };

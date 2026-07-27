@@ -10,6 +10,7 @@ import { PageLoader } from "@/components/feedback/PageLoader";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CancelPartRequestDialog } from "@/features/professional-buyer/components/CancelPartRequestDialog";
 import { PartRequestStatusBadge } from "@/features/professional-buyer/components/PartRequestStatusBadge";
+import { PartRequestSuppliersSection } from "@/features/professional-buyer/components/PartRequestSuppliersSection";
 import {
   ROUTES,
   editProfessionalBuyerPartRequestPath,
@@ -170,6 +171,13 @@ function PartRequestDetailView() {
             </div>
           ) : null}
         </section>
+      ) : null}
+
+      {data ? (
+        <PartRequestSuppliersSection
+          partRequestId={id}
+          status={data.status}
+        />
       ) : null}
 
       <CancelPartRequestDialog
