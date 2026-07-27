@@ -55,6 +55,8 @@ export const ROUTES = {
   REPRESENTATIVE_STATEMENT: "/representante/extrato",
   /** Área do comprador profissional (Sprint 9.1). */
   PROFESSIONAL_BUYER: "/comprador",
+  PROFESSIONAL_BUYER_PART_REQUESTS: "/comprador/solicitacoes",
+  PROFESSIONAL_BUYER_PART_REQUEST_NEW: "/comprador/solicitacoes/nova",
 } as const;
 
 /** Helper para rota pública de detalhe do anúncio (slug) */
@@ -104,6 +106,16 @@ export function representativeReferralPath(code: string) {
 /** Helper para detalhe de vendedor no portal do representante */
 export function representativeSellerPath(id: number) {
   return `${ROUTES.REPRESENTATIVE_SELLERS}/${id}` as const;
+}
+
+/** Helper para detalhe de solicitação do comprador profissional */
+export function professionalBuyerPartRequestPath(id: number) {
+  return `${ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}/${id}` as const;
+}
+
+/** Helper para editar solicitação do comprador profissional */
+export function editProfessionalBuyerPartRequestPath(id: number) {
+  return `${ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}/${id}/editar` as const;
 }
 
 /** Páginas acessíveis sem autenticação (área pública). */
@@ -180,6 +192,8 @@ export const REPRESENTATIVE_ROUTES = {
 /** Páginas do comprador profissional (protegidas por ProfessionalBuyerAuthGuard). */
 export const PROFESSIONAL_BUYER_ROUTES = {
   PROFESSIONAL_BUYER: ROUTES.PROFESSIONAL_BUYER,
+  PROFESSIONAL_BUYER_PART_REQUESTS: ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS,
+  PROFESSIONAL_BUYER_PART_REQUEST_NEW: ROUTES.PROFESSIONAL_BUYER_PART_REQUEST_NEW,
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

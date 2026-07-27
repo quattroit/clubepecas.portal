@@ -146,3 +146,11 @@ export enum ProfessionalBuyerStatus {
   Active = 2,
   Suspended = 3,
 }
+
+/** Status da solicitação de peças (Sprint 9.2). */
+export enum PartRequestStatus {
+  Draft = 0,
+  Open = 1,
+  Cancelled = 2,
+  Completed = 3,
+}

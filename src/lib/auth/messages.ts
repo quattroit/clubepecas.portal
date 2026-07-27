@@ -183,6 +183,37 @@ const CODE_MESSAGES: Record<string, string> = {
   "professional_buyer.zip_code.invalid":
     "Informe um CEP válido com 8 dígitos.",
   "professional_buyer.segment.invalid": "Segmento inválido.",
+  "part_request.not_found": "Solicitação não encontrada.",
+  "part_request.forbidden":
+    "Você não tem permissão para acessar esta solicitação.",
+  "part_request.not_editable":
+    "Não é possível editar uma solicitação cancelada ou concluída.",
+  "part_request.not_cancellable":
+    "Não é possível cancelar esta solicitação.",
+  "part_request.title.required": "Informe o título.",
+  "part_request.title.max_length": "O título excede o limite de caracteres.",
+  "part_request.description.max_length":
+    "A descrição excede o limite de caracteres.",
+  "part_request.vehicle_brand.required": "Selecione a marca.",
+  "part_request.vehicle_brand.invalid": "Selecione uma marca válida.",
+  "part_request.vehicle_model.required": "Selecione o modelo.",
+  "part_request.vehicle_model.invalid": "Selecione um modelo válido.",
+  "part_request.manufacturing_year.required":
+    "Informe o ano de fabricação.",
+  "part_request.manufacturing_year.invalid":
+    "Informe um ano de fabricação válido.",
+  "part_request.model_year.invalid": "Informe um ano/modelo válido.",
+  "part_request.engine.max_length": "O motor excede o limite de caracteres.",
+  "part_request.category.required": "Selecione a categoria.",
+  "part_request.category.invalid": "Selecione uma categoria válida.",
+  "part_request.requested_quantity.invalid":
+    "A quantidade deve ser maior que zero.",
+  "part_request.city.required": "Selecione a cidade.",
+  "part_request.city.invalid": "Selecione uma cidade válida.",
+  "part_request.maximum_suppliers.invalid":
+    "A quantidade de fornecedores deve ser entre 1 e 10.",
+  "part_request.status.invalid": "Status inválido.",
+  "part_request.invalid": "Dados da solicitação inválidos.",
   "representative.code.required": "Informe o código do representante.",
   "representative.code.not_found": "Código de representante inválido.",
   "representative.code.inactive":
