@@ -154,3 +154,11 @@ export enum PartRequestStatus {
   Cancelled = 2,
   Completed = 3,
 }
+
+/** Status de contato com fornecedor selecionado (Sprint 9.4). */
+export enum PartRequestSupplierContactStatus {
+  Pending = 0,
+  Contacted = 1,
+  Skipped = 2,
+  Completed = 3,
+}

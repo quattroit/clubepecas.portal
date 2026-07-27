@@ -9,3 +9,11 @@ export function formatDate(value: string): string {
     year: "numeric",
   }).format(new Date(value));
 }
+
+/** Formata hora ISO em pt-BR (ex.: 14:30). */
+export function formatTime(value: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}

@@ -222,6 +222,17 @@ const CODE_MESSAGES: Record<string, string> = {
     "A lista de fornecedores selecionados contém duplicatas.",
   "part_request.suppliers.seller_id.invalid":
     "Um ou mais fornecedores selecionados são inválidos.",
+  "whatsapp.missing": "Este fornecedor não possui WhatsApp cadastrado.",
+  "seller_inactive": "Este fornecedor está inativo.",
+  "seller_not_found": "Fornecedor não encontrado.",
+  "not_selected":
+    "Este fornecedor não está selecionado para esta solicitação.",
+  "part_request.suppliers.whatsapp.missing":
+    "Este fornecedor não possui WhatsApp cadastrado.",
+  "part_request.suppliers.seller_inactive": "Este fornecedor está inativo.",
+  "part_request.suppliers.seller_not_found": "Fornecedor não encontrado.",
+  "part_request.suppliers.not_selected":
+    "Este fornecedor não está selecionado para esta solicitação.",
   "representative.code.required": "Informe o código do representante.",
   "representative.code.not_found": "Código de representante inválido.",
   "representative.code.inactive":

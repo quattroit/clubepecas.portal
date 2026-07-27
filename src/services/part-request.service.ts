@@ -1,9 +1,11 @@
 import type {
+  ContactPartRequestSupplierResponse,
   CreatePartRequestRequest,
   ListMyPartRequestsParams,
   ListMyPartRequestsResponse,
   PartRequestDto,
   PartRequestSuppliersDto,
+  SkipPartRequestSupplierResponse,
   UpdatePartRequestRequest,
 } from "@/contracts/part-requests";
 import { api } from "@/lib/api";
@@ -54,6 +56,22 @@ export const partRequestService = {
       .put<PartRequestSuppliersDto>(`/api/v1/part-requests/${id}/suppliers`, {
         selectedSellerIds,
       })
+      .then((response) => response.data);
+  },
+
+  contactSupplier(id: number, sellerId: number) {
+    return api
+      .post<ContactPartRequestSupplierResponse>(
+        `/api/v1/part-requests/${id}/suppliers/${sellerId}/contact`,
+      )
+      .then((response) => response.data);
+  },
+
+  skipSupplier(id: number, sellerId: number) {
+    return api
+      .post<SkipPartRequestSupplierResponse>(
+        `/api/v1/part-requests/${id}/suppliers/${sellerId}/skip`,
+      )
       .then((response) => response.data);
   },
 };

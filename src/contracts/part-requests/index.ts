@@ -1,4 +1,7 @@
-import { PartRequestStatus } from "@/contracts/common/enums";
+import {
+  PartRequestStatus,
+  PartRequestSupplierContactStatus,
+} from "@/contracts/common/enums";
 
 export type PartRequestDto = {
   id: number;
@@ -62,9 +65,19 @@ export type PartRequestsSummaryDto = {
   completed: number;
   draft: number;
   suppliersFound: number;
+  suppliersContacted: number;
+  suppliersPending: number;
+};
+
+export type PartRequestSupplierContactSummaryDto = {
+  selected: number;
+  contacted: number;
+  pending: number;
+  skipped: number;
 };
 
 export type PartRequestSupplierDto = {
+  id: number;
   sellerId: number;
   storeName: string;
   cityName: string;
@@ -75,13 +88,40 @@ export type PartRequestSupplierDto = {
   photoUrl: string | null;
   selected: boolean;
   sameCityAsRequest: boolean;
+  displayOrder: number;
+  contactStatus: PartRequestSupplierContactStatus;
+  contactStatusLabel: string;
+  contactedAt: string | null;
+  contactMessage: string | null;
 };
 
 export type PartRequestSuppliersDto = {
   partRequestId: number;
   maximumSuppliers: number;
   selectedCount: number;
+  contactSummary: PartRequestSupplierContactSummaryDto;
+  nextPendingSellerId: number | null;
   items: PartRequestSupplierDto[];
+};
+
+export type ContactPartRequestSupplierResponse = {
+  partRequestId: number;
+  sellerId: number;
+  storeName: string;
+  whatsApp: string;
+  message: string;
+  whatsAppUrl: string;
+  contactStatus: PartRequestSupplierContactStatus;
+  contactedAt: string;
+  nextPendingSellerId: number | null;
+};
+
+export type SkipPartRequestSupplierResponse = {
+  partRequestId: number;
+  sellerId: number;
+  contactStatus: PartRequestSupplierContactStatus;
+  nextPendingSellerId: number | null;
+  allProcessed: boolean;
 };
 
 export type UpdatePartRequestSuppliersRequest = {

@@ -90,17 +90,25 @@ function ProfessionalBuyerDashboardView() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Users className="text-primary size-5" aria-hidden />
-                Fornecedores encontrados
+                Fornecedores
               </CardTitle>
               <CardDescription>
-                Total de fornecedores compatíveis com suas solicitações.
+                Fornecedores compatíveis e status de contato das suas
+                solicitações.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SummaryMetric
-                label="Quantidade"
-                value={summary.suppliersFound}
-              />
+              <div className="grid gap-4 sm:grid-cols-3">
+                <SummaryMetric label="Encontrados" value={summary.suppliersFound} />
+                <SummaryMetric
+                  label="Contatados"
+                  value={summary.suppliersContacted}
+                />
+                <SummaryMetric
+                  label="Pendentes"
+                  value={summary.suppliersPending}
+                />
+              </div>
             </CardContent>
           </Card>
         </div>
