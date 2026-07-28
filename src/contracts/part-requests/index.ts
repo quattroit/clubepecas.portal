@@ -1,4 +1,5 @@
 import {
+  PartRequestOutcome,
   PartRequestStatus,
   PartRequestSupplierContactStatus,
 } from "@/contracts/common/enums";
@@ -24,6 +25,12 @@ export type PartRequestDto = {
   maximumSuppliers: number;
   status: PartRequestStatus;
   statusLabel: string;
+  outcome: PartRequestOutcome;
+  outcomeLabel: string;
+  completedAt: string | null;
+  winningSellerId: number | null;
+  winningStoreName: string | null;
+  closingNotes: string | null;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -44,6 +51,12 @@ export type CreatePartRequestRequest = {
 
 export type UpdatePartRequestRequest = CreatePartRequestRequest;
 
+export type CompletePartRequestRequest = {
+  outcome: PartRequestOutcome.Found | PartRequestOutcome.NotFound;
+  winningSellerId?: number | null;
+  closingNotes?: string | null;
+};
+
 export type PartRequestStatusFilter =
   | "all"
   | "Draft"
@@ -51,9 +64,16 @@ export type PartRequestStatusFilter =
   | "Cancelled"
   | "Completed";
 
+export type PartRequestOutcomeFilter =
+  | "all"
+  | "Unknown"
+  | "Found"
+  | "NotFound";
+
 export type ListMyPartRequestsParams = {
   q?: string;
   status?: Exclude<PartRequestStatusFilter, "all">;
+  outcome?: Exclude<PartRequestOutcomeFilter, "all">;
   page?: number;
   pageSize?: number;
 };
@@ -67,6 +87,9 @@ export type PartRequestsSummaryDto = {
   suppliersFound: number;
   suppliersContacted: number;
   suppliersPending: number;
+  found: number;
+  notFound: number;
+  successRate: number | null;
 };
 
 export type PartRequestSupplierContactSummaryDto = {
@@ -146,5 +169,9 @@ export function isPartRequestEditable(status: PartRequestStatus): boolean {
 }
 
 export function isPartRequestCancellable(status: PartRequestStatus): boolean {
+  return status === PartRequestStatus.Open;
+}
+
+export function isPartRequestCompletable(status: PartRequestStatus): boolean {
   return status === PartRequestStatus.Open;
 }

@@ -3,7 +3,10 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { Providers } from "@/components/providers";
 import {
+  APP_APPLE_ICON_SRC,
   APP_DESCRIPTION,
+  APP_FAVICON_SRC,
+  APP_ICON_192_SRC,
   APP_LOGO_HEIGHT,
   APP_LOGO_SRC,
   APP_LOGO_WIDTH,
@@ -24,13 +27,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const name = settings.platformName ?? APP_NAME;
   const description = settings.defaultDescription ?? settings.platformDescription ?? APP_DESCRIPTION;
   const logo = settings.logoUrl ?? APP_LOGO_SRC;
+  const favicon = settings.faviconUrl ?? APP_FAVICON_SRC;
 
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
     title: { default: settings.defaultTitle ?? name, template: `%s | ${name}` },
     description,
     keywords: settings.defaultKeywords ?? undefined,
-    icons: { icon: settings.faviconUrl ?? APP_LOGO_SRC, apple: settings.faviconUrl ?? APP_LOGO_SRC },
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "48x48" },
+        { url: favicon, sizes: "32x32", type: "image/png" },
+        { url: APP_ICON_192_SRC, sizes: "192x192", type: "image/png" },
+      ],
+      apple: [{ url: settings.faviconUrl ?? APP_APPLE_ICON_SRC, sizes: "180x180" }],
+      shortcut: favicon,
+    },
     openGraph: {
       siteName: name,
       locale: "pt_BR",

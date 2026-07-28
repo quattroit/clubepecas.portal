@@ -49,6 +49,11 @@ export type AdminDashboardSummaryDto = {
   approvedCommissionsAmount: number;
   paidCommissionsAmount: number;
   representativesWithCommission: number;
+  completedPartRequests: number;
+  partsFound: number;
+  partsNotFound: number;
+  /** Percentual 0–100; null quando não há solicitações finalizadas com resultado. */
+  partRequestSuccessRate: number | null;
 };
 
 export type AdminBestStoreDto = {

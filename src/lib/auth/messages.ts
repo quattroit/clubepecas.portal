@@ -14,7 +14,7 @@ const CODE_MESSAGES: Record<string, string> = {
   "authentication.admin_required":
     "Acesso restrito a administradores. Utilize o login administrativo.",
   "authentication.seller_login_required":
-    "Esta conta é administrativa. Utilize o acesso em /loginAdm.",
+    "Esta conta é administrativa. Utilize o acesso em /loginadm.",
   "authentication.user_not_found": "Usuário não encontrado.",
   "user.first_name.required": "Informe o nome.",
   "user.last_name.required": "Informe o sobrenome.",
@@ -190,6 +190,22 @@ const CODE_MESSAGES: Record<string, string> = {
     "Não é possível editar uma solicitação cancelada ou concluída.",
   "part_request.not_cancellable":
     "Não é possível cancelar esta solicitação.",
+  "part_request.already_completed":
+    "Esta solicitação já foi concluída e não pode ser alterada.",
+  "part_request.not_completable":
+    "Não é possível concluir esta solicitação.",
+  "part_request.outcome.invalid":
+    "Informe se a peça foi encontrada ou não.",
+  "part_request.winning_seller.required":
+    "Selecione o fornecedor com quem a peça foi encontrada.",
+  "part_request.winning_seller.not_allowed":
+    "Não informe fornecedor quando a peça não foi encontrada.",
+  "part_request.winning_seller.invalid":
+    "Fornecedor inválido para esta solicitação.",
+  "part_request.winning_seller.not_selected":
+    "O fornecedor informado não está selecionado nesta solicitação.",
+  "part_request.closing_notes.max_length":
+    "As observações excedem o limite de caracteres.",
   "part_request.title.required": "Informe o título.",
   "part_request.title.max_length": "O título excede o limite de caracteres.",
   "part_request.description.max_length":

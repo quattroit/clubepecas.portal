@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { CancelPartRequestDialog } from "@/features/professional-buyer/components/CancelPartRequestDialog";
 import { PartRequestStatusBadge } from "@/features/professional-buyer/components/PartRequestStatusBadge";
+import { PART_REQUEST_OUTCOME_FILTER_OPTIONS, getPartRequestOutcomeBadgeVariant } from "@/features/professional-buyer/utils/partRequestOutcome";
 import { PART_REQUEST_STATUS_FILTER_OPTIONS } from "@/features/professional-buyer/utils/partRequestStatus";
 import {
   ROUTES,
@@ -21,12 +22,14 @@ import {
 } from "@/constants/routes";
 import type {
   PartRequestDto,
+  PartRequestOutcomeFilter,
   PartRequestStatusFilter,
 } from "@/contracts/part-requests";
 import {
   isPartRequestCancellable,
   isPartRequestEditable,
 } from "@/contracts/part-requests";
+import { Badge } from "@/components/ui/badge";
 import { useCancelPartRequest } from "@/hooks/api/useCancelPartRequest";
 import { useMyPartRequests } from "@/hooks/api/useMyPartRequests";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
@@ -47,6 +50,8 @@ function PartRequestsListView() {
   const q = searchParams.get("q") ?? "";
   const status =
     (searchParams.get("status") as PartRequestStatusFilter | null) ?? "all";
+  const outcome =
+    (searchParams.get("outcome") as PartRequestOutcomeFilter | null) ?? "all";
 
   const [qDraft, setQDraft] = useState(q);
   const [pendingCancel, setPendingCancel] = useState<PartRequestDto | null>(null);
@@ -57,8 +62,9 @@ function PartRequestsListView() {
       pageSize: 20,
       q: q || undefined,
       status: status === "all" ? undefined : status,
+      outcome: outcome === "all" ? undefined : outcome,
     }),
-    [page, q, status],
+    [page, q, status, outcome],
   );
 
   const listQuery = useMyPartRequests(params);
@@ -81,7 +87,7 @@ function PartRequestsListView() {
 
   const items = listQuery.data?.items ?? [];
   const totalPages = Math.max(1, listQuery.data?.totalPages ?? 1);
-  const hasFilters = Boolean(q || status !== "all");
+  const hasFilters = Boolean(q || status !== "all" || outcome !== "all");
 
   const handleConfirmCancel = () => {
     if (!pendingCancel) return;
@@ -150,6 +156,26 @@ function PartRequestsListView() {
           </select>
         </div>
 
+        <div className="flex flex-col gap-1.5 sm:w-48">
+          <label htmlFor="pr-outcome" className="text-sm font-medium">
+            Resultado
+          </label>
+          <select
+            id="pr-outcome"
+            className={selectClassName}
+            value={outcome}
+            onChange={(event) =>
+              patch({ outcome: event.target.value || undefined })
+            }
+          >
+            {PART_REQUEST_OUTCOME_FILTER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <Button
           type="button"
           variant="outline"
@@ -186,7 +212,12 @@ function PartRequestsListView() {
                 variant="outline"
                 onClick={() => {
                   setQDraft("");
-                  patch({ q: undefined, status: undefined, page: "1" });
+                  patch({
+                    q: undefined,
+                    status: undefined,
+                    outcome: undefined,
+                    page: "1",
+                  });
                 }}
               >
                 Limpar filtros
@@ -213,6 +244,7 @@ function PartRequestsListView() {
                   <th className="px-4 py-3 text-left font-medium">Veículo</th>
                   <th className="px-4 py-3 text-left font-medium">Cidade</th>
                   <th className="px-4 py-3 text-left font-medium">Status</th>
+                  <th className="px-4 py-3 text-left font-medium">Resultado</th>
                   <th className="px-4 py-3 text-left font-medium">Criada em</th>
                   <th className="px-4 py-3 text-right font-medium">Ações</th>
                 </tr>
@@ -239,6 +271,13 @@ function PartRequestsListView() {
                         status={item.status}
                         label={item.statusLabel}
                       />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        variant={getPartRequestOutcomeBadgeVariant(item.outcome)}
+                      >
+                        {item.outcomeLabel}
+                      </Badge>
                     </td>
                     <td className="text-muted-foreground px-4 py-3">
                       {formatDate(item.createdAt)}

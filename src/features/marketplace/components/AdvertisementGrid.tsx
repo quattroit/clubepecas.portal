@@ -20,7 +20,7 @@ function AdvertisementGrid({
       aria-label="Anúncios"
     >
       {advertisements.map((advertisement) => (
-        <li key={advertisement.slug ?? String(advertisement.id)}>
+        <li key={advertisement.id}>
           <AdvertisementCard advertisement={advertisement} />
         </li>
       ))}

@@ -1,6 +1,5 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
-import { ActiveReferralBanner } from "@/components/representatives/ActiveReferralBanner";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -19,7 +18,6 @@ function DashboardLayout({ children }: DashboardLayoutProps) {
           <Sidebar />
         </div>
         <main id="conteudo-principal" className="flex-1 p-5 sm:p-8 md:p-10">
-          <ActiveReferralBanner className="mb-4" />
           {children}
         </main>
       </div>

@@ -3,12 +3,18 @@
 import { usePathname } from "next/navigation";
 
 import { ActiveReferralBanner } from "@/components/representatives/ActiveReferralBanner";
+import { ROUTES } from "@/constants/routes";
 
+/**
+ * Exibe o banner "Indicado por" apenas na escolha de plano (/planos).
+ * Em demais telas públicas o banner fica oculto.
+ */
 function PublicReferralSlot() {
   const pathname = usePathname();
-  const hideOnReferralLanding = pathname?.startsWith("/r/");
 
-  if (hideOnReferralLanding) return null;
+  if (pathname !== ROUTES.PLANS) {
+    return null;
+  }
 
   return <ActiveReferralBanner className="mb-6" />;
 }

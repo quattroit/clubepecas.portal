@@ -1,4 +1,5 @@
 export { CancelPartRequestDialog } from "./components/CancelPartRequestDialog";
+export { CompletePartRequestDialog } from "./components/CompletePartRequestDialog";
 export { EditPartRequestView } from "./components/EditPartRequestView";
 export { NewPartRequestView } from "./components/NewPartRequestView";
 export { PartRequestDetailView } from "./components/PartRequestDetailView";

@@ -18,13 +18,23 @@ import { useMyPartRequests } from "@/hooks/api/useMyPartRequests";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 
-function SummaryMetric({ label, value }: { label: string; value: number }) {
+function SummaryMetric({
+  label,
+  value,
+  display,
+}: {
+  label: string;
+  value?: number;
+  display?: string;
+}) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
         {label}
       </span>
-      <span className="text-2xl font-semibold tabular-nums">{value}</span>
+      <span className="text-2xl font-semibold tabular-nums">
+        {display ?? value}
+      </span>
     </div>
   );
 }
@@ -63,7 +73,7 @@ function ProfessionalBuyerDashboardView() {
                   Solicitações
                 </CardTitle>
                 <CardDescription>
-                  Acompanhe suas solicitações de peças abertas e canceladas.
+                  Acompanhe o volume e o resultado das suas solicitações.
                 </CardDescription>
               </div>
               <Link
@@ -78,7 +88,23 @@ function ProfessionalBuyerDashboardView() {
               </Link>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <SummaryMetric label="Concluídas" value={summary.completed} />
+                <SummaryMetric label="Peças encontradas" value={summary.found} />
+                <SummaryMetric
+                  label="Não encontradas"
+                  value={summary.notFound}
+                />
+                <SummaryMetric
+                  label="Taxa de sucesso"
+                  display={
+                    summary.successRate != null
+                      ? `${Math.round(summary.successRate)}%`
+                      : "—"
+                  }
+                />
+              </div>
+              <div className="mt-4 grid gap-4 border-t pt-4 sm:grid-cols-3">
                 <SummaryMetric label="Total" value={summary.total} />
                 <SummaryMetric label="Abertas" value={summary.open} />
                 <SummaryMetric label="Canceladas" value={summary.cancelled} />

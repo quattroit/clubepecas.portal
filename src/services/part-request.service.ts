@@ -1,4 +1,5 @@
 import type {
+  CompletePartRequestRequest,
   ContactPartRequestSupplierResponse,
   CreatePartRequestRequest,
   ListMyPartRequestsParams,
@@ -42,6 +43,12 @@ export const partRequestService = {
   cancel(id: number) {
     return api
       .delete<PartRequestDto>(`/api/v1/part-requests/${id}`)
+      .then((response) => response.data);
+  },
+
+  complete(id: number, payload: CompletePartRequestRequest) {
+    return api
+      .post<PartRequestDto>(`/api/v1/part-requests/${id}/complete`, payload)
       .then((response) => response.data);
   },
 

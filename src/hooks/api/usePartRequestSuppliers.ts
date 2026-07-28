@@ -15,7 +15,9 @@ export function usePartRequestSuppliers(
 ) {
   const authReady = useProfessionalBuyerAuthQueryEnabled();
   const shouldFetch =
-    status === PartRequestStatus.Open || status === PartRequestStatus.Cancelled;
+    status === PartRequestStatus.Open ||
+    status === PartRequestStatus.Cancelled ||
+    status === PartRequestStatus.Completed;
 
   return useQuery({
     queryKey: queryKeys.partRequests.suppliers(id),

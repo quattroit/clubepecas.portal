@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/components/providers/AuthProvider";
 import { buttonVariants } from "@/components/ui/button";
+import { UserRole } from "@/contracts/common/enums";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
@@ -91,22 +92,35 @@ function UserMenu({ tone = "default" }: UserMenuProps) {
             <Home className="size-4 opacity-70" aria-hidden />
             Voltar ao site
           </Link>
-          <Link
-            href={ROUTES.MY_ADVERTISEMENTS}
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
-          >
-            Meus anúncios
-          </Link>
-          <Link
-            href={ROUTES.PROFILE}
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
-          >
-            Meu perfil
-          </Link>
+          {user.role === UserRole.ProfessionalBuyer ? (
+            <Link
+              href={ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
+            >
+              Solicitações
+            </Link>
+          ) : (
+            <>
+              <Link
+                href={ROUTES.MY_ADVERTISEMENTS}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
+              >
+                Meus anúncios
+              </Link>
+              <Link
+                href={ROUTES.PROFILE}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
+              >
+                Meu perfil
+              </Link>
+            </>
+          )}
           <button
             type="button"
             role="menuitem"

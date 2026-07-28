@@ -155,6 +155,13 @@ export enum PartRequestStatus {
   Completed = 3,
 }
 
+/** Resultado final da solicitação (Sprint 9.5). */
+export enum PartRequestOutcome {
+  Unknown = 0,
+  Found = 1,
+  NotFound = 2,
+}
+
 /** Status de contato com fornecedor selecionado (Sprint 9.4). */
 export enum PartRequestSupplierContactStatus {
   Pending = 0,

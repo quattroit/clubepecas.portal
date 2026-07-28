@@ -17,6 +17,9 @@ import {
   Trophy,
   Users,
   Wallet,
+  ClipboardCheck,
+  CircleCheck,
+  CircleX,
 } from "lucide-react";
 
 import {
@@ -285,7 +288,7 @@ function AdminDashboardView() {
       >
         {dashboardQuery.isLoading ? (
           <AdminStatsGrid aria-label="Carregando indicadores">
-            {Array.from({ length: 14 }).map((_, index) => (
+            {Array.from({ length: 18 }).map((_, index) => (
               <AdminMetricCardSkeleton key={index} />
             ))}
           </AdminStatsGrid>
@@ -372,6 +375,30 @@ function AdminDashboardView() {
                 summary.representativesWithCommission ?? 0,
               )}
               description="Representantes com ao menos um registro"
+            />
+            <AdminMetricCard
+              title="Solicitações finalizadas"
+              value={formatMetricCount(summary.completedPartRequests ?? 0)}
+              icon={<ClipboardCheck className="size-4" />}
+              description="Solicitações concluídas"
+            />
+            <AdminMetricCard
+              title="Taxa geral de sucesso"
+              value={formatConversionRate(summary.partRequestSuccessRate)}
+              icon={<Percent className="size-4" />}
+              description="Peças encontradas ÷ finalizadas"
+            />
+            <AdminMetricCard
+              title="Peças encontradas"
+              value={formatMetricCount(summary.partsFound ?? 0)}
+              icon={<CircleCheck className="size-4" />}
+              description="Outcome Found"
+            />
+            <AdminMetricCard
+              title="Peças não encontradas"
+              value={formatMetricCount(summary.partsNotFound ?? 0)}
+              icon={<CircleX className="size-4" />}
+              description="Outcome NotFound"
             />
           </AdminStatsGrid>
         ) : null}

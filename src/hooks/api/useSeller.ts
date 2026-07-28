@@ -2,6 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { useAuth } from "@/components/providers/AuthProvider";
+import { UserRole } from "@/contracts/common/enums";
 import { NotFoundError } from "@/lib/errors";
 import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
 import { queryKeys } from "@/lib/queryKeys";
@@ -18,14 +20,17 @@ function isSellerNotFound(error: unknown): boolean {
 
 /**
  * Perfil de vendedor do usuário autenticado.
+ * Só consulta a API quando o role é Seller (evita 403 para comprador/admin).
  * `seller.not_found` → data: null (fluxo normal, sem ErrorMessage).
  */
 export function useSeller() {
   const authReady = useAuthQueryEnabled();
+  const { user } = useAuth();
+  const isSeller = user?.role === UserRole.Seller;
 
   return useQuery({
     queryKey: queryKeys.seller.me,
-    enabled: authReady,
+    enabled: authReady && isSeller,
     queryFn: async () => {
       try {
         const dto = await sellerService.getMe();
