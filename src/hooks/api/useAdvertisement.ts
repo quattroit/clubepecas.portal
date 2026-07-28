@@ -13,16 +13,16 @@ import { categoryService } from "@/services/category.service";
 
 /**
  * Detalhe público do anúncio por slug.
- * Detalhe e relacionados em paralelo (marketplace temporário até endpoint dedicado).
+ * Relacionados: marketplace filtrado pela categoria do anúncio (evita lista completa sem filtro).
  */
 export function useAdvertisement(slug: string) {
   return useQuery({
     queryKey: queryKeys.marketplace.detail(slug),
     queryFn: async () => {
-      const [dto, marketplace] = await Promise.all([
-        advertisementService.getBySlug(slug),
-        categoryService.getMarketplace(),
-      ]);
+      const dto = await advertisementService.getBySlug(slug);
+      const marketplace = await categoryService.getMarketplace({
+        categorySlug: dto.categorySlug || undefined,
+      });
 
       const advertisement = mapAdvertisementBySlugToAdvertisement(dto);
       const seller = mapAdvertisementBySlugSeller(dto);

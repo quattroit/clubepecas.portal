@@ -1,0 +1,41 @@
+﻿{
+    "avgReqs":  7,
+    "avgMs":  320,
+    "avgBytes":  15165,
+    "avgEstQueries":  13,
+    "runs":  [
+                 {
+                     "Run":  1,
+                     "Reqs":  7,
+                     "Ms":  514,
+                     "Bytes":  15165,
+                     "EstQueries":  13,
+                     "MarketplaceMs":  222,
+                     "MarketplaceBytes":  4966,
+                     "Groups":  3,
+                     "SellerProfiles":  3
+                 },
+                 {
+                     "Run":  2,
+                     "Reqs":  7,
+                     "Ms":  228,
+                     "Bytes":  15165,
+                     "EstQueries":  13,
+                     "MarketplaceMs":  34,
+                     "MarketplaceBytes":  4966,
+                     "Groups":  3,
+                     "SellerProfiles":  3
+                 },
+                 {
+                     "Run":  3,
+                     "Reqs":  7,
+                     "Ms":  218,
+                     "Bytes":  15165,
+                     "EstQueries":  13,
+                     "MarketplaceMs":  32,
+                     "MarketplaceBytes":  4966,
+                     "Groups":  3,
+                     "SellerProfiles":  3
+                 }
+             ]
+}

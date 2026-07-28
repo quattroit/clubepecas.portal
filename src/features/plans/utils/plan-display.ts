@@ -32,15 +32,15 @@ export function sortPlanPrices(
 }
 
 /**
- * Ciclo padrão a ser pré-selecionado: o sinalizado como recomendado pela API
- * ou, na ausência de recomendação, o primeiro por ordem de exibição.
+ * Ciclo padrão a ser pré-selecionado: o de menor `displayOrder`
+ * (fonte da verdade cadastrada no admin).
+ * `isRecommended` continua só como badge/destaque visual, não como tab inicial.
  */
 export function getDefaultPlanPrice(
   prices: readonly SubscriptionPlanPriceDto[],
 ): SubscriptionPlanPriceDto | null {
   if (prices.length === 0) return null;
-  const sorted = sortPlanPrices(prices);
-  return sorted.find((price) => price.isRecommended) ?? sorted[0];
+  return sortPlanPrices(prices)[0] ?? null;
 }
 
 /** Plano com um único ciclo mensal gratuito (sem opções de ciclo a escolher). */

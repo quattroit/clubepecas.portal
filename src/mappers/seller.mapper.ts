@@ -4,6 +4,7 @@ import type {
 } from "@/contracts/advertisements/responses";
 import type {
   SellerMeDto,
+  SellerPublicListItemDto,
   SellerPublicProfileResponse,
 } from "@/contracts/seller/responses";
 import type { Seller } from "@/types/Seller";
@@ -19,6 +20,26 @@ export function mapPublicSellerDtoToSeller(
     city: dto.city,
     state: dto.state,
     advertisementCount: dto.advertisementCount ?? 0,
+    whatsApp: dto.whatsApp,
+    instagram: dto.instagram,
+  };
+}
+
+export function mapSellerPublicListItemToSeller(
+  dto: SellerPublicListItemDto,
+): Seller {
+  return {
+    id: 0,
+    slug: dto.slug,
+    name: dto.storeName,
+    displayName: dto.displayName,
+    cityId: dto.cityId,
+    city: dto.city,
+    state: dto.state,
+    citySlug: dto.citySlug,
+    advertisementCount: dto.advertisementCount,
+    avatarUrl: dto.photoUrl,
+    description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
   };

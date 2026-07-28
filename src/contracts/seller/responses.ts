@@ -69,3 +69,24 @@ export type SellerPublicProfileResponse = {
   instagram: string | null;
   advertisements: PublicSellerAdvertisementDto[];
 };
+
+/** Item de GET /api/v1/sellers (lista pública leve). */
+export type SellerPublicListItemDto = {
+  slug: string;
+  storeName: string;
+  displayName: string;
+  description: string | null;
+  cityId: number;
+  city: string;
+  state: string;
+  citySlug: string;
+  photoUrl: string | null;
+  whatsApp: string;
+  instagram: string | null;
+  advertisementCount: number;
+};
+
+/** GET /api/v1/sellers */
+export type ListPublicSellersResponse = {
+  items: SellerPublicListItemDto[];
+};

@@ -8,6 +8,7 @@ import type {
 } from "@/contracts/seller/metrics";
 import type {
   CreateSellerResponse,
+  ListPublicSellersResponse,
   SellerMeDto,
   SellerPublicProfileResponse,
 } from "@/contracts/seller/responses";
@@ -61,6 +62,13 @@ export const sellerService = {
       .get<SellerDashboardMetricsResponse>("/api/v1/seller/me/metrics", {
         params: { period },
       })
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/sellers — listagem pública leve (sem anúncios embutidos). */
+  listPublic() {
+    return api
+      .get<ListPublicSellersResponse>("/api/v1/sellers")
       .then((response) => response.data);
   },
 

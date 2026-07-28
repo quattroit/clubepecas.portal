@@ -1,0 +1,132 @@
+﻿{
+    "assets":  {
+                   "logo":  {
+                                "beforeBytes":  1060203,
+                                "afterBytes":  18802,
+                                "reductionPct":  98.2
+                            },
+                   "hero":  {
+                                "beforeBytes":  1521784,
+                                "afterBytes":  33854,
+                                "reductionPct":  97.8
+                            }
+               },
+    "homeRuns":  [
+                     {
+                         "Run":  1,
+                         "Ms":  126,
+                         "Bytes":  6097,
+                         "Reqs":  2,
+                         "MarketplaceMs":  97,
+                         "MarketplaceBytes":  4966,
+                         "SellersMs":  29,
+                         "SellersBytes":  1131
+                     },
+                     {
+                         "Run":  2,
+                         "Ms":  60,
+                         "Bytes":  6097,
+                         "Reqs":  2,
+                         "MarketplaceMs":  31,
+                         "MarketplaceBytes":  4966,
+                         "SellersMs":  29,
+                         "SellersBytes":  1131
+                     },
+                     {
+                         "Run":  3,
+                         "Ms":  61,
+                         "Bytes":  6097,
+                         "Reqs":  2,
+                         "MarketplaceMs":  32,
+                         "MarketplaceBytes":  4966,
+                         "SellersMs":  29,
+                         "SellersBytes":  1131
+                     },
+                     {
+                         "Run":  4,
+                         "Ms":  68,
+                         "Bytes":  6097,
+                         "Reqs":  2,
+                         "MarketplaceMs":  30,
+                         "MarketplaceBytes":  4966,
+                         "SellersMs":  38,
+                         "SellersBytes":  1131
+                     },
+                     {
+                         "Run":  5,
+                         "Ms":  71,
+                         "Bytes":  6097,
+                         "Reqs":  2,
+                         "MarketplaceMs":  39,
+                         "MarketplaceBytes":  4966,
+                         "SellersMs":  32,
+                         "SellersBytes":  1131
+                     }
+                 ],
+    "storeRuns":  [
+                      {
+                          "Run":  1,
+                          "Ms":  40,
+                          "Bytes":  1131,
+                          "Items":  3,
+                          "Reqs":  1
+                      },
+                      {
+                          "Run":  2,
+                          "Ms":  31,
+                          "Bytes":  1131,
+                          "Items":  3,
+                          "Reqs":  1
+                      },
+                      {
+                          "Run":  3,
+                          "Ms":  29,
+                          "Bytes":  1131,
+                          "Items":  3,
+                          "Reqs":  1
+                      },
+                      {
+                          "Run":  4,
+                          "Ms":  29,
+                          "Bytes":  1131,
+                          "Items":  3,
+                          "Reqs":  1
+                      },
+                      {
+                          "Run":  5,
+                          "Ms":  30,
+                          "Bytes":  1131,
+                          "Items":  3,
+                          "Reqs":  1
+                      }
+                  ],
+    "homePage":  {
+                     "before":  {
+                                    "avgReqs":  8,
+                                    "avgMs":  542,
+                                    "avgBytes":  20131,
+                                    "avgEstQueries":  14
+                                },
+                     "after":  {
+                                   "avgReqs":  2,
+                                   "avgMs":  77.2,
+                                   "avgBytes":  6097,
+                                   "avgEstQueries":  2
+                               }
+                 },
+    "scenario":  "loadPublicStores / listagem de lojas",
+    "before":  {
+                   "avgReqs":  7,
+                   "avgMs":  320,
+                   "avgBytes":  15165,
+                   "avgEstQueries":  13,
+                   "notes":  "marketplace + N ads-by-slug + M seller profiles"
+               },
+    "after":  {
+                  "avgReqs":  1,
+                  "avgMs":  31.8,
+                  "avgBytes":  1131,
+                  "avgEstQueries":  1,
+                  "notes":  "GET /api/v1/sellers single query"
+              }
+}
