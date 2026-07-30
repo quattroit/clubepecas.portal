@@ -179,6 +179,7 @@ export type SellerSubscriptionDto = {
   availablePlans: SubscriptionAvailablePlanDto[];
   pendingChange?: SubscriptionPendingChangeDto | null;
   cancellationRequested: boolean;
+  demoAlreadyUsed?: boolean;
 
   // Compatibilidade Sprint 8.3.1
   subscriptionPlanId: number;
@@ -363,6 +364,7 @@ export type SubscriptionPlanCatalogItemDto = {
   description?: string | null;
   advertisementLimit: number;
   displayOrder: number;
+  isDemo: boolean;
   startingPrice: number;
   currency: string;
   prices: SubscriptionPlanPriceDto[];

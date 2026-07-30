@@ -292,7 +292,14 @@ function AdminSubscriptionPlansView() {
                       className="hover:bg-muted/30 transition-colors"
                     >
                       <td className="text-foreground px-4 py-3 font-medium">
-                        {plan.name}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span>{plan.name}</span>
+                          {plan.isDemo ? (
+                            <span className="bg-muted text-muted-foreground rounded-md px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
+                              Demo
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="text-foreground px-4 py-3 tabular-nums">
                         A partir de {formatCurrency(plan.startingPrice)}

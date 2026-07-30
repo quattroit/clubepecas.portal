@@ -70,6 +70,10 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   const seller = sellerQuery.data ?? null;
   const addressComplete = hasCompleteSellerAddress(seller);
   const alreadyLinked = Boolean(seller?.representativeId);
+  const demoAlreadyUsed = Boolean(seller?.demoAlreadyUsed);
+  const visiblePlans = (plansQuery.data ?? []).filter(
+    (plan) => !(demoAlreadyUsed && plan.isDemo),
+  );
   const linkedCodeForCheckout =
     !alreadyLinked && validatedRepresentative
       ? validatedRepresentative.representativeCode
@@ -78,7 +82,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
   const pendingVariables = checkoutMutation.isPending
     ? checkoutMutation.variables
     : undefined;
-  const pendingPlan = plansQuery.data?.find(
+  const pendingPlan = visiblePlans.find(
     (plan) => plan.id === pendingVariables?.subscriptionPlanId,
   );
   const pendingPrice = pendingPlan?.prices.find(
@@ -365,7 +369,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
 
         {!plansQuery.isLoading &&
         !plansQuery.isError &&
-        (plansQuery.data?.length ?? 0) === 0 ? (
+        visiblePlans.length === 0 ? (
           <p className="text-small text-muted-foreground py-6 text-center">
             Nenhum plano ativo disponível no momento.
           </p>
@@ -393,7 +397,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
 
         {!selectedPlan && !plansQuery.isLoading && !plansQuery.isError ? (
           <ul className="flex flex-col gap-3">
-            {plansQuery.data?.map((plan) => {
+            {visiblePlans.map((plan) => {
               const isThisPending = pendingPlan?.id === plan.id;
               const isFree = isFreeMonthlyOnlyPlan(plan);
 

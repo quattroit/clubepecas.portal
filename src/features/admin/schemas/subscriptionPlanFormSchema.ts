@@ -66,6 +66,7 @@ export const subscriptionPlanFormSchema = z.object({
     .int("Informe um número inteiro")
     .min(0, "Deve ser zero ou maior"),
   isActive: z.boolean(),
+  isDemo: z.boolean(),
   prices: z
     .array(subscriptionPlanPriceFormSchema)
     .min(1, "Adicione ao menos um ciclo de cobrança")
@@ -73,6 +74,19 @@ export const subscriptionPlanFormSchema = z.object({
       const cycles = prices.map((price) => price.billingCycle);
       return new Set(cycles).size === cycles.length;
     }, "Cada ciclo de cobrança pode ser adicionado apenas uma vez"),
+}).superRefine((values, ctx) => {
+  if (
+    values.isDemo &&
+    values.prices.some(
+      (price) => price.isActive && parsePriceInput(price.price) !== 0,
+    )
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["isDemo"],
+      message: "Plano demonstração exige preços ativos iguais a R$ 0",
+    });
+  }
 });
 
 export type SubscriptionPlanFormValues = z.infer<
@@ -85,5 +99,6 @@ export const subscriptionPlanFormDefaultValues: SubscriptionPlanFormValues = {
   advertisementLimit: 0,
   displayOrder: 0,
   isActive: true,
+  isDemo: false,
   prices: [subscriptionPlanPriceFormDefaultValues],
 };

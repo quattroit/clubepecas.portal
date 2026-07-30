@@ -275,6 +275,39 @@ function SubscriptionPlanFormDialog({
             />
           </div>
 
+          <div className="border-border flex items-center justify-between gap-4 rounded-xl border p-3">
+            <div className="min-w-0">
+              <Label
+                htmlFor="subscription-plan-is-demo"
+                className="text-sm font-medium"
+              >
+                Plano demonstração
+              </Label>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Trial sem renovação automática; exige preços ativos iguais a
+                R$&nbsp;0 e expira ao fim do ciclo.
+              </p>
+              {errors.isDemo ? (
+                <p className="text-destructive mt-1 text-xs" role="alert">
+                  {errors.isDemo.message}
+                </p>
+              ) : null}
+            </div>
+            <Controller
+              name="isDemo"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="subscription-plan-is-demo"
+                  checked={field.value}
+                  disabled={isSubmitting}
+                  onCheckedChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+          </div>
+
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
               <div>

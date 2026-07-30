@@ -33,6 +33,8 @@ export type SellerMeDto = {
   representativeName?: string | null;
   representativeStatus?: number | null;
   representativeStatusLabel?: string | null;
+  /** True se o vendedor já ativou algum plano demonstração. */
+  demoAlreadyUsed?: boolean;
 };
 
 export type PublicSellerAdvertisementDto = {
