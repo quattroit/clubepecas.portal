@@ -1,13 +1,17 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-function CategoryGridSkeleton() {
+type CategoryGridSkeletonProps = {
+  count?: number;
+};
+
+function CategoryGridSkeleton({ count = 8 }: CategoryGridSkeletonProps) {
   return (
     <div
       className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:gap-4"
       aria-busy="true"
       aria-label="Carregando categorias"
     >
-      {Array.from({ length: 8 }).map((_, index) => (
+      {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
           className="flex flex-col items-center gap-2 rounded-2xl border p-3"
@@ -22,3 +26,4 @@ function CategoryGridSkeleton() {
 }
 
 export { CategoryGridSkeleton };
+export type { CategoryGridSkeletonProps };

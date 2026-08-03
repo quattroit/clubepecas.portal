@@ -22,7 +22,10 @@ import type {
 } from "@/contracts/admin/categories";
 import { CategoryFormDialog } from "@/features/admin/components/CategoryFormDialog";
 import { CategoryIcon } from "@/features/marketplace/components/CategoryIcon";
-import type { CategoryFormValues } from "@/features/admin/schemas/categoryFormSchema";
+import type {
+  CategoryFormInput,
+  CategoryFormValues,
+} from "@/features/admin/schemas/categoryFormSchema";
 import { useAdminCategories } from "@/hooks/api/useAdminCategories";
 import { useCreateAdminCategory } from "@/hooks/api/useCreateAdminCategory";
 import { useReorderAdminCategories } from "@/hooks/api/useReorderAdminCategories";
@@ -35,6 +38,10 @@ import {
   mapCategoryFormToCreateRequest,
   mapCategoryFormToUpdateRequest,
 } from "@/mappers/category-form.mapper";
+import {
+  getRootCategories,
+  sortCategoriesHierarchically,
+} from "@/utils/category-hierarchy";
 import { formatDate } from "@/utils/formatDate";
 import { formatMetricCount } from "@/utils/formatMetrics";
 import {
@@ -128,10 +135,32 @@ function AdminCategoriesView() {
     setFormOpen(true);
   };
 
-  const formDefaultValues: CategoryFormValues | undefined = useMemo(
+  const formDefaultValues: CategoryFormInput | undefined = useMemo(
     () => (editingCategory ? mapAdminCategoryToForm(editingCategory) : undefined),
     [editingCategory],
   );
+
+  const rootCategoryOptions = useMemo(() => {
+    const roots = getRootCategories(items);
+    return roots
+      .filter((category) => category.id !== editingCategory?.id)
+      .map((category) => ({ id: category.id, name: category.name }));
+  }, [items, editingCategory?.id]);
+
+  const parentNameById = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const category of items) {
+      if (category.parentId == null) {
+        map.set(category.id, category.name);
+      }
+    }
+    return map;
+  }, [items]);
+
+  const displayItems = useMemo(() => {
+    if (sort !== "order" || hasFilters) return items;
+    return sortCategoriesHierarchically(items);
+  }, [items, sort, hasFilters]);
 
   const submitError = createMutation.isError
     ? createMutation.error
@@ -384,7 +413,13 @@ function AdminCategoriesView() {
                   </tr>
                 </thead>
                 <tbody className="divide-border divide-y">
-                  {items.map((category) => (
+                  {displayItems.map((category) => {
+                    const isChild = category.parentId != null;
+                    const parentName = isChild
+                      ? parentNameById.get(category.parentId!)
+                      : undefined;
+
+                    return (
                     <tr
                       key={category.id}
                       draggable={canReorder}
@@ -436,9 +471,25 @@ function AdminCategoriesView() {
                         </span>
                       </td>
                       <td className="text-foreground px-4 py-3">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-medium">{category.name}</span>
-                          {category.description ? (
+                        <div
+                          className={cn(
+                            "flex flex-col gap-0.5",
+                            isChild && "pl-5",
+                          )}
+                        >
+                          <span className="font-medium">
+                            {isChild ? (
+                              <span className="text-muted-foreground mr-1.5" aria-hidden>
+                                ↳
+                              </span>
+                            ) : null}
+                            {category.name}
+                          </span>
+                          {isChild && parentName ? (
+                            <span className="text-muted-foreground text-xs">
+                              Subcategoria de {parentName}
+                            </span>
+                          ) : category.description ? (
                             <span className="text-muted-foreground line-clamp-1 text-xs">
                               {category.description}
                             </span>
@@ -482,7 +533,8 @@ function AdminCategoriesView() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -495,6 +547,7 @@ function AdminCategoriesView() {
         onOpenChange={setFormOpen}
         mode={formMode}
         defaultValues={formDefaultValues}
+        rootCategories={rootCategoryOptions}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
         submitError={submitError}
         onSubmit={handleFormSubmit}

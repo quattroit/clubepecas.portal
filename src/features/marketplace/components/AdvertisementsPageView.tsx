@@ -73,10 +73,12 @@ function AdvertisementsPageView() {
 
   const filterCategories = [
     { id: "all", label: "Todas" },
-    ...(categoriesQuery.data ?? []).map((category) => ({
-      id: String(category.id),
-      label: category.name,
-    })),
+    ...(categoriesQuery.data ?? [])
+      .filter((category) => category.parentId == null)
+      .map((category) => ({
+        id: String(category.id),
+        label: category.name,
+      })),
   ];
 
   const filterBrands = [

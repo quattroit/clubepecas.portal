@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { VehicleRequirement } from "@/contracts/common/enums";
 import {
   ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH,
   ADVERTISEMENT_DESCRIPTION_MAX_LENGTH,
   ADVERTISEMENT_TITLE_MAX_LENGTH,
   advertisementFormDefaultValues,
-  advertisementFormSchema,
+  createAdvertisementFormSchema,
+  type AdvertisementCategoryFieldConfig,
   type AdvertisementFormInput,
   type AdvertisementFormValues,
 } from "@/features/dashboard/schemas/advertisementFormSchema";
@@ -28,6 +30,11 @@ import {
 } from "@/mappers/categoryMeta";
 import type { Category } from "@/types/Category";
 import type { VehicleBrand } from "@/types/VehicleBrand";
+import {
+  getChildCategories,
+  getRootCategories,
+  resolveRootCategory,
+} from "@/utils/category-hierarchy";
 import { listVehicleYears } from "@/utils/vehicle-years";
 
 const selectClassName =
@@ -49,7 +56,8 @@ type AdvertisementFormProps = {
 
 /**
  * Formulário compartilhado de anúncio (Novo / Editar).
- * Não conhece DTOs — recebe e devolve AdvertisementFormValues.
+ * Categoria em dois níveis (raiz → subcategoria); campos de veículo
+ * conforme config da raiz.
  */
 function AdvertisementForm({
   mode = "create",
@@ -66,6 +74,20 @@ function AdvertisementForm({
 }: AdvertisementFormProps) {
   const conditions = listAdvertisementConditions();
   const vehicleYears = listVehicleYears();
+  const rootCategories = useMemo(
+    () => getRootCategories(categories),
+    [categories],
+  );
+
+  const fieldConfigRef = useRef<AdvertisementCategoryFieldConfig>({
+    vehicleRequirement: VehicleRequirement.Required,
+    showCompatibility: true,
+  });
+
+  const schema = useMemo(
+    () => createAdvertisementFormSchema(() => fieldConfigRef.current),
+    [],
+  );
 
   const {
     register,
@@ -73,9 +95,10 @@ function AdvertisementForm({
     reset,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm<AdvertisementFormInput, unknown, AdvertisementFormValues>({
-    resolver: zodResolver(advertisementFormSchema),
+    resolver: zodResolver(schema),
     shouldFocusError: true,
     defaultValues: {
       ...advertisementFormDefaultValues,
@@ -99,6 +122,35 @@ function AdvertisementForm({
     ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH - compatibilityValue.length,
   );
 
+  const selectedRootId = watch("rootCategoryId");
+  const selectedRootNumber =
+    selectedRootId === "" || selectedRootId == null
+      ? undefined
+      : Number(selectedRootId);
+  const selectedRoot =
+    selectedRootNumber && selectedRootNumber > 0
+      ? rootCategories.find((category) => category.id === selectedRootNumber)
+      : undefined;
+
+  const subcategories = useMemo(
+    () =>
+      selectedRootNumber && selectedRootNumber > 0
+        ? getChildCategories(categories, selectedRootNumber)
+        : [],
+    [categories, selectedRootNumber],
+  );
+
+  const vehicleRequirement =
+    selectedRoot?.vehicleRequirement ?? VehicleRequirement.Required;
+  const showCompatibility = selectedRoot?.showCompatibility ?? true;
+  const showVehicleFields = vehicleRequirement !== VehicleRequirement.Hidden;
+  const vehicleRequired = vehicleRequirement === VehicleRequirement.Required;
+
+  fieldConfigRef.current = {
+    vehicleRequirement,
+    showCompatibility,
+  };
+
   const selectedBrandId = watch("vehicleBrandId");
   const selectedBrandNumber =
     selectedBrandId === "" || selectedBrandId == null
@@ -117,15 +169,55 @@ function AdvertisementForm({
   );
 
   useEffect(() => {
-    reset({
+    const merged = {
       ...advertisementFormDefaultValues,
       ...defaultValues,
-    });
-  }, [defaultValues, reset]);
+    };
+
+    // Garante rootCategoryId ao editar quando só categoryId veio preenchido.
+    if (
+      (merged.rootCategoryId === 0 ||
+        merged.rootCategoryId === "" ||
+        merged.rootCategoryId == null) &&
+      merged.categoryId &&
+      Number(merged.categoryId) > 0 &&
+      categories.length > 0
+    ) {
+      const root = resolveRootCategory(categories, Number(merged.categoryId));
+      if (root) {
+        merged.rootCategoryId = root.id;
+      }
+    }
+
+    reset(merged);
+  }, [defaultValues, categories, reset]);
+
+  const clearVehicleFields = () => {
+    setValue("vehicleBrandId", "", { shouldValidate: false });
+    setValue("vehicleModelId", "", { shouldValidate: false });
+    setValue("manufacturingYear", "", { shouldValidate: false });
+    setValue("modelYear", "", { shouldValidate: false });
+    clearErrors([
+      "vehicleBrandId",
+      "vehicleModelId",
+      "manufacturingYear",
+      "modelYear",
+    ]);
+  };
 
   const submit = handleSubmit((values) => {
     if (isSubmitting) return;
-    onSubmit(values);
+    const payload: AdvertisementFormValues = { ...values };
+    if (!showVehicleFields) {
+      payload.vehicleBrandId = null;
+      payload.vehicleModelId = null;
+      payload.manufacturingYear = null;
+      payload.modelYear = null;
+    }
+    if (!showCompatibility) {
+      payload.compatibilityDescription = "";
+    }
+    onSubmit(payload);
   });
 
   return (
@@ -215,17 +307,25 @@ function AdvertisementForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="ad-category">Categoria</Label>
+          <Label htmlFor="ad-root-category">Categoria</Label>
           <select
-            id="ad-category"
+            id="ad-root-category"
             className={selectClassName}
-            aria-invalid={Boolean(errors.categoryId)}
+            aria-invalid={Boolean(errors.rootCategoryId)}
             aria-describedby={
-              errors.categoryId ? "ad-category-error" : undefined
+              errors.rootCategoryId ? "ad-root-category-error" : undefined
             }
             disabled={isSubmitting || categoriesLoading}
-            defaultValue=""
-            {...register("categoryId")}
+            {...register("rootCategoryId", {
+              onChange: () => {
+                setValue("categoryId", 0, { shouldValidate: false });
+                clearErrors("categoryId");
+                clearVehicleFields();
+                setValue("compatibilityDescription", "", {
+                  shouldValidate: false,
+                });
+              },
+            })}
           >
             {categoriesLoading ? (
               <option value="">Carregando…</option>
@@ -234,7 +334,52 @@ function AdvertisementForm({
                 <option value="" disabled>
                   Selecione uma categoria
                 </option>
-                {categories.map((category) => (
+                {rootCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </>
+            )}
+          </select>
+          {errors.rootCategoryId ? (
+            <p
+              id="ad-root-category-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.rootCategoryId.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ad-category">Subcategoria</Label>
+          <select
+            id="ad-category"
+            className={selectClassName}
+            aria-invalid={Boolean(errors.categoryId)}
+            aria-describedby={
+              errors.categoryId ? "ad-category-error" : undefined
+            }
+            disabled={
+              isSubmitting ||
+              categoriesLoading ||
+              !selectedRootNumber ||
+              selectedRootNumber <= 0
+            }
+            {...register("categoryId")}
+          >
+            {!selectedRootNumber || selectedRootNumber <= 0 ? (
+              <option value="">Selecione a categoria</option>
+            ) : subcategories.length === 0 ? (
+              <option value="">Nenhuma subcategoria</option>
+            ) : (
+              <>
+                <option value="" disabled>
+                  Selecione uma subcategoria
+                </option>
+                {subcategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -252,90 +397,52 @@ function AdvertisementForm({
             </p>
           ) : null}
         </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="ad-vehicle-brand">Marca</Label>
-          <select
-            id="ad-vehicle-brand"
-            className={selectClassName}
-            aria-invalid={Boolean(errors.vehicleBrandId)}
-            aria-describedby={
-              errors.vehicleBrandId ? "ad-vehicle-brand-error" : undefined
-            }
-            disabled={isSubmitting || vehicleBrandsLoading}
-            {...register("vehicleBrandId", {
-              onChange: () => {
-                setValue("vehicleModelId", "", { shouldValidate: false });
-              },
-            })}
-          >
-            {vehicleBrandsLoading ? (
-              <option value="">Carregando…</option>
-            ) : (
-              <>
-                <option value="">Selecione</option>
-                {vehicleBrands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
-              </>
-            )}
-          </select>
-          {errors.vehicleBrandId ? (
-            <p
-              id="ad-vehicle-brand-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.vehicleBrandId.message}
-            </p>
-          ) : null}
-        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="ad-vehicle-model">Modelo</Label>
-          <select
-            id="ad-vehicle-model"
-            className={selectClassName}
-            aria-invalid={Boolean(errors.vehicleModelId)}
-            aria-describedby={
-              errors.vehicleModelId ? "ad-vehicle-model-error" : undefined
-            }
-            disabled={
-              isSubmitting || !hasBrandSelected || vehicleModelsLoading
-            }
-            {...register("vehicleModelId")}
-          >
-            {!hasBrandSelected ? (
-              <option value="">Selecione</option>
-            ) : vehicleModelsLoading ? (
-              <option value="">Carregando…</option>
-            ) : vehicleModels.length === 0 ? (
-              <option value="">Nenhum modelo cadastrado</option>
-            ) : (
-              <>
-                <option value="">Selecione</option>
-                {vehicleModels.map((model) => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </>
-            )}
-          </select>
-          {errors.vehicleModelId ? (
-            <p
-              id="ad-vehicle-model-error"
-              className="text-destructive text-xs"
-              role="alert"
+        {showVehicleFields ? (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="ad-vehicle-brand">
+              Marca{vehicleRequired ? "" : " (opcional)"}
+            </Label>
+            <select
+              id="ad-vehicle-brand"
+              className={selectClassName}
+              aria-invalid={Boolean(errors.vehicleBrandId)}
+              aria-describedby={
+                errors.vehicleBrandId ? "ad-vehicle-brand-error" : undefined
+              }
+              disabled={isSubmitting || vehicleBrandsLoading}
+              {...register("vehicleBrandId", {
+                onChange: () => {
+                  setValue("vehicleModelId", "", { shouldValidate: false });
+                },
+              })}
             >
-              {errors.vehicleModelId.message}
-            </p>
-          ) : null}
-        </div>
+              {vehicleBrandsLoading ? (
+                <option value="">Carregando…</option>
+              ) : (
+                <>
+                  <option value="">Selecione</option>
+                  {vehicleBrands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </>
+              )}
+            </select>
+            {errors.vehicleBrandId ? (
+              <p
+                id="ad-vehicle-brand-error"
+                className="text-destructive text-xs"
+                role="alert"
+              >
+                {errors.vehicleBrandId.message}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="ad-condition">Condição</Label>
@@ -367,107 +474,161 @@ function AdvertisementForm({
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {showVehicleFields ? (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ad-vehicle-model">
+                Modelo{vehicleRequired ? "" : " (opcional)"}
+              </Label>
+              <select
+                id="ad-vehicle-model"
+                className={selectClassName}
+                aria-invalid={Boolean(errors.vehicleModelId)}
+                aria-describedby={
+                  errors.vehicleModelId ? "ad-vehicle-model-error" : undefined
+                }
+                disabled={
+                  isSubmitting || !hasBrandSelected || vehicleModelsLoading
+                }
+                {...register("vehicleModelId")}
+              >
+                {!hasBrandSelected ? (
+                  <option value="">Selecione</option>
+                ) : vehicleModelsLoading ? (
+                  <option value="">Carregando…</option>
+                ) : vehicleModels.length === 0 ? (
+                  <option value="">Nenhum modelo cadastrado</option>
+                ) : (
+                  <>
+                    <option value="">Selecione</option>
+                    {vehicleModels.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.name}
+                      </option>
+                    ))}
+                  </>
+                )}
+              </select>
+              {errors.vehicleModelId ? (
+                <p
+                  id="ad-vehicle-model-error"
+                  className="text-destructive text-xs"
+                  role="alert"
+                >
+                  {errors.vehicleModelId.message}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ad-manufacturing-year">
+                Ano de Fabricação{vehicleRequired ? "" : " (opcional)"}
+              </Label>
+              <select
+                id="ad-manufacturing-year"
+                className={selectClassName}
+                aria-invalid={Boolean(errors.manufacturingYear)}
+                aria-describedby={
+                  errors.manufacturingYear
+                    ? "ad-manufacturing-year-error"
+                    : undefined
+                }
+                disabled={isSubmitting}
+                {...register("manufacturingYear")}
+              >
+                <option value="">Selecione</option>
+                {vehicleYears.map((year) => (
+                  <option key={year} value={String(year)}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+              {errors.manufacturingYear ? (
+                <p
+                  id="ad-manufacturing-year-error"
+                  className="text-destructive text-xs"
+                  role="alert"
+                >
+                  {errors.manufacturingYear.message}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ad-model-year">Ano/Modelo</Label>
+              <select
+                id="ad-model-year"
+                className={selectClassName}
+                aria-invalid={Boolean(errors.modelYear)}
+                aria-describedby={
+                  errors.modelYear ? "ad-model-year-error" : undefined
+                }
+                disabled={isSubmitting}
+                {...register("modelYear")}
+              >
+                <option value="">Selecione</option>
+                {vehicleYears.map((year) => (
+                  <option key={year} value={String(year)}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+              {errors.modelYear ? (
+                <p
+                  id="ad-model-year-error"
+                  className="text-destructive text-xs"
+                  role="alert"
+                >
+                  {errors.modelYear.message}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </>
+      ) : null}
+
+      {showCompatibility ? (
         <div className="flex flex-col gap-2">
-          <Label htmlFor="ad-manufacturing-year">Ano de Fabricação</Label>
-          <select
-            id="ad-manufacturing-year"
-            className={selectClassName}
-            aria-invalid={Boolean(errors.manufacturingYear)}
+          <div className="flex items-end justify-between gap-3">
+            <Label htmlFor="ad-compatibility">Compatibilidade</Label>
+            <span
+              id="ad-compatibility-count"
+              className="text-muted-foreground text-xs tabular-nums"
+              aria-live="polite"
+            >
+              {compatibilityRemaining} caracteres restantes
+            </span>
+          </div>
+          <Input
+            id="ad-compatibility"
+            placeholder="Ex.: Civic 2014–2018, motor 1.8 (opcional)"
+            maxLength={ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH}
+            aria-invalid={Boolean(errors.compatibilityDescription)}
             aria-describedby={
-              errors.manufacturingYear
-                ? "ad-manufacturing-year-error"
-                : undefined
+              errors.compatibilityDescription
+                ? "ad-compatibility-error ad-compatibility-count"
+                : "ad-compatibility-hint ad-compatibility-count"
             }
             disabled={isSubmitting}
-            {...register("manufacturingYear")}
-          >
-            <option value="">Selecione</option>
-            {vehicleYears.map((year) => (
-              <option key={year} value={String(year)}>
-                {year}
-              </option>
-            ))}
-          </select>
-          {errors.manufacturingYear ? (
-            <p
-              id="ad-manufacturing-year-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.manufacturingYear.message}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="ad-model-year">Ano/Modelo</Label>
-          <select
-            id="ad-model-year"
-            className={selectClassName}
-            aria-invalid={Boolean(errors.modelYear)}
-            aria-describedby={
-              errors.modelYear ? "ad-model-year-error" : undefined
-            }
-            disabled={isSubmitting}
-            {...register("modelYear")}
-          >
-            <option value="">Selecione</option>
-            {vehicleYears.map((year) => (
-              <option key={year} value={String(year)}>
-                {year}
-              </option>
-            ))}
-          </select>
-          {errors.modelYear ? (
-            <p
-              id="ad-model-year-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.modelYear.message}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex items-end justify-between gap-3">
-          <Label htmlFor="ad-compatibility">Compatibilidade</Label>
-          <span
-            id="ad-compatibility-count"
-            className="text-muted-foreground text-xs tabular-nums"
-            aria-live="polite"
-          >
-            {compatibilityRemaining} caracteres restantes
-          </span>
-        </div>
-        <Input
-          id="ad-compatibility"
-          placeholder="Ex.: Civic 2014–2018, motor 1.8 (opcional)"
-          maxLength={ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH}
-          aria-invalid={Boolean(errors.compatibilityDescription)}
-          aria-describedby={
-            errors.compatibilityDescription
-              ? "ad-compatibility-error ad-compatibility-count"
-              : "ad-compatibility-hint ad-compatibility-count"
-          }
-          disabled={isSubmitting}
-          {...register("compatibilityDescription")}
-        />
-        <p id="ad-compatibility-hint" className="text-muted-foreground text-xs">
-          Opcional. Modelos, anos ou motores compatíveis com a peça.
-        </p>
-        {errors.compatibilityDescription ? (
-          <p
-            id="ad-compatibility-error"
-            className="text-destructive text-xs"
-            role="alert"
-          >
-            {errors.compatibilityDescription.message}
+            {...register("compatibilityDescription")}
+          />
+          <p id="ad-compatibility-hint" className="text-muted-foreground text-xs">
+            Opcional. Modelos, anos ou motores compatíveis com a peça.
           </p>
-        ) : null}
-      </div>
+          {errors.compatibilityDescription ? (
+            <p
+              id="ad-compatibility-error"
+              className="text-destructive text-xs"
+              role="alert"
+            >
+              {errors.compatibilityDescription.message}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 sm:max-w-md">
         <div className="flex flex-col gap-2">

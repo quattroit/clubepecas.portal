@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 
 const HOME_RECENT_ADS_LIMIT = 6;
 const HOME_FEATURED_STORES_LIMIT = 4;
+const HOME_CATEGORIES_LIMIT = 4;
 
 const HOW_IT_WORKS: {
   step: string;
@@ -112,7 +113,20 @@ function HomePageView() {
     platformSettingsQuery.data?.platformDescription ?? APP_DESCRIPTION;
 
   const marketplaceItems = advertisementsQuery.data?.items;
-  const categories = categoriesQuery.data ?? [];
+  const allCategories = categoriesQuery.data ?? [];
+  const categories = allCategories
+    .filter((category) => category.parentId == null)
+    .map((root) => {
+      const childrenAds = allCategories
+        .filter((category) => category.parentId === root.id)
+        .reduce((sum, category) => sum + category.advertisementCount, 0);
+      return {
+        ...root,
+        advertisementCount: root.advertisementCount + childrenAds,
+      };
+    })
+    .sort((a, b) => b.advertisementCount - a.advertisementCount)
+    .slice(0, HOME_CATEGORIES_LIMIT);
 
   const recentAdvertisements = (marketplaceItems ?? []).slice(
     0,
@@ -180,7 +194,9 @@ function HomePageView() {
           actionHref={ROUTES.CATEGORIES}
         />
 
-        {categoriesQuery.isLoading ? <CategoryGridSkeleton /> : null}
+        {categoriesQuery.isLoading ? (
+          <CategoryGridSkeleton count={HOME_CATEGORIES_LIMIT} />
+        ) : null}
 
         {categoriesQuery.isError ? (
           <ErrorMessage

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -24,16 +24,32 @@ import { CategoryIconPicker } from "@/features/admin/components/CategoryIconPick
 import {
   categoryFormDefaultValues,
   categoryFormSchema,
+  VEHICLE_REQUIREMENT_OPTIONS,
+  type CategoryFormInput,
   type CategoryFormValues,
 } from "@/features/admin/schemas/categoryFormSchema";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import { cn } from "@/lib/utils";
 import { slugify } from "@/utils/slugify";
+
+const selectClassName = cn(
+  "border-input bg-surface text-foreground h-10 w-full rounded-xl border px-3 text-sm outline-none",
+  "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+);
+
+type RootCategoryOption = {
+  id: number;
+  name: string;
+};
 
 type CategoryFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit";
-  defaultValues?: CategoryFormValues;
+  defaultValues?: CategoryFormInput;
+  /** Categorias raiz disponíveis como pai (excluir a própria ao editar). */
+  rootCategories?: RootCategoryOption[];
   isSubmitting?: boolean;
   submitError?: unknown;
   onSubmit: (values: CategoryFormValues) => void;
@@ -41,12 +57,14 @@ type CategoryFormDialogProps = {
 
 /**
  * Dialog de criar/editar categoria — RHF + Zod, slug auto-gerado do nome.
+ * Configuração de campos só aparece para categorias raiz (sem pai).
  */
 function CategoryFormDialog({
   open,
   onOpenChange,
   mode,
   defaultValues,
+  rootCategories = [],
   isSubmitting = false,
   submitError,
   onSubmit,
@@ -59,11 +77,15 @@ function CategoryFormDialog({
     getValues,
     setValue,
     formState: { errors },
-  } = useForm<CategoryFormValues>({
+  } = useForm<CategoryFormInput, unknown, CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     shouldFocusError: true,
     defaultValues: categoryFormDefaultValues,
   });
+
+  const parentId = useWatch({ control, name: "parentId" });
+  const isRoot =
+    parentId === "" || parentId === null || parentId === undefined;
 
   useEffect(() => {
     if (!open) return;
@@ -152,6 +174,28 @@ function CategoryFormDialog({
           </div>
 
           <div className="flex flex-col gap-2">
+            <Label htmlFor="category-parent">Categoria pai</Label>
+            <select
+              id="category-parent"
+              className={selectClassName}
+              disabled={isSubmitting}
+              aria-invalid={Boolean(errors.parentId)}
+              aria-describedby="category-parent-hint"
+              {...register("parentId")}
+            >
+              <option value="">Nenhuma (categoria raiz)</option>
+              {rootCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+            <p id="category-parent-hint" className="text-muted-foreground text-xs">
+              Subcategorias herdam a configuração de campos da raiz.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
             <Label htmlFor="category-description">Descrição</Label>
             <Textarea
               id="category-description"
@@ -226,6 +270,122 @@ function CategoryFormDialog({
               )}
             />
           </div>
+
+          {isRoot ? (
+            <fieldset className="bg-muted/30 border-border flex flex-col gap-4 rounded-xl border p-4">
+              <legend className="text-foreground px-1 text-sm font-semibold">
+                Configuração de campos
+              </legend>
+              <p className="text-muted-foreground -mt-2 text-xs">
+                Define quais campos de veículo e solicitação profissional aparecem
+                nos formulários. Subcategorias herdam esta configuração.
+              </p>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="category-vehicle-requirement">
+                  Campos de veículo
+                </Label>
+                <select
+                  id="category-vehicle-requirement"
+                  className={selectClassName}
+                  disabled={isSubmitting}
+                  aria-invalid={Boolean(errors.vehicleRequirement)}
+                  {...register("vehicleRequirement")}
+                >
+                  {VEHICLE_REQUIREMENT_OPTIONS.map((option) => (
+                    <option key={option.value} value={String(option.value)}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.vehicleRequirement ? (
+                  <p className="text-destructive text-xs" role="alert">
+                    {errors.vehicleRequirement.message}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="border-border flex items-center justify-between gap-4 rounded-lg border bg-surface/60 p-3">
+                <div className="min-w-0">
+                  <Label
+                    htmlFor="category-show-compatibility"
+                    className="text-sm font-medium"
+                  >
+                    Mostrar compatibilidade
+                  </Label>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Campo de texto livre de compatibilidade no anúncio.
+                  </p>
+                </div>
+                <Controller
+                  name="showCompatibility"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="category-show-compatibility"
+                      checked={field.value}
+                      disabled={isSubmitting}
+                      onCheckedChange={field.onChange}
+                      onBlur={field.onBlur}
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="border-border flex items-center justify-between gap-4 rounded-lg border bg-surface/60 p-3">
+                <div className="min-w-0">
+                  <Label
+                    htmlFor="category-allow-professional"
+                    className="text-sm font-medium"
+                  >
+                    Permitir solicitação profissional
+                  </Label>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Compradores profissionais podem usar esta categoria.
+                  </p>
+                </div>
+                <Controller
+                  name="allowProfessionalRequest"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="category-allow-professional"
+                      checked={field.value}
+                      disabled={isSubmitting}
+                      onCheckedChange={field.onChange}
+                      onBlur={field.onBlur}
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="category-search-keywords">
+                  Palavras-chave de busca
+                </Label>
+                <Textarea
+                  id="category-search-keywords"
+                  rows={2}
+                  placeholder="Ex.: motor cabeçote bloco"
+                  disabled={isSubmitting}
+                  aria-invalid={Boolean(errors.searchKeywords)}
+                  aria-describedby="category-search-keywords-hint"
+                  {...register("searchKeywords")}
+                />
+                <p
+                  id="category-search-keywords-hint"
+                  className="text-muted-foreground text-xs"
+                >
+                  Separadas por espaço. Usadas na busca do marketplace.
+                </p>
+                {errors.searchKeywords ? (
+                  <p className="text-destructive text-xs" role="alert">
+                    {errors.searchKeywords.message}
+                  </p>
+                ) : null}
+              </div>
+            </fieldset>
+          ) : null}
 
           <fieldset className="bg-muted/30 border-border flex flex-col gap-4 rounded-xl border p-4">
             <legend className="text-foreground px-1 text-sm font-semibold">

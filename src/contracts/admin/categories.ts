@@ -1,4 +1,7 @@
-import type { CategoryIconType } from "@/contracts/common/enums";
+import type {
+  CategoryIconType,
+  VehicleRequirement,
+} from "@/contracts/common/enums";
 
 export type AdminCategoryStatusFilter = "all" | "active" | "inactive";
 
@@ -27,6 +30,11 @@ export type AdminCategoryListItemDto = {
   metaTitle: string | null;
   metaDescription: string | null;
   ogImage: string | null;
+  parentId: number | null;
+  vehicleRequirement: VehicleRequirement;
+  showCompatibility: boolean;
+  allowProfessionalRequest: boolean;
+  searchKeywords: string | null;
   updatedAt: string;
 };
 
@@ -46,6 +54,11 @@ export type CreateAdminCategoryRequest = {
   metaTitle?: string;
   metaDescription?: string;
   ogImage?: string;
+  parentId?: number | null;
+  vehicleRequirement?: VehicleRequirement;
+  showCompatibility?: boolean;
+  allowProfessionalRequest?: boolean;
+  searchKeywords?: string | null;
 };
 
 /** PUT /api/v1/admin/categories/{id} */
@@ -59,6 +72,11 @@ export type UpdateAdminCategoryRequest = {
   metaTitle?: string;
   metaDescription?: string;
   ogImage?: string;
+  parentId?: number | null;
+  vehicleRequirement?: VehicleRequirement;
+  showCompatibility?: boolean;
+  allowProfessionalRequest?: boolean;
+  searchKeywords?: string | null;
 };
 
 /** PUT /api/v1/admin/categories/{id}/status */

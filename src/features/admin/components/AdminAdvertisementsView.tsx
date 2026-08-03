@@ -294,11 +294,13 @@ function AdminAdvertisementsView() {
               }}
             >
               <option value="all">Categoria: todas</option>
-              {(categoriesQuery.data ?? []).map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
+              {(categoriesQuery.data ?? [])
+                .filter((category) => category.parentId == null)
+                .map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
             </select>
 
             <Input

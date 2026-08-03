@@ -257,8 +257,9 @@ function PartRequestsListView() {
                   >
                     <td className="px-4 py-3 font-medium">{item.title}</td>
                     <td className="text-muted-foreground px-4 py-3">
-                      {item.vehicleBrandName} {item.vehicleModelName}{" "}
-                      {item.manufacturingYear}
+                      {[item.vehicleBrandName, item.vehicleModelName, item.manufacturingYear]
+                        .filter(Boolean)
+                        .join(" ") || "—"}
                     </td>
                     <td className="text-muted-foreground px-4 py-3">
                       {formatCityLabel({

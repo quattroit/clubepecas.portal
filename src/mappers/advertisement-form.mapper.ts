@@ -4,7 +4,12 @@ import type {
 } from "@/contracts/advertisements/requests";
 import type { AdvertisementDetailDto } from "@/contracts/advertisements/responses";
 import type { AdvertisementCondition } from "@/contracts/common/enums";
-import type { AdvertisementFormInput, AdvertisementFormValues } from "@/features/dashboard/schemas/advertisementFormSchema";
+import type {
+  AdvertisementFormInput,
+  AdvertisementFormValues,
+} from "@/features/dashboard/schemas/advertisementFormSchema";
+import type { Category } from "@/types/Category";
+import { resolveRootCategory } from "@/utils/category-hierarchy";
 import { parsePriceInput } from "@/utils/parsePriceInput";
 
 /**
@@ -29,13 +34,19 @@ export function mapAdvertisementFormToUpdateRequest(
  * Detalhe da API → valores do formulário (create/edit).
  * Fotos são gerenciadas fora do formulário via upload multipart.
  * Campos opcionais vazios usam "" para o select exibir "Selecione".
+ * `categories` resolve a raiz a partir da subcategoria do anúncio.
  */
 export function mapAdvertisementDetailToFormValues(
   dto: AdvertisementDetailDto,
+  categories: Category[] = [],
 ): AdvertisementFormInput {
+  const root = resolveRootCategory(categories, dto.categoryId);
+  const rootCategoryId = root?.id ?? dto.categoryId;
+
   return {
     title: dto.title,
     description: dto.description,
+    rootCategoryId,
     categoryId: dto.categoryId,
     vehicleBrandId: dto.vehicleBrandId ?? "",
     vehicleModelId: dto.vehicleModelId ?? "",

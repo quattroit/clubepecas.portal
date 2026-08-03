@@ -39,9 +39,12 @@ function EditPartRequestView() {
   const defaultValues = useMemo(
     () =>
       detailQuery.data
-        ? mapPartRequestDtoToFormInput(detailQuery.data)
+        ? mapPartRequestDtoToFormInput(
+            detailQuery.data,
+            categoriesQuery.data ?? [],
+          )
         : undefined,
-    [detailQuery.data],
+    [detailQuery.data, categoriesQuery.data],
   );
 
   const handleSubmit = (values: PartRequestFormValues) => {

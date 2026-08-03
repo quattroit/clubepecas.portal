@@ -104,6 +104,19 @@ export enum CategoryIconType {
   Url = 3,
 }
 
+/**
+ * Exigência de campos de veículo conforme a categoria raiz.
+ * Fonte: ClubePecas.Domain.Enums.VehicleRequirement
+ */
+export enum VehicleRequirement {
+  /** Exibir e exigir marca, modelo e ano de fabricação. */
+  Required = 0,
+  /** Exibir campos de veículo, sem obrigatoriedade. */
+  Optional = 1,
+  /** Não exibir campos de veículo. */
+  Hidden = 2,
+}
+
 /** Ciclo de cobrança dos planos de assinatura (Sprint 8.3.1 — múltiplos ciclos). */
 export enum BillingCycle {
   Monthly = 1,

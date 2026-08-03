@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { AdvertisementCondition } from "@/contracts/common/enums";
+import {
+  AdvertisementCondition,
+  VehicleRequirement,
+} from "@/contracts/common/enums";
 import { parsePriceInput } from "@/utils/parsePriceInput";
 import {
   getVehicleYearMax,
@@ -54,78 +57,131 @@ const optionalYearField = z
     `Informe um ano entre ${VEHICLE_YEAR_MIN} e ${getVehicleYearMax()}`,
   );
 
+export type AdvertisementCategoryFieldConfig = {
+  vehicleRequirement: VehicleRequirement;
+  showCompatibility: boolean;
+};
+
+const DEFAULT_FIELD_CONFIG: AdvertisementCategoryFieldConfig = {
+  vehicleRequirement: VehicleRequirement.Required,
+  showCompatibility: true,
+};
+
 /**
  * Schema compartilhado entre criar e editar anúncio.
- * Marca, modelo, anos e compatibilidade são opcionais.
+ * `rootCategoryId` seleciona a raiz; `categoryId` é a subcategoria enviada à API.
+ * Validação de veículo/compatibilidade depende da config da raiz (via factory).
  */
-export const advertisementFormSchema = z
-  .object({
-    title: z
-      .string()
-      .trim()
-      .min(1, "Informe o título")
-      .max(
-        ADVERTISEMENT_TITLE_MAX_LENGTH,
-        `Máximo de ${ADVERTISEMENT_TITLE_MAX_LENGTH} caracteres`,
-      ),
-    description: z
-      .string()
-      .trim()
-      .min(1, "Informe a descrição")
-      .max(
-        ADVERTISEMENT_DESCRIPTION_MAX_LENGTH,
-        `Máximo de ${ADVERTISEMENT_DESCRIPTION_MAX_LENGTH} caracteres`,
-      ),
-    categoryId: entityIdField("Selecione a categoria"),
-    vehicleBrandId: optionalEntityIdField,
-    vehicleModelId: optionalEntityIdField,
-    manufacturingYear: optionalYearField,
-    modelYear: optionalYearField,
-    compatibilityDescription: z
-      .string()
-      .trim()
-      .max(
-        ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH,
-        `Máximo de ${ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH} caracteres`,
-      ),
-    condition: z.enum(conditionOptions, {
-      message: "Selecione a condição",
-    }),
-    price: z
-      .string()
-      .trim()
-      .min(1, "Informe o preço")
-      .refine((value) => !Number.isNaN(parsePriceInput(value)), "Preço inválido")
-      .refine(
-        (value) => parsePriceInput(value) > 0,
-        "O preço deve ser maior que zero",
-      ),
-    stockQuantity: z
-      .string()
-      .trim()
-      .min(1, "Informe a quantidade em estoque")
-      .refine(
-        (value) => Number.isInteger(Number(value)) && Number(value) >= 1,
-        "A quantidade deve ser um número inteiro maior ou igual a 1",
-      ),
-  })
-  .superRefine((values, ctx) => {
-    if (values.vehicleModelId != null && values.vehicleBrandId == null) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["vehicleBrandId"],
-        message: "Selecione a marca ao informar o modelo",
-      });
-    }
-  });
+export function createAdvertisementFormSchema(
+  getConfig: () => AdvertisementCategoryFieldConfig = () => DEFAULT_FIELD_CONFIG,
+) {
+  return z
+    .object({
+      title: z
+        .string()
+        .trim()
+        .min(1, "Informe o título")
+        .max(
+          ADVERTISEMENT_TITLE_MAX_LENGTH,
+          `Máximo de ${ADVERTISEMENT_TITLE_MAX_LENGTH} caracteres`,
+        ),
+      description: z
+        .string()
+        .trim()
+        .min(1, "Informe a descrição")
+        .max(
+          ADVERTISEMENT_DESCRIPTION_MAX_LENGTH,
+          `Máximo de ${ADVERTISEMENT_DESCRIPTION_MAX_LENGTH} caracteres`,
+        ),
+      rootCategoryId: entityIdField("Selecione a categoria"),
+      categoryId: entityIdField("Selecione a subcategoria"),
+      vehicleBrandId: optionalEntityIdField,
+      vehicleModelId: optionalEntityIdField,
+      manufacturingYear: optionalYearField,
+      modelYear: optionalYearField,
+      compatibilityDescription: z
+        .string()
+        .trim()
+        .max(
+          ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH,
+          `Máximo de ${ADVERTISEMENT_COMPATIBILITY_MAX_LENGTH} caracteres`,
+        ),
+      condition: z.enum(conditionOptions, {
+        message: "Selecione a condição",
+      }),
+      price: z
+        .string()
+        .trim()
+        .min(1, "Informe o preço")
+        .refine((value) => !Number.isNaN(parsePriceInput(value)), "Preço inválido")
+        .refine(
+          (value) => parsePriceInput(value) > 0,
+          "O preço deve ser maior que zero",
+        ),
+      stockQuantity: z
+        .string()
+        .trim()
+        .min(1, "Informe a quantidade em estoque")
+        .refine(
+          (value) => Number.isInteger(Number(value)) && Number(value) >= 1,
+          "A quantidade deve ser um número inteiro maior ou igual a 1",
+        ),
+    })
+    .superRefine((values, ctx) => {
+      const config = getConfig();
+      const requiresVehicle =
+        config.vehicleRequirement === VehicleRequirement.Required;
+      const showsVehicle =
+        config.vehicleRequirement !== VehicleRequirement.Hidden;
 
-export type AdvertisementFormValues = z.output<typeof advertisementFormSchema>;
-export type AdvertisementFormInput = z.input<typeof advertisementFormSchema>;
+      if (showsVehicle && values.vehicleModelId != null && values.vehicleBrandId == null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["vehicleBrandId"],
+          message: "Selecione a marca ao informar o modelo",
+        });
+      }
+
+      if (requiresVehicle) {
+        if (values.vehicleBrandId == null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["vehicleBrandId"],
+            message: "Selecione a marca",
+          });
+        }
+        if (values.vehicleModelId == null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["vehicleModelId"],
+            message: "Selecione o modelo",
+          });
+        }
+        if (values.manufacturingYear == null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["manufacturingYear"],
+            message: "Informe o ano de fabricação",
+          });
+        }
+      }
+    });
+}
+
+export const advertisementFormSchema = createAdvertisementFormSchema();
+
+export type AdvertisementFormValues = z.output<
+  ReturnType<typeof createAdvertisementFormSchema>
+>;
+export type AdvertisementFormInput = z.input<
+  ReturnType<typeof createAdvertisementFormSchema>
+>;
 
 /** Defaults do formulário (input): selects vazios → "" → null no submit. */
 export const advertisementFormDefaultValues: AdvertisementFormInput = {
   title: "",
   description: "",
+  rootCategoryId: 0,
   categoryId: 0,
   vehicleBrandId: "",
   vehicleModelId: "",

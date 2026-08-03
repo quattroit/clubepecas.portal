@@ -1,11 +1,13 @@
 import type {
   AdvertisementCondition,
   CategoryIconType,
+  VehicleRequirement,
 } from "@/contracts/common/enums";
 
 /**
  * Item do catálogo público de categorias.
  * GET /api/v1/categories — CRUD administrativo por trás (Sprint 4.3.6).
+ * Configuração de campos vem da raiz (filhas herdam via parentId).
  */
 export type PublicCategoryListItemDto = {
   id: number;
@@ -17,6 +19,13 @@ export type PublicCategoryListItemDto = {
   iconType: CategoryIconType;
   iconValue: string;
   advertisementCount: number;
+  parentId: number | null;
+  vehicleRequirement: VehicleRequirement;
+  showCompatibility: boolean;
+  allowProfessionalRequest: boolean;
+  searchKeywords?: string | null;
+  /** Subcategorias aninhadas (GET /categories retorna árvore nas raízes). */
+  children?: PublicCategoryListItemDto[];
 };
 
 export type GetCategoriesResponse = {

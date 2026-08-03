@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { VehicleRequirement } from "@/contracts/common/enums";
 import {
   getVehicleYearMax,
   VEHICLE_YEAR_MIN,
@@ -19,6 +20,16 @@ const entityIdField = (message: string) =>
     .transform((value) => Number(value))
     .pipe(z.number().int().positive(message));
 
+/** Dropdown opcional: "" / 0 → null. */
+const optionalEntityIdField = z
+  .union([z.string(), z.number(), z.null()])
+  .transform((value) => {
+    if (value === "" || value === null || value === undefined) return null;
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed <= 0) return null;
+    return parsed;
+  });
+
 function isValidVehicleYear(value: string): boolean {
   const year = Number(value);
   return (
@@ -27,15 +38,6 @@ function isValidVehicleYear(value: string): boolean {
     year <= getVehicleYearMax()
   );
 }
-
-const requiredYearField = z
-  .union([z.string(), z.number()])
-  .transform((value) => String(value).trim())
-  .refine((value) => value.length > 0, "Informe o ano de fabricação")
-  .refine(
-    isValidVehicleYear,
-    `Informe um ano entre ${VEHICLE_YEAR_MIN} e ${getVehicleYearMax()}`,
-  );
 
 const optionalYearField = z
   .union([z.string(), z.number(), z.null()])
@@ -54,54 +56,117 @@ const supplierOptions = Array.from(
   (_, index) => String(index + 1),
 ) as [string, ...string[]];
 
-export const partRequestFormSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "Informe o título")
-    .max(
-      PART_REQUEST_TITLE_MAX_LENGTH,
-      `Máximo de ${PART_REQUEST_TITLE_MAX_LENGTH} caracteres`,
-    ),
-  description: z
-    .string()
-    .trim()
-    .max(
-      PART_REQUEST_DESCRIPTION_MAX_LENGTH,
-      `Máximo de ${PART_REQUEST_DESCRIPTION_MAX_LENGTH} caracteres`,
-    ),
-  categoryId: entityIdField("Selecione a categoria"),
-  vehicleBrandId: entityIdField("Selecione a marca"),
-  vehicleModelId: entityIdField("Selecione o modelo"),
-  manufacturingYear: requiredYearField,
-  modelYear: optionalYearField,
-  engine: z
-    .string()
-    .trim()
-    .max(
-      PART_REQUEST_ENGINE_MAX_LENGTH,
-      `Máximo de ${PART_REQUEST_ENGINE_MAX_LENGTH} caracteres`,
-    ),
-  requestedQuantity: z
-    .string()
-    .trim()
-    .min(1, "Informe a quantidade")
-    .refine(
-      (value) => Number.isInteger(Number(value)) && Number(value) > 0,
-      "A quantidade deve ser maior que zero",
-    ),
-  cityId: entityIdField("Selecione a cidade"),
-  maximumSuppliers: z.enum(supplierOptions, {
-    message: "Selecione a quantidade de fornecedores",
-  }),
-});
+export type PartRequestCategoryFieldConfig = {
+  vehicleRequirement: VehicleRequirement;
+};
 
-export type PartRequestFormValues = z.output<typeof partRequestFormSchema>;
-export type PartRequestFormInput = z.input<typeof partRequestFormSchema>;
+const DEFAULT_FIELD_CONFIG: PartRequestCategoryFieldConfig = {
+  vehicleRequirement: VehicleRequirement.Required,
+};
+
+/**
+ * Schema do formulário de solicitação de peças.
+ * `rootCategoryId` → raiz; `categoryId` → subcategoria enviada à API.
+ */
+export function createPartRequestFormSchema(
+  getConfig: () => PartRequestCategoryFieldConfig = () => DEFAULT_FIELD_CONFIG,
+) {
+  return z
+    .object({
+      title: z
+        .string()
+        .trim()
+        .min(1, "Informe o título")
+        .max(
+          PART_REQUEST_TITLE_MAX_LENGTH,
+          `Máximo de ${PART_REQUEST_TITLE_MAX_LENGTH} caracteres`,
+        ),
+      description: z
+        .string()
+        .trim()
+        .max(
+          PART_REQUEST_DESCRIPTION_MAX_LENGTH,
+          `Máximo de ${PART_REQUEST_DESCRIPTION_MAX_LENGTH} caracteres`,
+        ),
+      rootCategoryId: entityIdField("Selecione a categoria"),
+      categoryId: entityIdField("Selecione a subcategoria"),
+      vehicleBrandId: optionalEntityIdField,
+      vehicleModelId: optionalEntityIdField,
+      manufacturingYear: optionalYearField,
+      modelYear: optionalYearField,
+      engine: z
+        .string()
+        .trim()
+        .max(
+          PART_REQUEST_ENGINE_MAX_LENGTH,
+          `Máximo de ${PART_REQUEST_ENGINE_MAX_LENGTH} caracteres`,
+        ),
+      requestedQuantity: z
+        .string()
+        .trim()
+        .min(1, "Informe a quantidade")
+        .refine(
+          (value) => Number.isInteger(Number(value)) && Number(value) > 0,
+          "A quantidade deve ser maior que zero",
+        ),
+      cityId: entityIdField("Selecione a cidade"),
+      maximumSuppliers: z.enum(supplierOptions, {
+        message: "Selecione a quantidade de fornecedores",
+      }),
+    })
+    .superRefine((values, ctx) => {
+      const { vehicleRequirement } = getConfig();
+      const requiresVehicle =
+        vehicleRequirement === VehicleRequirement.Required;
+      const showsVehicle = vehicleRequirement !== VehicleRequirement.Hidden;
+
+      if (showsVehicle && values.vehicleModelId != null && values.vehicleBrandId == null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["vehicleBrandId"],
+          message: "Selecione a marca ao informar o modelo",
+        });
+      }
+
+      if (requiresVehicle) {
+        if (values.vehicleBrandId == null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["vehicleBrandId"],
+            message: "Selecione a marca",
+          });
+        }
+        if (values.vehicleModelId == null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["vehicleModelId"],
+            message: "Selecione o modelo",
+          });
+        }
+        if (values.manufacturingYear == null) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["manufacturingYear"],
+            message: "Informe o ano de fabricação",
+          });
+        }
+      }
+    });
+}
+
+export const partRequestFormSchema = createPartRequestFormSchema();
+
+export type PartRequestFormValues = z.output<
+  ReturnType<typeof createPartRequestFormSchema>
+>;
+export type PartRequestFormInput = z.input<
+  ReturnType<typeof createPartRequestFormSchema>
+>;
 
 export const partRequestFormDefaultValues: PartRequestFormInput = {
   title: "",
   description: "",
+  rootCategoryId: 0,
   categoryId: 0,
   vehicleBrandId: "",
   vehicleModelId: "",

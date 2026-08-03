@@ -1,6 +1,9 @@
+import type { VehicleRequirement } from "@/contracts/common/enums";
+
 /**
  * Modelo de UI de categoria.
- * Backend: CRUD administrativo (Sprint 4.3.6) — `id` é Guid.
+ * Backend: CRUD administrativo — hierarquia via `parentId`.
+ * Configuração de campos (veículo/compatibilidade) está na raiz; filhas herdam.
  */
 export type Category = {
   id: number;
@@ -10,4 +13,9 @@ export type Category = {
   /** Valor do ícone (ex.: nome Lucide "Cog") — vem de `iconValue` da API. */
   iconName: string;
   description?: string;
+  parentId: number | null;
+  vehicleRequirement: VehicleRequirement;
+  showCompatibility: boolean;
+  allowProfessionalRequest: boolean;
+  searchKeywords?: string | null;
 };

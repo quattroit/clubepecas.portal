@@ -29,20 +29,14 @@ function SubscriptionHistoryCard({ items }: SubscriptionHistoryCardProps) {
           </p>
         ) : (
           <div className="border-border overflow-x-auto rounded-xl border">
-            <table className="w-full min-w-[28rem] text-left text-sm">
+            <table className="w-full min-w-[20rem] text-left text-sm">
               <thead>
                 <tr className="bg-muted/50 border-border border-b">
                   <th scope="col" className="px-4 py-3 font-medium">
                     Data
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
-                    Tipo
-                  </th>
-                  <th scope="col" className="px-4 py-3 font-medium">
                     Descrição
-                  </th>
-                  <th scope="col" className="px-4 py-3 font-medium">
-                    Origem
                   </th>
                   <th scope="col" className="px-4 py-3 font-medium">
                     Resultado
@@ -58,9 +52,7 @@ function SubscriptionHistoryCard({ items }: SubscriptionHistoryCardProps) {
                     <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
                       {formatDate(item.occurredAtUtc)}
                     </td>
-                    <td className="px-4 py-3 font-medium">{item.type}</td>
                     <td className="px-4 py-3">{item.description}</td>
-                    <td className="px-4 py-3">{item.source}</td>
                     <td className="px-4 py-3">
                       <Badge variant={item.success ? "success" : "destructive"}>
                         {item.success ? "Sucesso" : "Falha"}

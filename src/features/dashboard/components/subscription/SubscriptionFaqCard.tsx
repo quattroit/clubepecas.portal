@@ -16,16 +16,22 @@ const FAQ_ITEMS = [
   {
     question: "Posso trocar de plano?",
     answer:
-      "Sim. No MVP, basta cancelar o plano atual e escolher outro.",
+      "Sim. Você pode fazer upgrade, downgrade ou alterar o ciclo de cobrança diretamente nesta página, conforme as opções disponíveis para a sua assinatura.",
   },
   {
     question: "Quando meu plano começa?",
-    answer: "Imediatamente após sua contratação.",
+    answer:
+      "Imediatamente após a confirmação do pagamento. Em planos demonstrativos, o acesso começa na ativação.",
   },
   {
-    question: "Perco meus anúncios ao cancelar?",
+    question: "O que acontece se eu cancelar a renovação?",
     answer:
-      "Não. Porém não será possível publicar novos anúncios enquanto não houver uma assinatura ativa.",
+      "O cancelamento encerra apenas a renovação automática. Você mantém os benefícios do plano — inclusive publicar e gerenciar anúncios — até o fim do período já contratado. Após essa data, os anúncios publicados são pausados até haver uma assinatura ativa novamente.",
+  },
+  {
+    question: "Posso reativar depois de cancelar a renovação?",
+    answer:
+      "Sim. Enquanto o período atual estiver vigente, você pode reativar a renovação automática. Depois do vencimento, escolha um novo plano para voltar a publicar.",
   },
   {
     question: "O limite considera quais anúncios?",

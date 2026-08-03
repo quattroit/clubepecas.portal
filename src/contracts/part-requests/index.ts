@@ -9,11 +9,11 @@ export type PartRequestDto = {
   professionalBuyerId: number;
   title: string;
   description: string | null;
-  vehicleBrandId: number;
-  vehicleBrandName: string;
-  vehicleModelId: number;
-  vehicleModelName: string;
-  manufacturingYear: number;
+  vehicleBrandId: number | null;
+  vehicleBrandName: string | null;
+  vehicleModelId: number | null;
+  vehicleModelName: string | null;
+  manufacturingYear: number | null;
   modelYear: number | null;
   engine: string | null;
   categoryId: number;
@@ -38,9 +38,9 @@ export type PartRequestDto = {
 export type CreatePartRequestRequest = {
   title: string;
   description?: string | null;
-  vehicleBrandId: number;
-  vehicleModelId: number;
-  manufacturingYear: number;
+  vehicleBrandId?: number | null;
+  vehicleModelId?: number | null;
+  manufacturingYear?: number | null;
   modelYear?: number | null;
   engine?: string | null;
   categoryId: number;

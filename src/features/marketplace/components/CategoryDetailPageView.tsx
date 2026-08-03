@@ -100,10 +100,12 @@ function CategoryDetailPageView() {
 
   const filterCategories = [
     { id: "all", label: "Todas" },
-    ...categories.map((item) => ({
-      id: String(item.id),
-      label: item.name,
-    })),
+    ...categories
+      .filter((item) => item.parentId == null)
+      .map((item) => ({
+        id: String(item.id),
+        label: item.name,
+      })),
   ];
 
   const filterBrands = [

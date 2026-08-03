@@ -17,7 +17,9 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 function CategoriesPageView() {
   const categoriesQuery = useCategories();
 
-  const categories = categoriesQuery.data ?? [];
+  const categories = (categoriesQuery.data ?? []).filter(
+    (category) => category.parentId == null,
+  );
   const isLoading = categoriesQuery.isLoading;
   const isError = categoriesQuery.isError;
   const error = categoriesQuery.error;

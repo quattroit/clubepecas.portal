@@ -217,11 +217,15 @@ function PartRequestDetailView() {
               label="Quantidade"
               value={String(data.requestedQuantity)}
             />
-            <DetailField label="Marca" value={data.vehicleBrandName} />
-            <DetailField label="Modelo" value={data.vehicleModelName} />
+            <DetailField label="Marca" value={data.vehicleBrandName ?? "—"} />
+            <DetailField label="Modelo" value={data.vehicleModelName ?? "—"} />
             <DetailField
               label="Ano fabricação"
-              value={String(data.manufacturingYear)}
+              value={
+                data.manufacturingYear != null
+                  ? String(data.manufacturingYear)
+                  : "—"
+              }
             />
             <DetailField
               label="Ano modelo"
