@@ -14,3 +14,5 @@ export { ChangePasswordForm } from "@/features/dashboard/components/ChangePasswo
 export { SellerProfileForm } from "@/features/dashboard/components/SellerProfileForm";
 export { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 export { SellerProfileView } from "@/features/dashboard/components/SellerProfileView";
+export { SellerQuotationDetailView } from "@/features/dashboard/components/SellerQuotationDetailView";
+export { SellerQuotationsListView } from "@/features/dashboard/components/SellerQuotationsListView";

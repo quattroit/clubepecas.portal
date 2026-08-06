@@ -93,14 +93,24 @@ function UserMenu({ tone = "default" }: UserMenuProps) {
             Voltar ao site
           </Link>
           {user.role === UserRole.ProfessionalBuyer ? (
-            <Link
-              href={ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}
-              role="menuitem"
-              onClick={() => setOpen(false)}
-              className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
-            >
-              Solicitações
-            </Link>
+            <>
+              <Link
+                href={ROUTES.PROFESSIONAL_BUYER_QUOTATION}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
+              >
+                Central de Cotações
+              </Link>
+              <Link
+                href={ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="hover:bg-muted focus-visible:ring-ring block rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-2"
+              >
+                Solicitações
+              </Link>
+            </>
           ) : (
             <>
               <Link

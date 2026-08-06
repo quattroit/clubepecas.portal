@@ -7,6 +7,7 @@ import { Suspense, useState } from "react";
 
 import { AnnounceButton } from "@/components/announce/AnnounceButton";
 import { Logo } from "@/components/layout/Logo";
+import { QuotationCenterLink } from "@/components/layout/QuotationCenterLink";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -183,6 +184,7 @@ function Header() {
           <div className="ml-auto flex items-center gap-2 lg:ml-2">
             {!isLoading && isAuthenticated ? (
               <>
+                <QuotationCenterLink className="hidden lg:inline-flex" />
                 <AnnounceButton
                   variant="primary"
                   size="sm"
@@ -240,6 +242,11 @@ function Header() {
                       <p className="text-small truncate font-medium">
                         {user?.fullName}
                       </p>
+                      <QuotationCenterLink
+                        tone="default"
+                        onNavigate={closeMenu}
+                        className="justify-center"
+                      />
                       <Link
                         href={ROUTES.MY_ADVERTISEMENTS}
                         onClick={closeMenu}

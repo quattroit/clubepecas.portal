@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { MapPin, MessageCircle, Share2, Store } from "lucide-react";
 import { toast } from "sonner";
 
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { APP_NAME } from "@/constants/app";
 import { storePath } from "@/constants/routes";
@@ -104,7 +104,7 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
       <div className="flex min-w-0 items-start gap-4 sm:items-center">
         <div className="bg-secondary text-store relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:size-20">
           {avatarUrl ? (
-            <Image
+            <RemoteImage
               src={avatarUrl}
               alt={`Logo de ${name}`}
               fill

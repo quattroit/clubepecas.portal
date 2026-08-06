@@ -8,3 +8,6 @@ export { PartRequestsListView } from "./components/PartRequestsListView";
 export { PartRequestStatusBadge } from "./components/PartRequestStatusBadge";
 export { PartRequestSuppliersSection } from "./components/PartRequestSuppliersSection";
 export { ProfessionalBuyerDashboardView } from "./components/ProfessionalBuyerDashboardView";
+export { QuotationDraftView } from "./components/QuotationDraftView";
+export { QuotationStatusBadge } from "./components/QuotationStatusBadge";
+export { QuotationsHistoryListView } from "./components/QuotationsHistoryListView";

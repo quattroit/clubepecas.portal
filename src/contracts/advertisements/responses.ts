@@ -67,6 +67,7 @@ export type AdvertisementDetailDto = {
 };
 
 export type PublicAdvertisementSellerDto = {
+  id: number;
   storeName: string;
   displayName: string;
   city: string;

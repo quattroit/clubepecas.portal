@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, Home, LayoutDashboard } from "lucide-react";
+import {
+  ClipboardList,
+  FileText,
+  Home,
+  LayoutDashboard,
+  Receipt,
+} from "lucide-react";
 
 import { Logo } from "@/components/layout/Logo";
 import { ROUTES } from "@/constants/routes";
@@ -14,6 +20,18 @@ const NAV_ITEMS = [
     label: "Dashboard",
     icon: LayoutDashboard,
     exact: true,
+  },
+  {
+    href: ROUTES.PROFESSIONAL_BUYER_QUOTATION,
+    label: "Minha Cotação",
+    icon: Receipt,
+    exact: true,
+  },
+  {
+    href: ROUTES.PROFESSIONAL_BUYER_QUOTATIONS_HISTORY,
+    label: "Cotações enviadas",
+    icon: FileText,
+    exact: false,
   },
   {
     href: ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS,

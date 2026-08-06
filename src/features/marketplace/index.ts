@@ -6,6 +6,7 @@ export { AdvertisementGrid } from "@/features/marketplace/components/Advertiseme
 export { AdvertisementGridSkeleton } from "@/features/marketplace/components/AdvertisementGridSkeleton";
 export { AdvertisementsPageView } from "@/features/marketplace/components/AdvertisementsPageView";
 export { AdvertisementsToolbar } from "@/features/marketplace/components/AdvertisementsToolbar";
+export { AddToQuotationButton } from "@/features/marketplace/components/AddToQuotationButton";
 export { CategoriesPageView } from "@/features/marketplace/components/CategoriesPageView";
 export { CategoryCard } from "@/features/marketplace/components/CategoryCard";
 export { CategoryIcon } from "@/features/marketplace/components/CategoryIcon";

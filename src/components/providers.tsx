@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { AuthQuerySync } from "@/components/providers/AuthQuerySync";
 import { ErrorBoundary } from "@/components/providers/ErrorBoundary";
+import { QuotationDraftProvider } from "@/components/providers/QuotationDraftProvider";
 import { ReferralProvider } from "@/components/providers/ReferralProvider";
 import { RepresentativeAuthProvider } from "@/components/providers/RepresentativeAuthProvider";
 import { RepresentativeAuthQuerySync } from "@/components/providers/RepresentativeAuthQuerySync";
@@ -29,12 +30,14 @@ function Providers({ children }: ProvidersProps) {
         <AuthProvider>
           <RepresentativeAuthProvider>
             <ReferralProvider>
-              <AuthQuerySync />
-              <RepresentativeAuthQuerySync />
-              <ErrorBoundary>
-                {children}
-                <Toaster position="top-right" richColors closeButton />
-              </ErrorBoundary>
+              <QuotationDraftProvider>
+                <AuthQuerySync />
+                <RepresentativeAuthQuerySync />
+                <ErrorBoundary>
+                  {children}
+                  <Toaster position="top-right" richColors closeButton />
+                </ErrorBoundary>
+              </QuotationDraftProvider>
             </ReferralProvider>
           </RepresentativeAuthProvider>
         </AuthProvider>

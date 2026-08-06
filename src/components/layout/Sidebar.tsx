@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, Home, LayoutDashboard, Package, UserRound } from "lucide-react";
+import {
+  CreditCard,
+  Home,
+  LayoutDashboard,
+  Package,
+  Receipt,
+  UserRound,
+} from "lucide-react";
 
 import { Logo } from "@/components/layout/Logo";
 import { ROUTES } from "@/constants/routes";
@@ -32,6 +39,14 @@ const NAV_ITEMS = [
     label: "Meu Plano",
     icon: CreditCard,
     exact: true,
+    requiresSeller: true,
+    requiresPlan: false,
+  },
+  {
+    href: ROUTES.SELLER_QUOTATIONS,
+    label: "Central de Cotações",
+    icon: Receipt,
+    exact: false,
     requiresSeller: true,
     requiresPlan: false,
   },

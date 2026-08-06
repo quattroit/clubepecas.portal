@@ -59,6 +59,7 @@ export type MarketplaceItemDto = {
   city: string;
   state: string;
   storeName: string;
+  sellerId: number;
   thumbnailUrl: string | null;
   publishedAt: string;
 };

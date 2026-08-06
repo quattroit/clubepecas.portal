@@ -38,6 +38,7 @@ export function mapMarketplaceItemToAdvertisement(
       : [],
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
+    sellerId: item.sellerId,
   };
 }
 
@@ -82,6 +83,7 @@ export function mapAdvertisementBySlugToAdvertisement(
     description: dto.description,
     publishedAt: dto.createdAt,
     compatibilityDescription: dto.compatibilityDescription ?? undefined,
+    sellerId: dto.seller.id,
   };
 }
 

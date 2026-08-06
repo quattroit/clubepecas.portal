@@ -182,3 +182,14 @@ export enum PartRequestSupplierContactStatus {
   Skipped = 2,
   Completed = 3,
 }
+
+/**
+ * Status da cotação enviada pelo comprador profissional a um vendedor.
+ * Valores reservados (Quoted/Accepted/Closed) preparados para evolução futura.
+ */
+export enum QuotationStatus {
+  Submitted = 1,
+  Quoted = 2,
+  Accepted = 3,
+  Closed = 4,
+}

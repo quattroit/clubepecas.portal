@@ -7,6 +7,7 @@ import { NotFound } from "@/components/feedback/NotFound";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { ROUTES } from "@/constants/routes";
 import {
+  AddToQuotationButton,
   AdvertisementDetails,
   AdvertisementGrid,
   ImageGallery,
@@ -91,6 +92,17 @@ function AdvertisementDetailPageView() {
             advertisementTitle={advertisement.title}
             listingSlug={advertisement.slug ?? slug}
           />
+          {seller.id > 0 ? (
+            <AddToQuotationButton
+              advertisementId={advertisement.id}
+              sellerId={seller.id}
+              storeName={seller.name}
+              sellerWhatsApp={seller.whatsApp}
+              title={advertisement.title}
+              thumbnailUrl={advertisement.imageUrl ?? null}
+              slug={advertisement.slug ?? slug ?? ""}
+            />
+          ) : null}
           <ShareButtons />
         </div>
       </div>

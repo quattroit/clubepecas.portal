@@ -7,13 +7,19 @@ import type {
   SellerPublicListItemDto,
   SellerPublicProfileResponse,
 } from "@/contracts/seller/responses";
+import { resolveMediaUrl } from "@/lib/photo-url";
 import type { Seller } from "@/types/Seller";
+
+function resolveSellerPhotoUrl(photoUrl: string | null | undefined): string | null {
+  const resolved = resolveMediaUrl(photoUrl);
+  return resolved || null;
+}
 
 export function mapPublicSellerDtoToSeller(
   dto: PublicAdvertisementSellerDto,
 ): Seller {
   return {
-    id: 0,
+    id: dto.id,
     slug: dto.slug,
     name: dto.storeName,
     displayName: dto.displayName,
@@ -38,7 +44,7 @@ export function mapSellerPublicListItemToSeller(
     state: dto.state,
     citySlug: dto.citySlug,
     advertisementCount: dto.advertisementCount,
-    avatarUrl: dto.photoUrl,
+    avatarUrl: resolveSellerPhotoUrl(dto.photoUrl),
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
@@ -56,7 +62,7 @@ export function mapSellerPublicProfileToSeller(
     city: dto.city,
     state: dto.state,
     advertisementCount: dto.advertisements.length,
-    avatarUrl: dto.photoUrl,
+    avatarUrl: resolveSellerPhotoUrl(dto.photoUrl),
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
@@ -74,7 +80,7 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     state: dto.state,
     citySlug: dto.citySlug,
     advertisementCount: 0,
-    avatarUrl: dto.photoUrl,
+    avatarUrl: resolveSellerPhotoUrl(dto.photoUrl),
     description: dto.description ?? undefined,
     registeredAt: dto.createdAt,
     personType: dto.personType,

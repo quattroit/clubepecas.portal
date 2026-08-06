@@ -25,6 +25,8 @@ export const ROUTES = {
   NEW_ADVERTISEMENT: "/painel/anuncios/novo",
   PROFILE: "/painel/perfil",
   MY_PLAN: "/painel/meu-plano",
+  /** Central de Cotações recebidas pelo vendedor. */
+  SELLER_QUOTATIONS: "/painel/cotacoes",
   ADMIN: "/admin",
   ADMIN_SELLERS: "/admin/vendedores",
   ADMIN_ADVERTISEMENTS: "/admin/anuncios",
@@ -57,6 +59,9 @@ export const ROUTES = {
   PROFESSIONAL_BUYER: "/comprador",
   PROFESSIONAL_BUYER_PART_REQUESTS: "/comprador/solicitacoes",
   PROFESSIONAL_BUYER_PART_REQUEST_NEW: "/comprador/solicitacoes/nova",
+  /** Central de Cotações do comprador profissional. */
+  PROFESSIONAL_BUYER_QUOTATION: "/comprador/cotacao",
+  PROFESSIONAL_BUYER_QUOTATIONS_HISTORY: "/comprador/cotacoes",
 } as const;
 
 /** Helper para rota pública de detalhe do anúncio (slug) */
@@ -118,6 +123,11 @@ export function editProfessionalBuyerPartRequestPath(id: number) {
   return `${ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS}/${id}/editar` as const;
 }
 
+/** Helper para detalhe de cotação recebida no painel do vendedor */
+export function sellerQuotationPath(id: number) {
+  return `${ROUTES.SELLER_QUOTATIONS}/${id}` as const;
+}
+
 /** Páginas acessíveis sem autenticação (área pública). */
 export const PUBLIC_ROUTES = {
   HOME: ROUTES.HOME,
@@ -147,6 +157,7 @@ export const PRIVATE_ROUTES = {
   NEW_ADVERTISEMENT: ROUTES.NEW_ADVERTISEMENT,
   PROFILE: ROUTES.PROFILE,
   MY_PLAN: ROUTES.MY_PLAN,
+  SELLER_QUOTATIONS: ROUTES.SELLER_QUOTATIONS,
 } as const;
 
 /** Páginas da área administrativa (protegidas por AdminAuthGuard). */
@@ -194,6 +205,8 @@ export const PROFESSIONAL_BUYER_ROUTES = {
   PROFESSIONAL_BUYER: ROUTES.PROFESSIONAL_BUYER,
   PROFESSIONAL_BUYER_PART_REQUESTS: ROUTES.PROFESSIONAL_BUYER_PART_REQUESTS,
   PROFESSIONAL_BUYER_PART_REQUEST_NEW: ROUTES.PROFESSIONAL_BUYER_PART_REQUEST_NEW,
+  PROFESSIONAL_BUYER_QUOTATION: ROUTES.PROFESSIONAL_BUYER_QUOTATION,
+  PROFESSIONAL_BUYER_QUOTATIONS_HISTORY: ROUTES.PROFESSIONAL_BUYER_QUOTATIONS_HISTORY,
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
