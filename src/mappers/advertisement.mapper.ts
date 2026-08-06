@@ -39,6 +39,7 @@ export function mapMarketplaceItemToAdvertisement(
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
     sellerId: item.sellerId,
+    offersLocalDelivery: Boolean(item.offersLocalDelivery),
   };
 }
 
@@ -84,12 +85,17 @@ export function mapAdvertisementBySlugToAdvertisement(
     publishedAt: dto.createdAt,
     compatibilityDescription: dto.compatibilityDescription ?? undefined,
     sellerId: dto.seller.id,
+    offersLocalDelivery: Boolean(dto.seller.offersLocalDelivery),
   };
 }
 
 export function mapPublicSellerAdvertisementToAdvertisement(
   item: PublicSellerAdvertisementDto,
-  location: { city: string; state: string },
+  location: {
+    city: string;
+    state: string;
+    offersLocalDelivery?: boolean;
+  },
 ): Advertisement {
   return {
     id: item.id,
@@ -115,6 +121,7 @@ export function mapPublicSellerAdvertisementToAdvertisement(
       : [],
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
+    offersLocalDelivery: Boolean(location.offersLocalDelivery),
   };
 }
 

@@ -24,6 +24,8 @@ export const ROUTES = {
   MY_ADVERTISEMENTS: "/painel/anuncios",
   NEW_ADVERTISEMENT: "/painel/anuncios/novo",
   PROFILE: "/painel/perfil",
+  /** Frete Local (motoboy / veículo próprio) — Cadastros. */
+  LOCAL_DELIVERY: "/painel/frete-local",
   MY_PLAN: "/painel/meu-plano",
   /** Central de Cotações recebidas pelo vendedor. */
   SELLER_QUOTATIONS: "/painel/cotacoes",

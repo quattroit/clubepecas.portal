@@ -30,4 +30,6 @@ export type Seller = {
   representativeName?: string | null;
   representativeStatus?: number | null;
   representativeStatusLabel?: string | null;
+  /** Loja oferece Frete Local (motoboy / veículo próprio). */
+  offersLocalDelivery?: boolean;
 };

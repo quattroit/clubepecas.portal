@@ -23,6 +23,7 @@ export type {
 } from "@/features/marketplace/components/SearchInput";
 export { SellerCard } from "@/features/marketplace/components/SellerCard";
 export { SellerContactCard } from "@/features/marketplace/components/SellerContactCard";
+export { ContactSellerDialog } from "@/features/marketplace/components/ContactSellerDialog";
 export { SellerGrid } from "@/features/marketplace/components/SellerGrid";
 export { ShareButtons } from "@/features/marketplace/components/ShareButtons";
 export { StoreDescription } from "@/features/marketplace/components/StoreDescription";

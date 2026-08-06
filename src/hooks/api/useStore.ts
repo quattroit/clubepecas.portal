@@ -23,6 +23,7 @@ export function useStore(slug: string) {
         mapPublicSellerAdvertisementToAdvertisement(item, {
           city: dto.city,
           state: dto.state,
+          offersLocalDelivery: Boolean(dto.offersLocalDelivery),
         }),
       );
       const categoriesCount = new Set(

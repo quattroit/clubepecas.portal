@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, MessageCircle, Share2, Store } from "lucide-react";
+import { MapPin, MessageCircle, Share2, Store, Truck } from "lucide-react";
 import { toast } from "sonner";
 
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
@@ -10,6 +10,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { APP_NAME } from "@/constants/app";
 import { storePath } from "@/constants/routes";
 import { AnalyticsEventType } from "@/contracts/analytics/enums";
+import { ContactSellerDialog } from "@/features/marketplace/components/ContactSellerDialog";
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 import type { Seller } from "@/types/Seller";
@@ -41,14 +42,17 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     slug,
     whatsApp,
     instagram,
+    offersLocalDelivery,
   } = seller;
   const [isSharing, setIsSharing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const adsLabel =
     advertisementCount === 1 ? "1 anúncio" : `${advertisementCount} anúncios`;
 
-  const contactHref = whatsApp?.trim()
-    ? buildWhatsAppUrl(whatsApp, buildStoreWhatsAppMessage())
-    : null;
+  const contactHref =
+    whatsApp?.trim() && !offersLocalDelivery
+      ? buildWhatsAppUrl(whatsApp, buildStoreWhatsAppMessage())
+      : null;
   const instagramHref = instagram?.trim()
     ? buildInstagramUrl(instagram)
     : null;
@@ -94,89 +98,125 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     });
   }
 
+  function handleContactClick() {
+    if (!whatsApp?.trim()) return;
+    if (offersLocalDelivery) {
+      setDialogOpen(true);
+      return;
+    }
+  }
+
   return (
-    <header
-      className={cn(
-        "bg-surface border-border flex flex-col gap-5 rounded-xl border p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-7",
-        className,
-      )}
-    >
-      <div className="flex min-w-0 items-start gap-4 sm:items-center">
-        <div className="bg-secondary text-store relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:size-20">
-          {avatarUrl ? (
-            <RemoteImage
-              src={avatarUrl}
-              alt={`Logo de ${name}`}
-              fill
-              sizes="80px"
-              className="object-cover"
-            />
+    <>
+      <header
+        className={cn(
+          "bg-surface border-border flex flex-col gap-5 rounded-xl border p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-7",
+          className,
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-4 sm:items-center">
+          <div className="bg-secondary text-store relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:size-20">
+            {avatarUrl ? (
+              <RemoteImage
+                src={avatarUrl}
+                alt={`Logo de ${name}`}
+                fill
+                sizes="80px"
+                className="object-cover"
+              />
+            ) : (
+              <Store className="size-8" aria-hidden />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h1 className="text-h1">{name}</h1>
+            <p className="text-small mt-1.5 flex items-center gap-1.5">
+              <MapPin className="text-location size-3.5 shrink-0" aria-hidden />
+              {city}, {state}
+            </p>
+            <p className="text-small text-muted-foreground mt-1">{adsLabel}</p>
+            {offersLocalDelivery ? (
+              <p className="text-primary mt-1 flex items-center gap-1 text-sm font-medium">
+                <Truck className="size-4 shrink-0" aria-hidden />
+                Oferece Frete Local
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 sm:shrink-0 sm:flex-row sm:flex-wrap">
+          {whatsApp?.trim() && offersLocalDelivery ? (
+            <Button
+              type="button"
+              variant="whatsapp"
+              aria-label={`Abrir WhatsApp de ${name}`}
+              onClick={handleContactClick}
+            >
+              <MessageCircle aria-hidden />
+              Entrar em contato
+            </Button>
+          ) : contactHref ? (
+            <a
+              href={contactHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(buttonVariants({ variant: "whatsapp" }))}
+              aria-label={`Abrir WhatsApp de ${name}`}
+              onClick={handleStoreWhatsAppClick}
+            >
+              <MessageCircle aria-hidden />
+              Entrar em contato
+            </a>
           ) : (
-            <Store className="size-8" aria-hidden />
+            <Button
+              type="button"
+              variant="whatsapp"
+              disabled
+              title="Esta loja não informou WhatsApp"
+            >
+              <MessageCircle aria-hidden />
+              Entrar em contato
+            </Button>
           )}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <h1 className="text-h1">{name}</h1>
-          <p className="text-small mt-1.5 flex items-center gap-1.5">
-            <MapPin className="text-location size-3.5 shrink-0" aria-hidden />
-            {city}, {state}
-          </p>
-          <p className="text-small text-muted-foreground mt-1">{adsLabel}</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2 sm:shrink-0 sm:flex-row sm:flex-wrap">
-        {contactHref ? (
-          <a
-            href={contactHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(buttonVariants({ variant: "whatsapp" }))}
-            aria-label={`Abrir WhatsApp de ${name}`}
-            onClick={handleStoreWhatsAppClick}
-          >
-            <MessageCircle aria-hidden />
-            Entrar em contato
-          </a>
-        ) : (
+          {instagramHref && instagramLabel ? (
+            <a
+              href={instagramHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(buttonVariants({ variant: "instagram" }))}
+              aria-label={`Abrir Instagram de ${name}`}
+            >
+              <InstagramIcon />
+              {instagramLabel}
+            </a>
+          ) : null}
           <Button
             type="button"
-            variant="whatsapp"
-            disabled
-            title="Esta loja não informou WhatsApp"
+            variant="outline"
+            className="text-share"
+            disabled={isSharing || !slug}
+            aria-busy={isSharing}
+            onClick={() => {
+              void handleShareStore();
+            }}
           >
-            <MessageCircle aria-hidden />
-            Entrar em contato
+            <Share2 aria-hidden />
+            Compartilhar loja
           </Button>
-        )}
-        {instagramHref && instagramLabel ? (
-          <a
-            href={instagramHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(buttonVariants({ variant: "instagram" }))}
-            aria-label={`Abrir Instagram de ${name}`}
-          >
-            <InstagramIcon />
-            {instagramLabel}
-          </a>
-        ) : null}
-        <Button
-          type="button"
-          variant="outline"
-          className="text-share"
-          disabled={isSharing || !slug}
-          aria-busy={isSharing}
-          onClick={() => {
-            void handleShareStore();
-          }}
-        >
-          <Share2 aria-hidden />
-          Compartilhar loja
-        </Button>
-      </div>
-    </header>
+        </div>
+      </header>
+
+      {whatsApp?.trim() && offersLocalDelivery ? (
+        <ContactSellerDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          sellerSlug={slug}
+          sellerWhatsApp={whatsApp}
+          onBeforeOpenWhatsApp={handleStoreWhatsAppClick}
+        />
+      ) : null}
+    </>
   );
 }
 

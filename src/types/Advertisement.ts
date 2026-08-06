@@ -47,4 +47,6 @@ export type Advertisement = {
   sellerId?: number;
   slug?: string;
   compatibilityDescription?: string;
+  /** Loja oferece Frete Local (motoboy / veículo próprio). */
+  offersLocalDelivery?: boolean;
 };

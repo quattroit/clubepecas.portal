@@ -30,6 +30,10 @@ import type {
   SellerSubscriptionDto,
   SyncSellerSubscriptionPaymentResponse,
 } from "@/contracts/seller/subscription";
+import type {
+  SellerLocalDeliveryDto,
+  UpdateSellerLocalDeliveryRequest,
+} from "@/contracts/local-delivery";
 import type { ListSellerPaymentsResponse } from "@/contracts/seller/payments";
 import { api } from "@/lib/api";
 
@@ -216,6 +220,20 @@ export const sellerService = {
   listPayments() {
     return api
       .get<ListSellerPaymentsResponse>("/api/v1/seller/payments")
+      .then((response) => response.data);
+  },
+
+  /** GET /api/v1/seller/local-delivery */
+  getLocalDelivery() {
+    return api
+      .get<SellerLocalDeliveryDto>("/api/v1/seller/local-delivery")
+      .then((response) => response.data);
+  },
+
+  /** PUT /api/v1/seller/local-delivery */
+  updateLocalDelivery(payload: UpdateSellerLocalDeliveryRequest) {
+    return api
+      .put<SellerLocalDeliveryDto>("/api/v1/seller/local-delivery", payload)
       .then((response) => response.data);
   },
 

@@ -193,3 +193,9 @@ export enum QuotationStatus {
   Accepted = 3,
   Closed = 4,
 }
+
+/** Forma de cálculo do Frete Local (entrega própria da loja). */
+export enum LocalDeliveryPricingMode {
+  FixedPlusPerKm = 1,
+  DistanceTiers = 2,
+}

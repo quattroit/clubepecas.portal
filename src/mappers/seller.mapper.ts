@@ -28,6 +28,7 @@ export function mapPublicSellerDtoToSeller(
     advertisementCount: dto.advertisementCount ?? 0,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
+    offersLocalDelivery: Boolean(dto.offersLocalDelivery),
   };
 }
 
@@ -66,6 +67,7 @@ export function mapSellerPublicProfileToSeller(
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
+    offersLocalDelivery: Boolean(dto.offersLocalDelivery),
   };
 }
 

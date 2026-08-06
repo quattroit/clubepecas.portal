@@ -76,6 +76,7 @@ export type PublicAdvertisementSellerDto = {
   instagram: string | null;
   slug: string;
   advertisementCount: number;
+  offersLocalDelivery?: boolean;
 };
 
 export type PublicAdvertisementPhotoDto = {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Package } from "lucide-react";
+import { MapPin, Package, Truck } from "lucide-react";
 
 import { RemoteImage } from "@/components/media/RemoteImage";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,7 @@ function AdvertisementCard({
     category,
     imageUrl,
     isNew,
+    offersLocalDelivery,
   } = advertisement;
   const location = `${city}, ${state}`;
   const href = advertisementPath(slug ?? String(id));
@@ -75,6 +76,19 @@ function AdvertisementCard({
               <Badge variant="secondary">Usado</Badge>
             )}
           </div>
+
+          {offersLocalDelivery ? (
+            <div className="absolute top-2 right-2">
+              <Badge
+                variant="outline"
+                className="border-primary/25 bg-primary/90 text-primary-foreground shadow-sm backdrop-blur-sm"
+                title="Esta loja oferece Frete Local"
+              >
+                <Truck data-icon="inline-start" aria-hidden />
+                Frete Local
+              </Badge>
+            </div>
+          ) : null}
         </div>
 
         <CardContent className="flex flex-1 flex-col gap-1 py-2.5">
@@ -100,6 +114,12 @@ function AdvertisementCard({
             <MapPin className="text-location size-3 shrink-0" aria-hidden />
             <span className="truncate text-xs">{location}</span>
           </p>
+          {offersLocalDelivery ? (
+            <p className="text-primary flex items-center gap-1 text-xs font-medium">
+              <Truck className="size-3.5 shrink-0" aria-hidden />
+              Oferece Frete Local
+            </p>
+          ) : null}
         </CardContent>
       </Card>
     </Link>

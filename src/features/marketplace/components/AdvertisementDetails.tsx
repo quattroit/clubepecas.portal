@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { MapPin, Truck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -41,6 +41,7 @@ function AdvertisementDetails({
     state,
     description,
     publishedAt,
+    offersLocalDelivery,
   } = advertisement;
 
   const publishedLabel = formatPublishedAt(publishedAt);
@@ -56,6 +57,16 @@ function AdvertisementDetails({
         {isNew ? <Badge variant="success">Novo</Badge> : (
           <Badge variant="secondary">Usado</Badge>
         )}
+        {offersLocalDelivery ? (
+          <Badge
+            variant="outline"
+            className="border-primary/30 bg-primary/10 text-primary"
+            title="Esta loja oferece Frete Local"
+          >
+            <Truck data-icon="inline-start" aria-hidden />
+            Frete Local
+          </Badge>
+        ) : null}
       </div>
 
       <h1 className="text-h1">{title}</h1>
