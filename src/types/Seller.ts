@@ -32,4 +32,6 @@ export type Seller = {
   representativeStatusLabel?: string | null;
   /** Loja oferece Frete Local (motoboy / veículo próprio). */
   offersLocalDelivery?: boolean;
+  /** True se o vendedor já ativou algum plano demonstração. */
+  demoAlreadyUsed?: boolean;
 };

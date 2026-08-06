@@ -99,6 +99,7 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     representativeName: dto.representativeName,
     representativeStatus: dto.representativeStatus,
     representativeStatusLabel: dto.representativeStatusLabel,
+    demoAlreadyUsed: Boolean(dto.demoAlreadyUsed),
   };
 }
 
