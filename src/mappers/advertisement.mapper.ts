@@ -40,6 +40,7 @@ export function mapMarketplaceItemToAdvertisement(
     publishedAt: item.publishedAt,
     sellerId: item.sellerId,
     offersLocalDelivery: Boolean(item.offersLocalDelivery),
+    localDeliveryMaxRadiusKm: item.localDeliveryMaxRadiusKm ?? null,
   };
 }
 
@@ -86,6 +87,7 @@ export function mapAdvertisementBySlugToAdvertisement(
     compatibilityDescription: dto.compatibilityDescription ?? undefined,
     sellerId: dto.seller.id,
     offersLocalDelivery: Boolean(dto.seller.offersLocalDelivery),
+    localDeliveryMaxRadiusKm: dto.seller.localDeliveryMaxRadiusKm ?? null,
   };
 }
 
@@ -95,6 +97,7 @@ export function mapPublicSellerAdvertisementToAdvertisement(
     city: string;
     state: string;
     offersLocalDelivery?: boolean;
+    localDeliveryMaxRadiusKm?: number | null;
   },
 ): Advertisement {
   return {
@@ -122,6 +125,7 @@ export function mapPublicSellerAdvertisementToAdvertisement(
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
     offersLocalDelivery: Boolean(location.offersLocalDelivery),
+    localDeliveryMaxRadiusKm: location.localDeliveryMaxRadiusKm ?? null,
   };
 }
 

@@ -12,6 +12,8 @@ export function toWhatsAppDigits(phone: string): string {
 export type LocalDeliveryWhatsAppContext = {
   receiptMode: "pickup" | "local_delivery";
   deliveryZipCode?: string;
+  /** Endereço completo de entrega (rua, número, bairro, cidade/UF, CEP). */
+  deliveryAddress?: string;
   distanceKm?: number | null;
   estimatedPrice?: number | null;
   withinRadius?: boolean;
@@ -31,7 +33,9 @@ function appendReceiptContext(
   }
 
   lines.push("Preferência de recebimento: entrega local (motoboy).");
-  if (context.deliveryZipCode) {
+  if (context.deliveryAddress?.trim()) {
+    lines.push(`Endereço de entrega: ${context.deliveryAddress.trim()}`);
+  } else if (context.deliveryZipCode) {
     lines.push(
       `CEP informado: ${formatPostalCodeInput(context.deliveryZipCode)}`,
     );

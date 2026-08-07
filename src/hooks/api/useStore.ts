@@ -24,6 +24,7 @@ export function useStore(slug: string) {
           city: dto.city,
           state: dto.state,
           offersLocalDelivery: Boolean(dto.offersLocalDelivery),
+          localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
         }),
       );
       const categoriesCount = new Set(

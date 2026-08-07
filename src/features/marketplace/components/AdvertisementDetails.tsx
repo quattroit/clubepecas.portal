@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Advertisement } from "@/types/Advertisement";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { formatLocalDeliveryOfferLabel } from "@/utils/localDelivery";
 import { formatVehicleYears } from "@/utils/vehicle-years";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,7 @@ function AdvertisementDetails({
     description,
     publishedAt,
     offersLocalDelivery,
+    localDeliveryMaxRadiusKm,
   } = advertisement;
 
   const publishedLabel = formatPublishedAt(publishedAt);
@@ -49,6 +51,9 @@ function AdvertisementDetails({
     typeof manufacturingYear === "number" && typeof modelYear === "number"
       ? formatVehicleYears(manufacturingYear, modelYear)
       : null;
+  const localDeliveryLabel = formatLocalDeliveryOfferLabel(
+    localDeliveryMaxRadiusKm,
+  );
 
   return (
     <div className={cn("flex flex-col gap-5", className)}>
@@ -61,10 +66,13 @@ function AdvertisementDetails({
           <Badge
             variant="outline"
             className="border-primary/30 bg-primary/10 text-primary"
-            title="Esta loja oferece Frete Local"
+            title={localDeliveryLabel}
           >
             <Truck data-icon="inline-start" aria-hidden />
-            Frete Local
+            {typeof localDeliveryMaxRadiusKm === "number" &&
+            localDeliveryMaxRadiusKm > 0
+              ? `Frete Local · ${localDeliveryMaxRadiusKm} km`
+              : "Frete Local"}
           </Badge>
         ) : null}
       </div>

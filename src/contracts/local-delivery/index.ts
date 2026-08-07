@@ -31,6 +31,11 @@ export type EstimateLocalDeliveryRequest = {
   sellerId?: number | null;
   sellerSlug?: string | null;
   deliveryZipCode: string;
+  deliveryStreet?: string | null;
+  deliveryNumber?: string | null;
+  deliveryNeighborhood?: string | null;
+  deliveryCity?: string | null;
+  deliveryState?: string | null;
 };
 
 export type EstimateLocalDeliveryResponse = {

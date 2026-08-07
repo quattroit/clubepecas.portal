@@ -70,6 +70,7 @@ export type SellerPublicProfileResponse = {
   whatsApp: string;
   instagram: string | null;
   offersLocalDelivery?: boolean;
+  localDeliveryMaxRadiusKm?: number | null;
   advertisements: PublicSellerAdvertisementDto[];
 };
 

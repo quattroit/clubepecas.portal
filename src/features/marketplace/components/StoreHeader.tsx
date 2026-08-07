@@ -18,6 +18,7 @@ import {
   buildInstagramUrl,
   formatInstagramHandle,
 } from "@/utils/instagram";
+import { formatLocalDeliveryOfferLabel } from "@/utils/localDelivery";
 import { shareOrCopyUrl, toAbsoluteUrl } from "@/utils/share";
 import {
   buildStoreWhatsAppMessage,
@@ -43,11 +44,15 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     whatsApp,
     instagram,
     offersLocalDelivery,
+    localDeliveryMaxRadiusKm,
   } = seller;
   const [isSharing, setIsSharing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const adsLabel =
     advertisementCount === 1 ? "1 anúncio" : `${advertisementCount} anúncios`;
+  const localDeliveryLabel = formatLocalDeliveryOfferLabel(
+    localDeliveryMaxRadiusKm,
+  );
 
   const contactHref =
     whatsApp?.trim() && !offersLocalDelivery
@@ -139,7 +144,7 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
             {offersLocalDelivery ? (
               <p className="text-primary mt-1 flex items-center gap-1 text-sm font-medium">
                 <Truck className="size-4 shrink-0" aria-hidden />
-                Oferece Frete Local
+                {localDeliveryLabel}
               </p>
             ) : null}
           </div>

@@ -8,6 +8,7 @@ import { advertisementPath } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 import type { Advertisement } from "@/types/Advertisement";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { formatLocalDeliveryOfferLabel } from "@/utils/localDelivery";
 import { formatVehicleYears } from "@/utils/vehicle-years";
 
 type AdvertisementCardProps = {
@@ -33,6 +34,7 @@ function AdvertisementCard({
     imageUrl,
     isNew,
     offersLocalDelivery,
+    localDeliveryMaxRadiusKm,
   } = advertisement;
   const location = `${city}, ${state}`;
   const href = advertisementPath(slug ?? String(id));
@@ -40,6 +42,9 @@ function AdvertisementCard({
     typeof manufacturingYear === "number" && typeof modelYear === "number"
       ? formatVehicleYears(manufacturingYear, modelYear)
       : null;
+  const localDeliveryLabel = formatLocalDeliveryOfferLabel(
+    localDeliveryMaxRadiusKm,
+  );
 
   return (
     <Link
@@ -82,7 +87,7 @@ function AdvertisementCard({
               <Badge
                 variant="outline"
                 className="border-primary/25 bg-primary/90 text-primary-foreground shadow-sm backdrop-blur-sm"
-                title="Esta loja oferece Frete Local"
+                title={localDeliveryLabel}
               >
                 <Truck data-icon="inline-start" aria-hidden />
                 Frete Local
@@ -117,7 +122,7 @@ function AdvertisementCard({
           {offersLocalDelivery ? (
             <p className="text-primary flex items-center gap-1 text-xs font-medium">
               <Truck className="size-3.5 shrink-0" aria-hidden />
-              Oferece Frete Local
+              {localDeliveryLabel}
             </p>
           ) : null}
         </CardContent>

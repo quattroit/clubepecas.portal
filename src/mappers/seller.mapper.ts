@@ -29,6 +29,7 @@ export function mapPublicSellerDtoToSeller(
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
+    localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
   };
 }
 
@@ -68,6 +69,7 @@ export function mapSellerPublicProfileToSeller(
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
+    localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
   };
 }
 

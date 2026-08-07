@@ -12,6 +12,7 @@ import { ContactSellerDialog } from "@/features/marketplace/components/ContactSe
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 import type { Seller } from "@/types/Seller";
+import { formatLocalDeliveryOfferLabel } from "@/utils/localDelivery";
 import {
   buildAdvertisementWhatsAppMessage,
   buildWhatsAppUrl,
@@ -43,10 +44,14 @@ function SellerContactCard({
     slug,
     whatsApp,
     offersLocalDelivery,
+    localDeliveryMaxRadiusKm,
   } = seller;
   const [dialogOpen, setDialogOpen] = useState(false);
   const adsLabel =
     advertisementCount === 1 ? "1 anúncio" : `${advertisementCount} anúncios`;
+  const localDeliveryLabel = formatLocalDeliveryOfferLabel(
+    localDeliveryMaxRadiusKm,
+  );
 
   const canContact = Boolean(whatsApp?.trim());
 
@@ -108,7 +113,7 @@ function SellerContactCard({
               {offersLocalDelivery ? (
                 <p className="text-primary mt-1 flex items-center gap-1 text-xs font-medium">
                   <Truck className="size-3.5 shrink-0" aria-hidden />
-                  Oferece Frete Local
+                  {localDeliveryLabel}
                 </p>
               ) : null}
             </div>

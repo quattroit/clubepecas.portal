@@ -63,6 +63,7 @@ export type MarketplaceItemDto = {
   thumbnailUrl: string | null;
   publishedAt: string;
   offersLocalDelivery?: boolean;
+  localDeliveryMaxRadiusKm?: number | null;
 };
 
 export type GetMarketplaceResponse = {

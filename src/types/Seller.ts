@@ -32,6 +32,8 @@ export type Seller = {
   representativeStatusLabel?: string | null;
   /** Loja oferece Frete Local (motoboy / veículo próprio). */
   offersLocalDelivery?: boolean;
+  /** Raio máximo de Frete Local em km, quando habilitado. */
+  localDeliveryMaxRadiusKm?: number | null;
   /** True se o vendedor já ativou algum plano demonstração. */
   demoAlreadyUsed?: boolean;
 };

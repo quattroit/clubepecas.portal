@@ -49,4 +49,6 @@ export type Advertisement = {
   compatibilityDescription?: string;
   /** Loja oferece Frete Local (motoboy / veículo próprio). */
   offersLocalDelivery?: boolean;
+  /** Raio máximo de Frete Local em km, quando habilitado. */
+  localDeliveryMaxRadiusKm?: number | null;
 };

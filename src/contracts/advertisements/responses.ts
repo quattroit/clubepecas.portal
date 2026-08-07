@@ -77,6 +77,7 @@ export type PublicAdvertisementSellerDto = {
   slug: string;
   advertisementCount: number;
   offersLocalDelivery?: boolean;
+  localDeliveryMaxRadiusKm?: number | null;
 };
 
 export type PublicAdvertisementPhotoDto = {
