@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +53,8 @@ type AdvertisementFormProps = {
   onSubmit: (values: AdvertisementFormValues) => void;
   submitLabel?: string;
   submittingLabel?: string;
+  cancelHref?: string;
+  cancelLabel?: string;
 };
 
 /**
@@ -71,6 +74,8 @@ function AdvertisementForm({
   onSubmit,
   submitLabel = mode === "edit" ? "Salvar alterações" : "Publicar anúncio",
   submittingLabel = mode === "edit" ? "Salvando…" : "Publicando…",
+  cancelHref,
+  cancelLabel = "Cancelar",
 }: AdvertisementFormProps) {
   const conditions = listAdvertisementConditions();
   const vehicleYears = listVehicleYears();
@@ -716,6 +721,17 @@ function AdvertisementForm({
       </div>
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        {cancelHref ? (
+          <Link
+            href={cancelHref}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "min-w-[10rem]",
+            )}
+          >
+            {cancelLabel}
+          </Link>
+        ) : null}
         <Button
           type="submit"
           variant="primary"

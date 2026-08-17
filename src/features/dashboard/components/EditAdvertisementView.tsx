@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 import { useParams } from "next/navigation";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
-import { buttonVariants } from "@/components/ui/button";
 import { AdvertisementForm } from "@/features/dashboard/components/AdvertisementForm";
 import { AdvertisementPhotosManager } from "@/features/dashboard/components/photos/AdvertisementPhotosManager";
 import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
@@ -20,7 +18,6 @@ import {
   mapAdvertisementDetailToFormValues,
   mapAdvertisementFormToUpdateRequest,
 } from "@/mappers/advertisement-form.mapper";
-import { cn } from "@/lib/utils";
 import { parseRouteId } from "@/utils/parseRouteId";
 
 function EditAdvertisementView() {
@@ -56,22 +53,13 @@ function EditAdvertisementView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-h1">Editar anúncio</h1>
-          <p className="text-small text-muted-foreground">
-            {advertisementQuery.data?.title
-              ? `Atualize os dados de “${advertisementQuery.data.title}”.`
-              : "Atualize os dados do seu anúncio."}
-          </p>
-        </div>
-
-        <Link
-          href={ROUTES.MY_ADVERTISEMENTS}
-          className={cn(buttonVariants({ variant: "outline" }), "shrink-0")}
-        >
-          Cancelar
-        </Link>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-h1">Editar anúncio</h1>
+        <p className="text-small text-muted-foreground">
+          {advertisementQuery.data?.title
+            ? `Atualize os dados de “${advertisementQuery.data.title}”.`
+            : "Atualize os dados do seu anúncio."}
+        </p>
       </div>
 
       {advertisementQuery.isLoading ||
@@ -129,6 +117,7 @@ function EditAdvertisementView() {
               updateMutation.isError ? updateMutation.error : undefined
             }
             onSubmit={handleSubmit}
+            cancelHref={ROUTES.MY_ADVERTISEMENTS}
           />
         </>
       ) : null}
