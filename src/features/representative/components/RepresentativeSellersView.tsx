@@ -335,10 +335,6 @@ function RepresentativeSellersView() {
             <dl className="grid gap-3 sm:grid-cols-2">
               <Detail label="Loja" value={detailQuery.data.storeName} />
               <Detail
-                label="Nome de exibição"
-                value={detailQuery.data.displayName}
-              />
-              <Detail
                 label="Cidade / UF"
                 value={`${detailQuery.data.city} / ${detailQuery.data.state}`}
               />

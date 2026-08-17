@@ -27,7 +27,7 @@ function matchesStoreFilters(
 ): boolean {
   if (filters.q) {
     const query = filters.q.toLowerCase();
-    const haystack = `${store.name} ${store.displayName ?? ""}`.toLowerCase();
+    const haystack = store.name.toLowerCase();
     if (!haystack.includes(query)) {
       return false;
     }

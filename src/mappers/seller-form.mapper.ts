@@ -22,7 +22,6 @@ export function mapSellerToProfileFormValues(
 
   return {
     storeName: seller.name,
-    displayName: seller.displayName ?? "",
     cityId: seller.cityId ?? 0,
     personType,
     document: seller.document
@@ -65,7 +64,6 @@ function mapSellerProfileFormToRequest(
 ): CreateSellerRequest {
   return {
     storeName: values.storeName.trim(),
-    displayName: values.displayName.trim(),
     cityId: values.cityId,
     personType: values.personType,
     document: values.document.trim(),

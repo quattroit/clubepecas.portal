@@ -76,6 +76,7 @@ export type SellerPublicProfileResponse = {
 
 /** Item de GET /api/v1/sellers (lista pública leve). */
 export type SellerPublicListItemDto = {
+  id: number;
   slug: string;
   storeName: string;
   displayName: string;

@@ -268,7 +268,7 @@ function AdminSellerDetailView() {
       title={data?.storeName ?? "Vendedor"}
       description={
         data
-          ? `${data.displayName} · ${data.city} — ${data.state}`
+          ? `${data.city} — ${data.state}`
           : "Carregando detalhes…"
       }
       breadcrumb={[
@@ -433,7 +433,9 @@ function AdminSellerDetailView() {
               <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <dt className="text-muted-foreground text-xs">Proprietário</dt>
-                  <dd className="text-sm font-medium">{data.displayName}</dd>
+                  <dd className="text-sm font-medium">
+                    {data.ownerName?.trim() || data.email}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground text-xs">E-mail</dt>

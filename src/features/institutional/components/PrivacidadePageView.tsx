@@ -39,7 +39,7 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
           </li>
           <li>
             <span className="font-medium">Dados de perfil de vendedor:</span> nome
-            da loja, nome de exibição, cidade, estado, descrição, WhatsApp e URL
+            da loja, cidade, estado, descrição, WhatsApp e URL
             de foto
           </li>
           <li>

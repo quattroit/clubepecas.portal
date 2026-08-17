@@ -342,7 +342,7 @@ function RepresentativeDetailDialog({
                                   "h-auto px-0",
                                 )}
                               >
-                                {seller.storeName || seller.displayName}
+                                {seller.storeName}
                               </Link>
                             </td>
                             <td className="px-3 py-2">{seller.email || "—"}</td>

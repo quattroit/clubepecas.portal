@@ -84,6 +84,7 @@ export type AdminSellerDetailResponse = {
   userId: number;
   displayName: string;
   storeName: string;
+  ownerName?: string;
   description: string | null;
   city: string;
   state: string;

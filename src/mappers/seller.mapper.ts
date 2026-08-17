@@ -37,7 +37,7 @@ export function mapSellerPublicListItemToSeller(
   dto: SellerPublicListItemDto,
 ): Seller {
   return {
-    id: 0,
+    id: dto.id,
     slug: dto.slug,
     name: dto.storeName,
     displayName: dto.displayName,

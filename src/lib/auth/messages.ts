@@ -93,7 +93,6 @@ const CODE_MESSAGES: Record<string, string> = {
   "seller.document.invalid": "Informe um CPF ou CNPJ válido.",
   "seller.document.required": "Informe o CPF ou CNPJ.",
   "seller.store_name.required": "Informe o nome da loja.",
-  "seller.display_name.required": "Informe o nome de exibição.",
   "seller.city.required": "Informe a cidade.",
   "seller.cityId.required": "Selecione a cidade.",
   "seller.cityId.invalid": "Selecione uma cidade válida.",

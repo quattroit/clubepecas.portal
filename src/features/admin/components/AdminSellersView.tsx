@@ -130,9 +130,6 @@ function AdminSellersView() {
           >
             {row.storeName}
           </Link>
-          <span className="text-muted-foreground truncate text-xs">
-            {row.displayName}
-          </span>
         </div>
       ),
     },

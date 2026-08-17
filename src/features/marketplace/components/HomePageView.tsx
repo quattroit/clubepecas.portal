@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { createElement } from "react";
+import { createElement, useMemo } from "react";
 import {
   Handshake,
   MessageCircle,
@@ -38,6 +38,21 @@ import { cn } from "@/lib/utils";
 const HOME_RECENT_ADS_LIMIT = 6;
 const HOME_FEATURED_STORES_LIMIT = 4;
 const HOME_CATEGORIES_LIMIT = 4;
+
+function pickRandomById<T extends { id: number }>(items: T[], limit: number): T[] {
+  const pool = items.filter((item) => item.id > 0);
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const current = pool[i];
+    const swap = pool[j];
+    if (current === undefined || swap === undefined) {
+      continue;
+    }
+    pool[i] = swap;
+    pool[j] = current;
+  }
+  return pool.slice(0, limit);
+}
 
 const HOW_IT_WORKS: {
   step: string;
@@ -133,9 +148,9 @@ function HomePageView() {
     HOME_RECENT_ADS_LIMIT,
   );
 
-  const featuredStores = (storesQuery.data ?? []).slice(
-    0,
-    HOME_FEATURED_STORES_LIMIT,
+  const featuredStores = useMemo(
+    () => pickRandomById(storesQuery.data ?? [], HOME_FEATURED_STORES_LIMIT),
+    [storesQuery.data],
   );
 
   return (

@@ -184,50 +184,26 @@ function SellerProfileForm({
         />
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-store-name">Nome da loja</Label>
-          <Input
-            id="seller-store-name"
-            aria-invalid={Boolean(errors.storeName)}
-            aria-describedby={
-              errors.storeName ? "seller-store-name-error" : undefined
-            }
-            disabled={isSubmitting}
-            {...register("storeName")}
-          />
-          {errors.storeName ? (
-            <p
-              id="seller-store-name-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.storeName.message}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="seller-display-name">Nome de exibição</Label>
-          <Input
-            id="seller-display-name"
-            aria-invalid={Boolean(errors.displayName)}
-            aria-describedby={
-              errors.displayName ? "seller-display-name-error" : undefined
-            }
-            disabled={isSubmitting}
-            {...register("displayName")}
-          />
-          {errors.displayName ? (
-            <p
-              id="seller-display-name-error"
-              className="text-destructive text-xs"
-              role="alert"
-            >
-              {errors.displayName.message}
-            </p>
-          ) : null}
-        </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="seller-store-name">Nome da loja</Label>
+        <Input
+          id="seller-store-name"
+          aria-invalid={Boolean(errors.storeName)}
+          aria-describedby={
+            errors.storeName ? "seller-store-name-error" : undefined
+          }
+          disabled={isSubmitting}
+          {...register("storeName")}
+        />
+        {errors.storeName ? (
+          <p
+            id="seller-store-name-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            {errors.storeName.message}
+          </p>
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

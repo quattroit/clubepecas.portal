@@ -24,7 +24,6 @@ const optionalUrl = z
 export const sellerProfileFormSchema = z
   .object({
     storeName: z.string().trim().min(1, "Informe o nome da loja"),
-    displayName: z.string().trim().min(1, "Informe o nome de exibição"),
     cityId: z
       .union([z.string(), z.number()])
       .transform((value) => Number(value))
@@ -82,7 +81,6 @@ export type SellerProfileFormValues = z.infer<typeof sellerProfileFormSchema>;
 
 export const sellerProfileFormDefaultValues: SellerProfileFormValues = {
   storeName: "",
-  displayName: "",
   cityId: 0,
   personType: PersonType.Individual,
   document: "",
