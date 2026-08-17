@@ -29,3 +29,13 @@ export type ResetPasswordRequest = {
   newPassword: string;
   confirmPassword: string;
 };
+
+/** POST /api/v1/auth/confirm-email */
+export type ConfirmEmailRequest = {
+  token: string;
+};
+
+/** POST /api/v1/auth/resend-confirmation */
+export type ResendConfirmationRequest = {
+  email: string;
+};

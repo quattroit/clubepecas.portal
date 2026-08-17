@@ -1,16 +1,20 @@
 import type {
   ChangePasswordRequest,
+  ConfirmEmailRequest,
   ForgotPasswordRequest,
   LoginRequest,
   RegisterUserRequest,
+  ResendConfirmationRequest,
   ResetPasswordRequest,
 } from "@/contracts/authentication/requests";
 import type {
   ChangePasswordResponse,
+  ConfirmEmailResponse,
   CurrentUserResponse,
   ForgotPasswordResponse,
   LoginResponse,
   RegisterUserResponse,
+  ResendConfirmationResponse,
   ResetPasswordResponse,
 } from "@/contracts/authentication/responses";
 import { api } from "@/lib/api";
@@ -58,6 +62,21 @@ export const authenticationService = {
   resetPassword(payload: ResetPasswordRequest) {
     return api
       .post<ResetPasswordResponse>("/api/v1/auth/reset-password", payload)
+      .then((response) => response.data);
+  },
+
+  confirmEmail(payload: ConfirmEmailRequest) {
+    return api
+      .post<ConfirmEmailResponse>("/api/v1/auth/confirm-email", payload)
+      .then((response) => response.data);
+  },
+
+  resendConfirmation(payload: ResendConfirmationRequest) {
+    return api
+      .post<ResendConfirmationResponse>(
+        "/api/v1/auth/resend-confirmation",
+        payload,
+      )
       .then((response) => response.data);
   },
 };

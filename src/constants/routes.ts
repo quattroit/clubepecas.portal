@@ -20,6 +20,7 @@ export const ROUTES = {
   REGISTER: "/cadastro",
   FORGOT_PASSWORD: "/esqueci-senha",
   RESET_PASSWORD: "/reset-password",
+  CONFIRM_EMAIL: "/confirmar-email",
   DASHBOARD: "/painel",
   MY_ADVERTISEMENTS: "/painel/anuncios",
   NEW_ADVERTISEMENT: "/painel/anuncios/novo",
@@ -150,6 +151,7 @@ export const AUTH_ROUTES = {
   REGISTER: ROUTES.REGISTER,
   FORGOT_PASSWORD: ROUTES.FORGOT_PASSWORD,
   RESET_PASSWORD: ROUTES.RESET_PASSWORD,
+  CONFIRM_EMAIL: ROUTES.CONFIRM_EMAIL,
 } as const;
 
 /** Páginas da área autenticada do vendedor (protegidas por AuthGuard). */

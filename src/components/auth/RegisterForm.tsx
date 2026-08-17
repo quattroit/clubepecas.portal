@@ -10,7 +10,8 @@ import { Loader2 } from "lucide-react";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { RegisterRepresentativeReferralSection } from "@/components/auth/RegisterRepresentativeReferralSection";
-import { Button } from "@/components/ui/button";
+import { ResendConfirmationButton } from "@/components/auth/ResendConfirmationButton";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -19,6 +20,7 @@ import { useRegister } from "@/hooks/api/useRegister";
 import { getSafeAuthNextPath } from "@/lib/announce-flow";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { passwordSchema } from "@/lib/auth/passwordPolicy";
+import { cn } from "@/lib/utils";
 import {
   formatDocumentAuto,
   isValidDocumentAuto,
@@ -76,6 +78,10 @@ function RegisterForm() {
 
   const isPending = registerMutation.isPending;
   const passwordValue = watch("password") ?? "";
+  const registeredEmail =
+    registerMutation.variables?.email.trim() ??
+    registerMutation.data?.email ??
+    "";
 
   const onSubmit = handleSubmit((values) => {
     if (isPending) return;
@@ -88,6 +94,37 @@ function RegisterForm() {
       document: onlyDigits(values.document),
     });
   });
+
+  if (registerMutation.isSuccess) {
+    return (
+      <div className="flex w-full flex-col gap-5 text-center">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-h1">Cadastro realizado!</h1>
+          <p className="text-small">Enviamos um e-mail para:</p>
+        </div>
+        <div
+          role="status"
+          className="border-border bg-secondary text-secondary-foreground rounded-lg border px-4 py-3"
+        >
+          <p className="text-small font-medium">{registeredEmail}</p>
+        </div>
+        <p className="text-small">
+          Acesse sua caixa de entrada e clique no link para confirmar seu
+          e-mail. Depois da confirmação, você poderá acessar o ClubePeças.
+        </p>
+        <ResendConfirmationButton
+          email={registeredEmail}
+          label="Reenviar e-mail"
+        />
+        <Link
+          href={loginHref}
+          className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+        >
+          Voltar para o login
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form

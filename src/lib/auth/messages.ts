@@ -15,6 +15,8 @@ const CODE_MESSAGES: Record<string, string> = {
     "Acesso restrito a administradores. Utilize o login administrativo.",
   "authentication.seller_login_required":
     "Esta conta é administrativa. Utilize o acesso em /loginadm.",
+  "authentication.email_not_confirmed":
+    "Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada para ativar sua conta.",
   "authentication.user_not_found": "Usuário não encontrado.",
   "user.first_name.required": "Informe o nome.",
   "user.last_name.required": "Informe o sobrenome.",
@@ -38,6 +40,10 @@ const CODE_MESSAGES: Record<string, string> = {
     "Este link expirou. Solicite um novo envio.",
   "auth.reset_token.used":
     "Este link já foi utilizado. Solicite um novo envio.",
+  "auth.confirm_token.invalid": "Este link de confirmação é inválido.",
+  "auth.confirm_token.expired":
+    "Este link de confirmação expirou. Solicite um novo envio.",
+  "auth.confirm_token.used": "Este e-mail já foi confirmado.",
   "auth.account_locked":
     "Conta temporariamente bloqueada. Tente novamente mais tarde.",
   "rate_limit.exceeded":
@@ -288,6 +294,18 @@ const CODE_MESSAGES: Record<string, string> = {
   forbidden: "Você não tem permissão para esta ação.",
   "validation.failed": "Dados inválidos. Verifique o formulário.",
 };
+
+export function hasErrorCode(error: unknown, code: string): boolean {
+  if (!(error instanceof ApiError)) {
+    return false;
+  }
+
+  if (error.code === code) {
+    return true;
+  }
+
+  return error.errors.some((item) => item.code === code);
+}
 
 /**
  * Mensagens amigáveis — nunca exibe o erro bruto da API.

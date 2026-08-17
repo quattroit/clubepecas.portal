@@ -36,3 +36,12 @@ export type ForgotPasswordResponse = {
 export type ResetPasswordResponse = {
   success: boolean;
 };
+
+export type ConfirmEmailResponse = {
+  success: boolean;
+  alreadyConfirmed: boolean;
+};
+
+export type ResendConfirmationResponse = {
+  message: string;
+};

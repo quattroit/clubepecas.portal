@@ -8,6 +8,7 @@ import { z } from "zod";
 import { Loader2 } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
+import { ResendConfirmationButton } from "@/components/auth/ResendConfirmationButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +16,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { ROUTES } from "@/constants/routes";
 import { useLogin } from "@/hooks/api/useLogin";
 import { getSafeAuthNextPath } from "@/lib/announce-flow";
-import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import { getFriendlyErrorMessage, hasErrorCode } from "@/lib/auth/messages";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Informe o e-mail").email("E-mail inválido"),
@@ -35,6 +36,7 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -46,6 +48,10 @@ function LoginForm() {
   });
 
   const isPending = loginMutation.isPending;
+  const emailNotConfirmed = hasErrorCode(
+    loginMutation.error,
+    "authentication.email_not_confirmed",
+  );
 
   const onSubmit = handleSubmit((values) => {
     if (isPending) return;
@@ -66,8 +72,15 @@ function LoginForm() {
 
       {loginMutation.isError ? (
         <ErrorMessage
-          title="Falha no login"
+          title={emailNotConfirmed ? "E-mail não confirmado" : "Falha no login"}
           message={getFriendlyErrorMessage(loginMutation.error)}
+        />
+      ) : null}
+
+      {emailNotConfirmed ? (
+        <ResendConfirmationButton
+          email={getValues("email")}
+          label="Reenviar confirmação"
         />
       ) : null}
 

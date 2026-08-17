@@ -106,7 +106,8 @@ api.interceptors.response.use(
             path.startsWith(ROUTES.LOGIN_ADMIN) ||
             path.startsWith(ROUTES.REGISTER) ||
             path.startsWith(ROUTES.FORGOT_PASSWORD) ||
-            path.startsWith(ROUTES.RESET_PASSWORD);
+            path.startsWith(ROUTES.RESET_PASSWORD) ||
+            path.startsWith(ROUTES.CONFIRM_EMAIL);
 
           if (!isAuthPage) {
             const currentPath = `${path}${window.location.search}`;
