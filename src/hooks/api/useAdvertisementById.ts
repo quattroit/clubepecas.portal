@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { mapAdvertisementDetailToFormValues } from "@/mappers/advertisement-form.mapper";
 import { useAuthQueryEnabled } from "@/hooks/useAuthQueryEnabled";
 import { queryKeys } from "@/lib/queryKeys";
 import { advertisementService } from "@/services/advertisement.service";
@@ -29,12 +28,12 @@ export function useAdvertisementById(id: number) {
       return {
         id: dto.id,
         title: dto.title,
+        detail: dto,
         photos,
         maxPhotos: photosResponse.maxPhotos,
         usedCount: photosResponse.usedCount,
         remaining: photosResponse.remaining,
         maxFileSizeMB: photosResponse.maxFileSizeMB,
-        formValues: mapAdvertisementDetailToFormValues(dto),
       };
     },
   });

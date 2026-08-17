@@ -71,6 +71,7 @@ export type SellerPublicProfileResponse = {
   instagram: string | null;
   offersLocalDelivery?: boolean;
   localDeliveryMaxRadiusKm?: number | null;
+  createdAt: string;
   advertisements: PublicSellerAdvertisementDto[];
 };
 

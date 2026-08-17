@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { useParams } from "next/navigation";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
@@ -15,7 +16,10 @@ import { useCategories } from "@/hooks/api/useCategories";
 import { useUpdateAdvertisement } from "@/hooks/api/useUpdateAdvertisement";
 import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { mapAdvertisementFormToUpdateRequest } from "@/mappers/advertisement-form.mapper";
+import {
+  mapAdvertisementDetailToFormValues,
+  mapAdvertisementFormToUpdateRequest,
+} from "@/mappers/advertisement-form.mapper";
 import { cn } from "@/lib/utils";
 import { parseRouteId } from "@/utils/parseRouteId";
 
@@ -27,6 +31,20 @@ function EditAdvertisementView() {
   const categoriesQuery = useCategories();
   const vehicleBrandsQuery = useVehicleBrands();
   const updateMutation = useUpdateAdvertisement();
+  const categories = categoriesQuery.data ?? [];
+  const vehicleBrands = vehicleBrandsQuery.data ?? [];
+  const catalogsReady =
+    categoriesQuery.isSuccess && vehicleBrandsQuery.isSuccess;
+
+  const formValues = useMemo(() => {
+    if (!advertisementQuery.data?.detail || categories.length === 0) {
+      return undefined;
+    }
+    return mapAdvertisementDetailToFormValues(
+      advertisementQuery.data.detail,
+      categories,
+    );
+  }, [advertisementQuery.data?.detail, categories]);
 
   const handleSubmit = (values: AdvertisementFormValues) => {
     if (!id) return;
@@ -56,7 +74,8 @@ function EditAdvertisementView() {
         </Link>
       </div>
 
-      {advertisementQuery.isLoading ? (
+      {advertisementQuery.isLoading ||
+      (advertisementQuery.isSuccess && !catalogsReady) ? (
         <SellerProfileSkeleton label="Carregando anúncio" />
       ) : null}
 
@@ -67,9 +86,20 @@ function EditAdvertisementView() {
         />
       ) : null}
 
+      {categoriesQuery.isError || vehicleBrandsQuery.isError ? (
+        <ErrorMessage
+          title="Não foi possível carregar as opções do anúncio"
+          message={getFriendlyErrorMessage(
+            categoriesQuery.error ?? vehicleBrandsQuery.error,
+          )}
+        />
+      ) : null}
+
       {!advertisementQuery.isLoading &&
       !advertisementQuery.isError &&
       advertisementQuery.data &&
+      catalogsReady &&
+      formValues &&
       id ? (
         <>
           <AdvertisementPhotosManager
@@ -89,10 +119,10 @@ function EditAdvertisementView() {
           <AdvertisementForm
             key={advertisementQuery.data.id}
             mode="edit"
-            defaultValues={advertisementQuery.data.formValues}
-            categories={categoriesQuery.data ?? []}
+            defaultValues={formValues}
+            categories={categories}
             categoriesLoading={categoriesQuery.isLoading}
-            vehicleBrands={vehicleBrandsQuery.data ?? []}
+            vehicleBrands={vehicleBrands}
             vehicleBrandsLoading={vehicleBrandsQuery.isLoading}
             isSubmitting={updateMutation.isPending}
             submitError={

@@ -156,6 +156,11 @@ function AdvertisementForm({
     selectedBrandId === "" || selectedBrandId == null
       ? undefined
       : Number(selectedBrandId);
+  const selectedModelId = watch("vehicleModelId");
+  const selectedModelNumber =
+    selectedModelId === "" || selectedModelId == null
+      ? undefined
+      : Number(selectedModelId);
   const vehicleModelsQuery = useVehicleModels({
     brandId:
       selectedBrandNumber && selectedBrandNumber > 0
@@ -174,19 +179,31 @@ function AdvertisementForm({
       ...defaultValues,
     };
 
-    // Garante rootCategoryId ao editar quando só categoryId veio preenchido.
-    if (
-      (merged.rootCategoryId === 0 ||
-        merged.rootCategoryId === "" ||
-        merged.rootCategoryId == null) &&
-      merged.categoryId &&
-      Number(merged.categoryId) > 0 &&
-      categories.length > 0
-    ) {
+    if (merged.categoryId && Number(merged.categoryId) > 0 && categories.length > 0) {
       const root = resolveRootCategory(categories, Number(merged.categoryId));
       if (root) {
-        merged.rootCategoryId = root.id;
+        merged.rootCategoryId = String(root.id);
       }
+    }
+
+    merged.categoryId =
+      merged.categoryId && Number(merged.categoryId) > 0
+        ? String(merged.categoryId)
+        : "";
+    merged.vehicleBrandId =
+      merged.vehicleBrandId && Number(merged.vehicleBrandId) > 0
+        ? String(merged.vehicleBrandId)
+        : "";
+    merged.vehicleModelId =
+      merged.vehicleModelId && Number(merged.vehicleModelId) > 0
+        ? String(merged.vehicleModelId)
+        : "";
+    merged.condition = String(merged.condition ?? "");
+    if (merged.manufacturingYear) {
+      merged.manufacturingYear = String(merged.manufacturingYear);
+    }
+    if (merged.modelYear) {
+      merged.modelYear = String(merged.modelYear);
     }
 
     reset(merged);
@@ -327,15 +344,15 @@ function AdvertisementForm({
               },
             })}
           >
-            {categoriesLoading ? (
+            {categoriesLoading && rootCategories.length === 0 ? (
               <option value="">Carregando…</option>
             ) : (
               <>
-                <option value="" disabled>
+                <option value="">
                   Selecione uma categoria
                 </option>
                 {rootCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.id} value={String(category.id)}>
                     {category.name}
                   </option>
                 ))}
@@ -376,11 +393,11 @@ function AdvertisementForm({
               <option value="">Nenhuma subcategoria</option>
             ) : (
               <>
-                <option value="" disabled>
+                <option value="">
                   Selecione uma subcategoria
                 </option>
                 {subcategories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.id} value={String(category.id)}>
                     {category.name}
                   </option>
                 ))}
@@ -419,13 +436,13 @@ function AdvertisementForm({
                 },
               })}
             >
-              {vehicleBrandsLoading ? (
+              {vehicleBrandsLoading && vehicleBrands.length === 0 ? (
                 <option value="">Carregando…</option>
               ) : (
                 <>
                   <option value="">Selecione</option>
                   {vehicleBrands.map((brand) => (
-                    <option key={brand.id} value={brand.id}>
+                    <option key={brand.id} value={String(brand.id)}>
                       {brand.name}
                     </option>
                   ))}
@@ -495,18 +512,31 @@ function AdvertisementForm({
               >
                 {!hasBrandSelected ? (
                   <option value="">Selecione</option>
-                ) : vehicleModelsLoading ? (
-                  <option value="">Carregando…</option>
-                ) : vehicleModels.length === 0 ? (
-                  <option value="">Nenhum modelo cadastrado</option>
                 ) : (
                   <>
-                    <option value="">Selecione</option>
+                    <option value="">
+                      {vehicleModelsLoading
+                        ? "Carregando…"
+                        : vehicleModels.length === 0
+                          ? "Nenhum modelo cadastrado"
+                          : "Selecione"}
+                    </option>
                     {vehicleModels.map((model) => (
-                      <option key={model.id} value={model.id}>
+                      <option key={model.id} value={String(model.id)}>
                         {model.name}
                       </option>
                     ))}
+                    {selectedModelNumber &&
+                    selectedModelNumber > 0 &&
+                    !vehicleModels.some(
+                      (model) => model.id === selectedModelNumber,
+                    ) ? (
+                      <option value={String(selectedModelNumber)}>
+                        {vehicleModelsLoading
+                          ? "Carregando…"
+                          : "Modelo selecionado"}
+                      </option>
+                    ) : null}
                   </>
                 )}
               </select>

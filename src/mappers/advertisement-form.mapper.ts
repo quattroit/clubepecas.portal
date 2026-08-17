@@ -30,6 +30,12 @@ export function mapAdvertisementFormToUpdateRequest(
   return mapAdvertisementFormToRequest(values);
 }
 
+function toSelectValue(value: number | string | null | undefined): string {
+  if (value == null || value === "") return "";
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? String(parsed) : "";
+}
+
 /**
  * Detalhe da API → valores do formulário (create/edit).
  * Fotos são gerenciadas fora do formulário via upload multipart.
@@ -41,20 +47,20 @@ export function mapAdvertisementDetailToFormValues(
   categories: Category[] = [],
 ): AdvertisementFormInput {
   const root = resolveRootCategory(categories, dto.categoryId);
-  const rootCategoryId = root?.id ?? dto.categoryId;
 
   return {
     title: dto.title,
     description: dto.description,
-    rootCategoryId,
-    categoryId: dto.categoryId,
-    vehicleBrandId: dto.vehicleBrandId ?? "",
-    vehicleModelId: dto.vehicleModelId ?? "",
+    // Nunca usar o ID da subcategoria como raiz — o select só lista raízes.
+    rootCategoryId: root ? String(root.id) : "",
+    categoryId: toSelectValue(dto.categoryId),
+    vehicleBrandId: toSelectValue(dto.vehicleBrandId),
+    vehicleModelId: toSelectValue(dto.vehicleModelId),
     manufacturingYear:
       dto.manufacturingYear != null ? String(dto.manufacturingYear) : "",
     modelYear: dto.modelYear != null ? String(dto.modelYear) : "",
     compatibilityDescription: dto.compatibilityDescription ?? "",
-    condition: String(dto.condition),
+    condition: toSelectValue(dto.condition) || String(dto.condition),
     price: dto.price.toFixed(2).replace(".", ","),
     stockQuantity: String(dto.stockQuantity),
   };

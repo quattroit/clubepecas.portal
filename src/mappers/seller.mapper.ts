@@ -70,6 +70,7 @@ export function mapSellerPublicProfileToSeller(
     instagram: dto.instagram,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
     localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
+    registeredAt: dto.createdAt,
   };
 }
 
