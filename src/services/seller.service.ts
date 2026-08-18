@@ -255,4 +255,23 @@ export const sellerService = {
       .delete<{ sellerId: number }>("/api/v1/seller/me/photo")
       .then((response) => response.data);
   },
+
+  uploadCover(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api
+      .post<{ coverUrl: string; thumbnailPublicUrl?: string | null }>(
+        "/api/v1/seller/me/cover/upload",
+        formData,
+        { timeout: 120_000 },
+      )
+      .then((response) => response.data);
+  },
+
+  deleteCover() {
+    return api
+      .delete<{ sellerId: number }>("/api/v1/seller/me/cover")
+      .then((response) => response.data);
+  },
 };

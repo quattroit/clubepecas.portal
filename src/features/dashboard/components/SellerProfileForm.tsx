@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { Textarea } from "@/components/ui/textarea";
+import { SellerCoverPicker } from "@/features/dashboard/components/photos/SellerCoverPicker";
 import { SellerPhotoPicker } from "@/features/dashboard/components/photos/SellerPhotoPicker";
 import { BRAZILIAN_STATE_OPTIONS } from "@/constants/brazilian-states";
 import { PersonType } from "@/contracts/common/enums";
@@ -49,6 +50,8 @@ type SellerProfileFormProps = {
   /** Arquivo pendente (create) — enviado após criar o perfil. */
   pendingPhotoFile?: File | null;
   onPendingPhotoFileChange?: (file: File | null) => void;
+  pendingCoverFile?: File | null;
+  onPendingCoverFileChange?: (file: File | null) => void;
 };
 
 /**
@@ -66,6 +69,8 @@ function SellerProfileForm({
   submittingLabel = mode === "edit" ? "Salvando…" : "Criando…",
   pendingPhotoFile = null,
   onPendingPhotoFileChange,
+  pendingCoverFile = null,
+  onPendingCoverFileChange,
 }: SellerProfileFormProps) {
   const citiesQuery = useCities();
   const cities = citiesQuery.data ?? [];
@@ -89,6 +94,7 @@ function SellerProfileForm({
 
   const personType = useWatch({ control, name: "personType" });
   const photoUrl = useWatch({ control, name: "photoUrl" }) ?? "";
+  const coverUrl = useWatch({ control, name: "coverUrl" }) ?? "";
   const cityId = useWatch({ control, name: "cityId" }) ?? 0;
   const zipCode = useWatch({ control, name: "zipCode" }) ?? "";
 
@@ -614,6 +620,20 @@ function SellerProfileForm({
         }
         pendingFile={pendingPhotoFile}
         onPendingFileChange={(file) => onPendingPhotoFileChange?.(file)}
+        disabled={isSubmitting}
+      />
+
+      <SellerCoverPicker
+        mode={mode}
+        value={coverUrl}
+        onChange={(nextCoverUrl) =>
+          setValue("coverUrl", nextCoverUrl, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
+        }
+        pendingFile={pendingCoverFile}
+        onPendingFileChange={(file) => onPendingCoverFileChange?.(file)}
         disabled={isSubmitting}
       />
 

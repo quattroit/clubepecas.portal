@@ -36,6 +36,7 @@ function SellerProfileView() {
   const createMutation = useCreateSeller();
   const updateMutation = useUpdateSeller();
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
+  const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
 
   const createDefaults = useMemo(() => {
     const document = currentUserQuery.data?.document?.trim();
@@ -70,10 +71,12 @@ function SellerProfileView() {
           photoUrl: "",
         }),
         photoFile: pendingPhotoFile,
+        coverFile: pendingCoverFile,
       },
       {
         onSuccess: () => {
           setPendingPhotoFile(null);
+          setPendingCoverFile(null);
           router.replace(SELLER_ONBOARDING_PLAN_PATH);
         },
       },
@@ -125,9 +128,13 @@ function SellerProfileView() {
           }
           pendingPhotoFile={pendingPhotoFile}
           onPendingPhotoFileChange={setPendingPhotoFile}
+          pendingCoverFile={pendingCoverFile}
+          onPendingCoverFileChange={setPendingCoverFile}
           onSubmit={handleCreate}
           submittingLabel={
-            pendingPhotoFile ? "Criando e enviando foto…" : undefined
+            pendingPhotoFile || pendingCoverFile
+              ? "Criando e enviando imagens…"
+              : undefined
           }
         />
       ) : null}

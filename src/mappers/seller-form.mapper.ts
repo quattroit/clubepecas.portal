@@ -38,6 +38,7 @@ export function mapSellerToProfileFormValues(
       ? formatInstagramHandle(seller.instagram)
       : "",
     photoUrl: seller.avatarUrl ?? "",
+    coverUrl: seller.coverUrl ?? "",
   };
 }
 

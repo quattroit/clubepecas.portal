@@ -40,6 +40,7 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     state,
     advertisementCount,
     avatarUrl,
+    coverUrl,
     slug,
     whatsApp,
     instagram,
@@ -115,11 +116,27 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     <>
       <header
         className={cn(
-          "bg-surface border-border flex flex-col gap-5 rounded-xl border p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-7",
+          "bg-surface border-border relative flex flex-col gap-5 overflow-hidden rounded-xl border p-5 shadow-sm sm:flex-row sm:items-stretch sm:p-7",
           className,
         )}
       >
-        <div className="flex min-w-0 items-start gap-4 sm:items-center">
+        {coverUrl ? (
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 w-[min(46%,11rem)] sm:hidden"
+            aria-hidden
+          >
+            <RemoteImage
+              src={coverUrl}
+              alt=""
+              fill
+              sizes="46vw"
+              className="object-cover object-right"
+            />
+            <div className="from-surface via-surface/85 absolute inset-0 bg-linear-to-r to-transparent" />
+          </div>
+        ) : null}
+
+        <div className="relative z-10 flex min-w-0 max-w-[calc(100%-6.5rem)] items-start gap-4 sm:max-w-none sm:shrink-0 sm:items-center">
           <div className="bg-secondary text-store relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:size-20">
             {avatarUrl ? (
               <RemoteImage
@@ -150,7 +167,24 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 sm:shrink-0 sm:flex-row sm:flex-wrap">
+        <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center sm:min-h-full">
+          {coverUrl ? (
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 left-0 hidden sm:block sm:-top-7 sm:-right-7 sm:-bottom-7 sm:-left-5"
+              aria-hidden
+            >
+              <RemoteImage
+                src={coverUrl}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 70vw, 50rem"
+                className="object-cover object-right"
+              />
+              <div className="from-surface via-surface/80 absolute inset-0 bg-linear-to-r to-transparent sm:via-surface/55" />
+            </div>
+          ) : null}
+
+          <div className="relative z-10 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
           {whatsApp?.trim() && offersLocalDelivery ? (
             <Button
               type="button"
@@ -209,6 +243,7 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
             <Share2 aria-hidden />
             Compartilhar loja
           </Button>
+          </div>
         </div>
       </header>
 

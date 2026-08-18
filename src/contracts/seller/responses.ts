@@ -21,6 +21,7 @@ export type SellerMeDto = {
   whatsApp: string;
   instagram: string | null;
   photoUrl: string | null;
+  coverUrl: string | null;
   zipCode: string | null;
   street: string | null;
   number: string | null;
@@ -66,6 +67,7 @@ export type SellerPublicProfileResponse = {
   city: string;
   state: string;
   photoUrl: string | null;
+  coverUrl: string | null;
   slug: string;
   whatsApp: string;
   instagram: string | null;

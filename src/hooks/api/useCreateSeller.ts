@@ -14,6 +14,7 @@ import { sellerService } from "@/services/seller.service";
 type CreateSellerInput = {
   request: CreateSellerRequest;
   photoFile?: File | null;
+  coverFile?: File | null;
 };
 
 type CreateSellerResult = CreateSellerResponse & {
@@ -33,7 +34,7 @@ async function syncSellerMeCache(queryClient: QueryClient) {
 }
 
 /**
- * Cria perfil de vendedor e, se houver, envia a foto em seguida.
+ * Cria perfil de vendedor e, se houver, envia foto e capa em seguida.
  * Após criar (ou se já existir — 409), sincroniza o cache de `seller.me`
  * para o formulário sair do modo criação.
  */
@@ -44,6 +45,7 @@ export function useCreateSeller() {
     mutationFn: async ({
       request,
       photoFile,
+      coverFile,
     }: CreateSellerInput): Promise<CreateSellerResult> => {
       try {
         const created = await sellerService.create(request);
@@ -55,6 +57,17 @@ export function useCreateSeller() {
             if (isCanceledError(error)) throw error;
             toast.warning(
               `Perfil criado, mas a foto não pôde ser enviada: ${getFriendlyErrorMessage(error)}`,
+            );
+          }
+        }
+
+        if (coverFile) {
+          try {
+            await sellerService.uploadCover(coverFile);
+          } catch (error) {
+            if (isCanceledError(error)) throw error;
+            toast.warning(
+              `Perfil criado, mas a capa não pôde ser enviada: ${getFriendlyErrorMessage(error)}`,
             );
           }
         }

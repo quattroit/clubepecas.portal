@@ -45,6 +45,7 @@ function RemoteImage({
       sizes={sizes}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
+      referrerPolicy="no-referrer"
       draggable={false}
       className={cn(fill && "absolute inset-0 size-full", className)}
       {...props}

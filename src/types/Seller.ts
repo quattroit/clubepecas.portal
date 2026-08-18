@@ -12,6 +12,8 @@ export type Seller = {
   citySlug?: string;
   advertisementCount: number;
   avatarUrl?: string | null;
+  /** Imagem de capa do cabeçalho público da loja. */
+  coverUrl?: string | null;
   description?: string;
   /** ISO date string — data de cadastro */
   registeredAt?: string;

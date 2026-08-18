@@ -63,6 +63,7 @@ export const sellerProfileFormSchema = z
         "Informe um @usuário ou URL do Instagram válida",
       ),
     photoUrl: optionalUrl,
+    coverUrl: optionalUrl,
   })
   .superRefine((values, ctx) => {
     if (!isValidDocument(values.document, values.personType)) {
@@ -93,4 +94,5 @@ export const sellerProfileFormDefaultValues: SellerProfileFormValues = {
   whatsApp: "",
   instagram: "",
   photoUrl: "",
+  coverUrl: "",
 };
