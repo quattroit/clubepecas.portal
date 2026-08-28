@@ -47,6 +47,7 @@ export function mapSellerPublicListItemToSeller(
     citySlug: dto.citySlug,
     advertisementCount: dto.advertisementCount,
     avatarUrl: resolveSellerPhotoUrl(dto.photoUrl),
+    coverUrl: resolveSellerPhotoUrl(dto.coverUrl),
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,

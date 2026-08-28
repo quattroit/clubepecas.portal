@@ -89,6 +89,7 @@ export type SellerPublicListItemDto = {
   state: string;
   citySlug: string;
   photoUrl: string | null;
+  coverUrl: string | null;
   whatsApp: string;
   instagram: string | null;
   advertisementCount: number;

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MapPin, MessageCircle, Store } from "lucide-react";
 
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,6 +32,7 @@ function SellerCard({ seller, className }: SellerCardProps) {
     state,
     advertisementCount,
     avatarUrl,
+    coverUrl,
     slug,
     whatsApp,
     instagram,
@@ -53,20 +55,41 @@ function SellerCard({ seller, className }: SellerCardProps) {
     <Card
       size="sm"
       className={cn(
-        "card-interactive flex h-full flex-col rounded-2xl",
+        "card-interactive relative flex h-full flex-col overflow-hidden rounded-2xl",
         className,
       )}
     >
-      <CardContent className="flex flex-1 flex-col gap-3 py-0.5">
+      {coverUrl ? (
+        <div
+          className="pointer-events-none absolute inset-0"
+          aria-hidden
+        >
+          <RemoteImage
+            src={coverUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 100vw, 20rem"
+            className="object-cover object-right"
+          />
+          <div className="absolute inset-0 bg-linear-to-r from-card from-45% via-card/35 via-58% to-transparent" />
+        </div>
+      ) : null}
+
+      <CardContent className="relative z-10 flex flex-1 flex-col gap-3 py-0.5">
         <Link
           href={storePath(slug)}
           className="focus-visible:ring-ring flex min-h-[4.5rem] items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           aria-label={`Ver loja ${name}`}
         >
-          <div className="bg-store/15 text-store flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+          <div className="bg-store/15 text-store relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg">
             {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- avatar remoto da loja
-              <img src={avatarUrl} alt="" className="size-full object-cover" />
+              <RemoteImage
+                src={avatarUrl}
+                alt=""
+                fill
+                sizes="40px"
+                className="object-cover"
+              />
             ) : (
               <Store className="size-5" aria-hidden />
             )}
