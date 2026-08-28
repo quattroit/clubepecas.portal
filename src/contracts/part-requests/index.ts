@@ -19,9 +19,9 @@ export type PartRequestDto = {
   categoryId: number;
   categoryName: string;
   requestedQuantity: number;
-  cityId: number;
-  cityName: string;
-  cityState: string;
+  cityId: number | null;
+  cityName: string | null;
+  cityState: string | null;
   maximumSuppliers: number;
   status: PartRequestStatus;
   statusLabel: string;
@@ -45,7 +45,7 @@ export type CreatePartRequestRequest = {
   engine?: string | null;
   categoryId: number;
   requestedQuantity: number;
-  cityId: number;
+  cityId?: number | null;
   maximumSuppliers: number;
 };
 
@@ -145,6 +145,21 @@ export type SkipPartRequestSupplierResponse = {
   contactStatus: PartRequestSupplierContactStatus;
   nextPendingSellerId: number | null;
   allProcessed: boolean;
+};
+
+export type PartRequestSupplierAdvertisementDto = {
+  id: number;
+  slug: string;
+  title: string;
+  price: number;
+  thumbnailUrl: string | null;
+};
+
+export type PartRequestSupplierAdvertisementsDto = {
+  partRequestId: number;
+  sellerId: number;
+  storeName: string;
+  items: PartRequestSupplierAdvertisementDto[];
 };
 
 export type UpdatePartRequestSuppliersRequest = {

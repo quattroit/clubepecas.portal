@@ -31,6 +31,11 @@ export type CreateQuotationResponse = {
 export type ListMyQuotationsParams = {
   page?: number;
   pageSize?: number;
+  number?: string;
+  seller?: string;
+  status?: string;
+  submittedFrom?: string;
+  submittedTo?: string;
 };
 
 export type MyQuotationListItemDto = {
@@ -54,6 +59,11 @@ export type ListMyQuotationsResponse = {
 export type ListSellerQuotationsParams = {
   page?: number;
   pageSize?: number;
+  number?: string;
+  buyer?: string;
+  status?: string;
+  submittedFrom?: string;
+  submittedTo?: string;
 };
 
 export type SellerQuotationListItemDto = {
@@ -96,6 +106,31 @@ export type SellerQuotationDetailDto = {
   buyerCompanyName: string | null;
   buyerWhatsApp: string | null;
   items: SellerQuotationItemDto[];
+};
+
+/** GET /api/v1/quotations/{id} — detalhe do comprador */
+export type MyQuotationItemDto = {
+  id: number;
+  advertisementId: number;
+  title: string;
+  advertisementCode: string;
+  thumbnailUrl: string | null;
+  quantity: number;
+  itemNotes: string | null;
+  unitPriceSnapshot: number | null;
+  advertisementSlug: string | null;
+};
+
+export type MyQuotationDetailDto = {
+  id: number;
+  number: string;
+  submittedAtUtc: string;
+  status: QuotationStatus;
+  generalNotes: string | null;
+  sellerId: number;
+  storeName: string;
+  sellerWhatsApp: string | null;
+  items: MyQuotationItemDto[];
 };
 
 export function getQuotationStatusLabel(status: QuotationStatus): string {

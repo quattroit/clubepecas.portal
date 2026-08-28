@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
+import { PageLoader } from "@/components/feedback/PageLoader";
 import { QuotationsHistoryListView } from "@/features/professional-buyer";
 
 export const metadata: Metadata = {
@@ -9,5 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default function QuotationsHistoryPage() {
-  return <QuotationsHistoryListView />;
+  return (
+    <Suspense fallback={<PageLoader label="Carregando cotações…" />}>
+      <QuotationsHistoryListView />
+    </Suspense>
+  );
 }

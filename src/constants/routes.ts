@@ -131,6 +131,11 @@ export function sellerQuotationPath(id: number) {
   return `${ROUTES.SELLER_QUOTATIONS}/${id}` as const;
 }
 
+/** Helper para detalhe de cotação enviada pelo comprador profissional */
+export function professionalBuyerQuotationPath(id: number) {
+  return `${ROUTES.PROFESSIONAL_BUYER_QUOTATIONS_HISTORY}/${id}` as const;
+}
+
 /** Páginas acessíveis sem autenticação (área pública). */
 export const PUBLIC_ROUTES = {
   HOME: ROUTES.HOME,

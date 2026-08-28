@@ -6,6 +6,13 @@ import { getQuotationStatusLabel } from "@/contracts/quotations";
 
 export { getQuotationStatusLabel };
 
+export type QuotationStatusFilter =
+  | "all"
+  | "Submitted"
+  | "Quoted"
+  | "Accepted"
+  | "Closed";
+
 export function getQuotationStatusBadgeVariant(
   status: QuotationStatus,
 ): NonNullable<VariantProps<typeof badgeVariants>["variant"]> {
@@ -22,3 +29,14 @@ export function getQuotationStatusBadgeVariant(
       return "outline";
   }
 }
+
+export const QUOTATION_STATUS_FILTER_OPTIONS: {
+  value: QuotationStatusFilter;
+  label: string;
+}[] = [
+  { value: "all", label: "Todos" },
+  { value: "Submitted", label: "Enviada" },
+  { value: "Quoted", label: "Orçada" },
+  { value: "Accepted", label: "Aceita" },
+  { value: "Closed", label: "Encerrada" },
+];

@@ -62,13 +62,13 @@ function PartRequestDetailView() {
     Boolean(id && data),
   );
 
-  const cityLabel = useMemo(
-    () =>
-      data
-        ? formatCityLabel({ name: data.cityName, state: data.cityState })
-        : "",
-    [data],
-  );
+  const cityLabel = useMemo(() => {
+    if (!data?.cityName?.trim()) return "—";
+    return formatCityLabel({
+      name: data.cityName,
+      state: data.cityState ?? "",
+    });
+  }, [data]);
 
   const selectedSuppliers = useMemo(
     () => (suppliersQuery.data?.items ?? []).filter((item) => item.selected),
@@ -261,6 +261,8 @@ function PartRequestDetailView() {
         <PartRequestSuppliersSection
           partRequestId={id}
           status={data.status}
+          cityName={data.cityName}
+          cityState={data.cityState}
         />
       ) : null}
 

@@ -16,6 +16,11 @@ import { PartRequestStatusBadge } from "@/features/professional-buyer/components
 import { PART_REQUEST_OUTCOME_FILTER_OPTIONS, getPartRequestOutcomeBadgeVariant } from "@/features/professional-buyer/utils/partRequestOutcome";
 import { PART_REQUEST_STATUS_FILTER_OPTIONS } from "@/features/professional-buyer/utils/partRequestStatus";
 import {
+  QUOTATION_DEFAULT_PAGE_SIZE,
+  QUOTATION_PAGE_SIZE_OPTIONS,
+  parseQuotationPageSize,
+} from "@/features/professional-buyer/utils/quotationPagination";
+import {
   ROUTES,
   editProfessionalBuyerPartRequestPath,
   professionalBuyerPartRequestPath,
@@ -47,6 +52,7 @@ function PartRequestsListView() {
   const searchParams = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? "1") || 1;
+  const pageSize = parseQuotationPageSize(searchParams.get("pageSize"));
   const q = searchParams.get("q") ?? "";
   const status =
     (searchParams.get("status") as PartRequestStatusFilter | null) ?? "all";
@@ -59,12 +65,12 @@ function PartRequestsListView() {
   const params = useMemo(
     () => ({
       page,
-      pageSize: 20,
+      pageSize,
       q: q || undefined,
       status: status === "all" ? undefined : status,
       outcome: outcome === "all" ? undefined : outcome,
     }),
-    [page, q, status, outcome],
+    [page, pageSize, q, status, outcome],
   );
 
   const listQuery = useMyPartRequests(params);
@@ -262,10 +268,12 @@ function PartRequestsListView() {
                         .join(" ") || "—"}
                     </td>
                     <td className="text-muted-foreground px-4 py-3">
-                      {formatCityLabel({
-                        name: item.cityName,
-                        state: item.cityState,
-                      })}
+                      {item.cityName?.trim()
+                        ? formatCityLabel({
+                            name: item.cityName,
+                            state: item.cityState ?? "",
+                          })
+                        : "—"}
                     </td>
                     <td className="px-4 py-3">
                       <PartRequestStatusBadge
@@ -326,12 +334,46 @@ function PartRequestsListView() {
         </div>
       ) : null}
 
-      {!listQuery.isLoading && totalPages > 1 ? (
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={(nextPage) => patch({ page: String(nextPage) })}
-        />
+      {!listQuery.isLoading && !listQuery.isError && items.length > 0 ? (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="pr-page-size"
+              className="text-small text-muted-foreground whitespace-nowrap"
+            >
+              Itens por página
+            </label>
+            <select
+              id="pr-page-size"
+              className={cn(selectClassName, "h-8 w-auto")}
+              value={pageSize}
+              onChange={(event) => {
+                const next = parseQuotationPageSize(event.target.value);
+                patch({
+                  pageSize:
+                    next === QUOTATION_DEFAULT_PAGE_SIZE
+                      ? undefined
+                      : String(next),
+                  page: "1",
+                });
+              }}
+            >
+              {QUOTATION_PAGE_SIZE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {totalPages > 1 ? (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(nextPage) => patch({ page: String(nextPage) })}
+            />
+          ) : null}
+        </div>
       ) : null}
 
       <CancelPartRequestDialog

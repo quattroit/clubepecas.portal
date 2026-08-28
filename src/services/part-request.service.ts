@@ -5,6 +5,7 @@ import type {
   ListMyPartRequestsParams,
   ListMyPartRequestsResponse,
   PartRequestDto,
+  PartRequestSupplierAdvertisementsDto,
   PartRequestSuppliersDto,
   SkipPartRequestSupplierResponse,
   UpdatePartRequestRequest,
@@ -78,6 +79,14 @@ export const partRequestService = {
     return api
       .post<SkipPartRequestSupplierResponse>(
         `/api/v1/part-requests/${id}/suppliers/${sellerId}/skip`,
+      )
+      .then((response) => response.data);
+  },
+
+  getSupplierAdvertisements(id: number, sellerId: number) {
+    return api
+      .get<PartRequestSupplierAdvertisementsDto>(
+        `/api/v1/part-requests/${id}/suppliers/${sellerId}/advertisements`,
       )
       .then((response) => response.data);
   },

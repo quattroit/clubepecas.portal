@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
+  Eye,
   MessageCircle,
   Phone,
   SkipForward,
@@ -24,6 +25,7 @@ import {
   PartRequestStatus,
   PartRequestSupplierContactStatus,
 } from "@/contracts/common/enums";
+import { SupplierCompatibleAdsDialog } from "@/features/professional-buyer/components/SupplierCompatibleAdsDialog";
 import {
   getSupplierContactStatusBadgeVariant,
   isSupplierContactPending,
@@ -41,6 +43,8 @@ import { formatDate, formatTime } from "@/utils/formatDate";
 type PartRequestSuppliersSectionProps = {
   partRequestId: number;
   status: PartRequestStatus;
+  cityName?: string | null;
+  cityState?: string | null;
 };
 
 function ContactSummaryBar({
@@ -168,12 +172,14 @@ function EditableSupplierRow({
   highlighted,
   rowRef,
   onToggle,
+  onPreview,
 }: {
   supplier: PartRequestSupplierDto;
   disabled: boolean;
   highlighted: boolean;
   rowRef?: (node: HTMLLIElement | null) => void;
   onToggle: (sellerId: number, nextSelected: boolean) => void;
+  onPreview: (supplier: PartRequestSupplierDto) => void;
 }) {
   return (
     <li
@@ -194,6 +200,16 @@ function EditableSupplierRow({
       />
       <SupplierAvatar supplier={supplier} />
       <SupplierSelectionDetails supplier={supplier} />
+      <Button
+        type="button"
+        variant="primary"
+        size="sm"
+        className="shrink-0"
+        onClick={() => onPreview(supplier)}
+      >
+        <Eye className="size-3.5" aria-hidden />
+        Ver peças
+      </Button>
     </li>
   );
 }
@@ -224,9 +240,14 @@ function SelectedSupplierContactRow({
 function PartRequestSuppliersSection({
   partRequestId,
   status,
+  cityName,
+  cityState,
 }: PartRequestSuppliersSectionProps) {
   const isOpen = status === PartRequestStatus.Open;
   const isCancelled = status === PartRequestStatus.Cancelled;
+  const cityLabel = cityName?.trim()
+    ? formatCityLabel({ name: cityName, state: cityState ?? "" })
+    : null;
 
   const suppliersQuery = usePartRequestSuppliers(
     partRequestId,
@@ -247,6 +268,8 @@ function PartRequestSuppliersSection({
       pending: 0,
       skipped: 0,
     });
+  const [previewSeller, setPreviewSeller] =
+    useState<PartRequestSupplierDto | null>(null);
   const [localNextPendingSellerId, setLocalNextPendingSellerId] = useState<
     number | null
   >(null);
@@ -408,8 +431,9 @@ function PartRequestSuppliersSection({
           <h2 className="text-lg font-semibold">Fornecedores Compatíveis</h2>
           {isOpen ? (
             <p className="text-muted-foreground text-sm">
-              Selecione até {localMaximumSuppliers} fornecedores e contate-os
-              pelo WhatsApp.
+              {cityLabel
+                ? `Buscando fornecedores em ${cityLabel}. Selecione até ${localMaximumSuppliers} e contate-os pelo WhatsApp.`
+                : `Selecione até ${localMaximumSuppliers} fornecedores e contate-os pelo WhatsApp.`}
             </p>
           ) : (
             <p className="text-muted-foreground text-sm">
@@ -444,8 +468,12 @@ function PartRequestSuppliersSection({
 
       {isOpen && suppliersQuery.data && localItems.length === 0 ? (
         <EmptyState
-          title="Nenhum fornecedor compatível"
-          description="Ainda não há fornecedores com anúncios compatíveis para esta solicitação."
+          title="Nenhum fornecedor encontrado"
+          description={
+            cityLabel
+              ? `Não encontramos fornecedores em ${cityLabel} com anúncios compatíveis para este item. Tente outra cidade ou crie uma solicitação sem filtrar por cidade.`
+              : "Não encontramos fornecedores com anúncios compatíveis para este item. Verifique a categoria e os dados do veículo."
+          }
           icon={<Store aria-hidden />}
         />
       ) : null}
@@ -467,6 +495,7 @@ function PartRequestSuppliersSection({
                 }
                 rowRef={setRowRef(supplier.sellerId)}
                 onToggle={handleToggle}
+                onPreview={setPreviewSeller}
               />
             ))}
           </ul>
@@ -511,6 +540,15 @@ function PartRequestSuppliersSection({
                 <SupplierContactDetails supplier={focusedSupplier} />
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setPreviewSeller(focusedSupplier)}
+                >
+                  <Eye className="size-3.5" aria-hidden />
+                  Ver peças
+                </Button>
                 <Button
                   type="button"
                   variant="whatsapp"
@@ -569,6 +607,16 @@ function PartRequestSuppliersSection({
           icon={<Store aria-hidden />}
         />
       ) : null}
+
+      <SupplierCompatibleAdsDialog
+        open={previewSeller !== null}
+        partRequestId={partRequestId}
+        sellerId={previewSeller?.sellerId ?? null}
+        storeName={previewSeller?.storeName}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setPreviewSeller(null);
+        }}
+      />
     </section>
   );
 }

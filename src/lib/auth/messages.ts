@@ -231,7 +231,6 @@ const CODE_MESSAGES: Record<string, string> = {
   "part_request.category.invalid": "Selecione uma categoria válida.",
   "part_request.requested_quantity.invalid":
     "A quantidade deve ser maior que zero.",
-  "part_request.city.required": "Selecione a cidade.",
   "part_request.city.invalid": "Selecione uma cidade válida.",
   "part_request.maximum_suppliers.invalid":
     "A quantidade de fornecedores deve ser entre 1 e 10.",

@@ -598,7 +598,7 @@ function PartRequestForm({
       ) : null}
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="pr-city">Cidade</Label>
+        <Label htmlFor="pr-city">Cidade (opcional)</Label>
         <Controller
           control={control}
           name="cityId"
@@ -607,14 +607,20 @@ function PartRequestForm({
               id="pr-city"
               cities={cities}
               value={field.value ? Number(field.value) : null}
-              onChange={(cityId) => field.onChange(cityId ?? 0)}
+              onChange={(cityId) => field.onChange(cityId ?? "")}
               onBlur={field.onBlur}
               disabled={isSubmitting || citiesQuery.isLoading}
               invalid={Boolean(errors.cityId)}
-              aria-describedby={errors.cityId ? "pr-city-error" : undefined}
+              aria-describedby={
+                errors.cityId ? "pr-city-error" : "pr-city-help"
+              }
             />
           )}
         />
+        <p id="pr-city-help" className="text-muted-foreground text-xs">
+          Se informar a cidade, buscamos apenas fornecedores dessa cidade com
+          anúncios compatíveis.
+        </p>
         {errors.cityId ? (
           <p id="pr-city-error" className="text-destructive text-xs" role="alert">
             {errors.cityId.message}

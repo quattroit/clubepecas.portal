@@ -5,6 +5,7 @@ import type {
   ListMyQuotationsResponse,
   ListSellerQuotationsParams,
   ListSellerQuotationsResponse,
+  MyQuotationDetailDto,
   SellerQuotationDetailDto,
 } from "@/contracts/quotations";
 import { api } from "@/lib/api";
@@ -23,6 +24,12 @@ export const quotationService = {
   getMine(params: ListMyQuotationsParams = {}) {
     return api
       .get<ListMyQuotationsResponse>("/api/v1/quotations/me", { params })
+      .then((response) => response.data);
+  },
+
+  getMineById(id: number) {
+    return api
+      .get<MyQuotationDetailDto>(`/api/v1/quotations/${id}`)
       .then((response) => response.data);
   },
 

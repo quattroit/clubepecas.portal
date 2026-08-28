@@ -29,7 +29,9 @@ function NewPartRequestView() {
         <div className="flex flex-col gap-1">
           <h1 className="text-h1">Nova solicitação</h1>
           <p className="text-small text-muted-foreground">
-            Descreva a peça que você precisa e quantos fornecedores deseja contatar.
+            Descreva a peça que você precisa e quantos fornecedores deseja
+            contatar. A cidade é opcional: se informar, buscamos só fornecedores
+            dessa cidade.
           </p>
         </div>
 

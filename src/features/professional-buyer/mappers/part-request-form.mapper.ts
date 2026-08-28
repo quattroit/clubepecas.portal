@@ -34,7 +34,7 @@ function mapFormToRequest(
     engine: values.engine.trim() ? values.engine.trim() : null,
     categoryId: values.categoryId,
     requestedQuantity: Number(values.requestedQuantity),
-    cityId: values.cityId,
+    cityId: toOptionalId(values.cityId),
     maximumSuppliers: Number(values.maximumSuppliers),
   };
 }
@@ -71,7 +71,7 @@ export function mapPartRequestDtoToFormInput(
     modelYear: dto.modelYear != null ? String(dto.modelYear) : "",
     engine: dto.engine ?? "",
     requestedQuantity: String(dto.requestedQuantity),
-    cityId: dto.cityId,
+    cityId: dto.cityId ? String(dto.cityId) : "",
     maximumSuppliers: String(dto.maximumSuppliers),
   };
 }

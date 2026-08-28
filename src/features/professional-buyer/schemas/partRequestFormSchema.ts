@@ -109,7 +109,7 @@ export function createPartRequestFormSchema(
           (value) => Number.isInteger(Number(value)) && Number(value) > 0,
           "A quantidade deve ser maior que zero",
         ),
-      cityId: entityIdField("Selecione a cidade"),
+      cityId: optionalEntityIdField,
       maximumSuppliers: z.enum(supplierOptions, {
         message: "Selecione a quantidade de fornecedores",
       }),
@@ -174,6 +174,6 @@ export const partRequestFormDefaultValues: PartRequestFormInput = {
   modelYear: "",
   engine: "",
   requestedQuantity: "1",
-  cityId: 0,
+  cityId: "",
   maximumSuppliers: String(PART_REQUEST_DEFAULT_MAX_SUPPLIERS),
 };
