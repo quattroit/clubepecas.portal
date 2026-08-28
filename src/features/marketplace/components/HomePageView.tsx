@@ -36,7 +36,7 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
 import { createListingShuffleSeed, PUBLIC_LISTING_DEFAULT_PAGE_SIZE } from "@/utils/public-listing-pagination";
 
-const HOME_RECENT_ADS_LIMIT = 6;
+const HOME_RECENT_ADS_LIMIT = 8;
 const HOME_FEATURED_STORES_LIMIT = 3;
 const HOME_CATEGORIES_LIMIT = 4;
 
@@ -110,7 +110,7 @@ function HomePageView() {
   const homeStoreShuffleSeed = useMemo(() => createListingShuffleSeed(), []);
   const advertisementsQuery = useAdvertisements({
     page: 1,
-    pageSize: HOME_RECENT_ADS_LIMIT,
+    pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
     sort: "recent",
   });
   const storesQuery = useStores({
