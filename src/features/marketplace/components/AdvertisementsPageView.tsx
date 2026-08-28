@@ -2,11 +2,11 @@
 
 import { PackageSearch } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
+import { ListingPaginationControls } from "@/components/navigation/ListingPaginationControls";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
-import { Pagination } from "@/components/navigation/Pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ROUTES } from "@/constants/routes";
 import { AdvertisementGrid } from "@/features/marketplace";
@@ -21,10 +21,19 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { formatCityLabel } from "@/mappers/city.mapper";
 import {
   buildAdvertisementsHref,
+  clampMarketplaceListingPage,
+  hasActiveMarketplaceListingFilters,
+  isRandomMarketplaceSort,
+  MARKETPLACE_DEFAULT_SORT,
+  MARKETPLACE_UNFILTERED_MAX_PAGES,
   parseMarketplaceListingFilters,
   toMarketplaceApiParams,
   type MarketplaceListingFilters,
 } from "@/utils/marketplace-search";
+import {
+  createListingShuffleSeed,
+  PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
+} from "@/utils/public-listing-pagination";
 
 /**
  * Conteúdo da listagem pública /anuncios.
@@ -34,11 +43,45 @@ function AdvertisementsPageView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filters = parseMarketplaceListingFilters(searchParams);
-  const apiParams = toMarketplaceApiParams(filters);
+  const [shuffleSeed, setShuffleSeed] = useState(() => createListingShuffleSeed());
+  const page = clampMarketplaceListingPage(filters, filters.page ?? 1);
+  const pageSize = filters.pageSize ?? PUBLIC_LISTING_DEFAULT_PAGE_SIZE;
+  const sort = filters.sort ?? MARKETPLACE_DEFAULT_SORT;
+  const isRandomSort = isRandomMarketplaceSort(sort);
+  const hasActiveFilters = hasActiveMarketplaceListingFilters(filters);
+  const effectiveShuffleSeed = isRandomSort
+    ? page === 1
+      ? shuffleSeed
+      : (filters.shuffleSeed ?? shuffleSeed)
+    : undefined;
+
+  useEffect(() => {
+    if (page === 1 && filters.shuffleSeed) {
+      router.replace(
+        buildAdvertisementsHref({ ...filters, shuffleSeed: undefined }),
+      );
+    }
+  }, [filters, page, router]);
+
+  useEffect(() => {
+    const rawPage = filters.page ?? 1;
+    if (!hasActiveFilters && rawPage > MARKETPLACE_UNFILTERED_MAX_PAGES) {
+      router.replace(
+        buildAdvertisementsHref({
+          ...filters,
+          page: MARKETPLACE_UNFILTERED_MAX_PAGES,
+        }),
+      );
+    }
+  }, [filters, hasActiveFilters, router]);
 
   const advertisementsQuery = useAdvertisements({
-    ...apiParams,
-    page: 1,
+    ...toMarketplaceApiParams(filters),
+    ...(isRandomSort && effectiveShuffleSeed
+      ? { shuffleSeed: effectiveShuffleSeed }
+      : {}),
+    page,
+    pageSize,
   });
   const categoriesQuery = useCategories();
   const citiesQuery = useCities();
@@ -46,22 +89,8 @@ function AdvertisementsPageView() {
 
   const advertisements = advertisementsQuery.data?.items ?? [];
   const total = advertisementsQuery.data?.total ?? 0;
-  const currentPage = advertisementsQuery.data?.page ?? 1;
+  const currentPage = advertisementsQuery.data?.page ?? page;
   const totalPages = advertisementsQuery.data?.totalPages ?? 1;
-
-  const hasActiveFilters = Boolean(
-    filters.q ||
-      filters.category ||
-      filters.brand ||
-      filters.model ||
-      filters.manufacturingYear ||
-      filters.modelYear ||
-      filters.state ||
-      filters.city ||
-      filters.priceMin ||
-      filters.priceMax ||
-      filters.newOnly,
-  );
 
   const totalLabel = filters.q
     ? total === 1
@@ -99,11 +128,16 @@ function AdvertisementsPageView() {
 
   const applyFilters = useCallback(
     (next: MarketplaceListingFilters) => {
+      if (isRandomMarketplaceSort(filters.sort)) {
+        setShuffleSeed(createListingShuffleSeed());
+      }
+
       router.push(
         buildAdvertisementsHref({
           ...next,
           q: filters.q,
           sort: filters.sort,
+          page: 1,
         }),
       );
     },
@@ -111,8 +145,53 @@ function AdvertisementsPageView() {
   );
 
   const applySort = useCallback(
-    (sort: string) => {
-      router.push(buildAdvertisementsHref({ ...filters, sort }));
+    (nextSort: string) => {
+      if (nextSort === MARKETPLACE_DEFAULT_SORT) {
+        setShuffleSeed(createListingShuffleSeed());
+      }
+
+      router.push(
+        buildAdvertisementsHref({
+          ...filters,
+          sort: nextSort,
+          page: 1,
+        }),
+      );
+    },
+    [filters, router],
+  );
+
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      const clampedPage = clampMarketplaceListingPage(filters, nextPage);
+
+      router.push(
+        buildAdvertisementsHref({
+          ...filters,
+          page: clampedPage,
+          shuffleSeed:
+            isRandomMarketplaceSort(filters.sort) && clampedPage > 1
+              ? shuffleSeed
+              : undefined,
+        }),
+      );
+    },
+    [filters, router, shuffleSeed],
+  );
+
+  const changePageSize = useCallback(
+    (nextPageSize: number) => {
+      if (isRandomMarketplaceSort(filters.sort)) {
+        setShuffleSeed(createListingShuffleSeed());
+      }
+
+      router.push(
+        buildAdvertisementsHref({
+          ...filters,
+          pageSize: nextPageSize,
+          page: 1,
+        }),
+      );
     },
     [filters, router],
   );
@@ -133,7 +212,7 @@ function AdvertisementsPageView() {
 
       <AdvertisementsToolbar
         searchQuery={filters.q ?? ""}
-        sort={filters.sort ?? "recent"}
+        sort={filters.sort ?? MARKETPLACE_DEFAULT_SORT}
         onSortChange={applySort}
         filterValues={filters}
         filterCategories={filterCategories}
@@ -200,7 +279,14 @@ function AdvertisementsPageView() {
           {!advertisementsQuery.isLoading &&
           !advertisementsQuery.isError &&
           advertisements.length > 0 ? (
-            <Pagination currentPage={currentPage} totalPages={totalPages} />
+            <ListingPaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              onPageChange={goToPage}
+              onPageSizeChange={changePageSize}
+              pageSizeSelectId="ads-page-size"
+            />
           ) : null}
         </div>
       </div>

@@ -34,25 +34,11 @@ import { useStores } from "@/hooks/api/useStores";
 import { usePlatformSettings } from "@/hooks/api/usePlatformSettings";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
+import { createListingShuffleSeed } from "@/utils/public-listing-pagination";
 
 const HOME_RECENT_ADS_LIMIT = 6;
-const HOME_FEATURED_STORES_LIMIT = 4;
+const HOME_FEATURED_STORES_LIMIT = 3;
 const HOME_CATEGORIES_LIMIT = 4;
-
-function pickRandomById<T extends { id: number }>(items: T[], limit: number): T[] {
-  const pool = items.filter((item) => item.id > 0);
-  for (let i = pool.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const current = pool[i];
-    const swap = pool[j];
-    if (current === undefined || swap === undefined) {
-      continue;
-    }
-    pool[i] = swap;
-    pool[j] = current;
-  }
-  return pool.slice(0, limit);
-}
 
 const HOW_IT_WORKS: {
   step: string;
@@ -121,8 +107,18 @@ function SectionHeading({
  */
 function HomePageView() {
   const categoriesQuery = useCategories();
-  const advertisementsQuery = useAdvertisements({ page: 1 });
-  const storesQuery = useStores();
+  const homeStoreShuffleSeed = useMemo(() => createListingShuffleSeed(), []);
+  const advertisementsQuery = useAdvertisements({
+    page: 1,
+    pageSize: HOME_RECENT_ADS_LIMIT,
+    sort: "recent",
+  });
+  const storesQuery = useStores({
+    page: 1,
+    pageSize: 30,
+    sort: "random",
+    shuffleSeed: homeStoreShuffleSeed,
+  });
   const platformSettingsQuery = usePlatformSettings();
   const platformDescription =
     platformSettingsQuery.data?.platformDescription ?? APP_DESCRIPTION;
@@ -149,8 +145,9 @@ function HomePageView() {
   );
 
   const featuredStores = useMemo(
-    () => pickRandomById(storesQuery.data ?? [], HOME_FEATURED_STORES_LIMIT),
-    [storesQuery.data],
+    () =>
+      (storesQuery.data?.items ?? []).slice(0, HOME_FEATURED_STORES_LIMIT),
+    [storesQuery.data?.items],
   );
 
   return (

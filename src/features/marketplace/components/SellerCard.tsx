@@ -52,12 +52,15 @@ function SellerCard({ seller, className }: SellerCardProps) {
   return (
     <Card
       size="sm"
-      className={cn("card-interactive h-full rounded-2xl", className)}
+      className={cn(
+        "card-interactive flex h-full flex-col rounded-2xl",
+        className,
+      )}
     >
-      <CardContent className="flex flex-col gap-3 py-0.5">
+      <CardContent className="flex flex-1 flex-col gap-3 py-0.5">
         <Link
           href={storePath(slug)}
-          className="focus-visible:ring-ring flex items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="focus-visible:ring-ring flex min-h-[4.5rem] items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           aria-label={`Ver loja ${name}`}
         >
           <div className="bg-store/15 text-store flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg">
@@ -81,48 +84,50 @@ function SellerCard({ seller, className }: SellerCardProps) {
           </div>
         </Link>
 
-        {contactHref || instagramHref ? (
-          <div className="flex flex-col gap-2">
-            {contactHref ? (
-              <a
-                href={contactHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(
-                  buttonVariants({ variant: "whatsapp", size: "sm" }),
-                  "w-full justify-center",
-                )}
-                aria-label={`Abrir WhatsApp de ${name}`}
-                onClick={() => {
-                  if (slug) {
-                    trackAnalyticsEvent({
-                      eventType: AnalyticsEventType.StoreWhatsappClicked,
-                      storeSlug: slug,
-                    });
-                  }
-                }}
-              >
-                <MessageCircle aria-hidden className="size-4" />
-                Entrar em contato
-              </a>
-            ) : null}
-            {instagramHref && instagramLabel ? (
-              <a
-                href={instagramHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(
-                  buttonVariants({ variant: "instagram", size: "sm" }),
-                  "w-full justify-center",
-                )}
-                aria-label={`Abrir Instagram de ${name}`}
-              >
-                <InstagramIcon className="size-4" />
-                {instagramLabel}
-              </a>
-            ) : null}
-          </div>
-        ) : null}
+        <div className="mt-auto flex min-h-[5.75rem] flex-col justify-end gap-2">
+          {contactHref ? (
+            <a
+              href={contactHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                buttonVariants({ variant: "whatsapp", size: "sm" }),
+                "w-full justify-center",
+              )}
+              aria-label={`Abrir WhatsApp de ${name}`}
+              onClick={() => {
+                if (slug) {
+                  trackAnalyticsEvent({
+                    eventType: AnalyticsEventType.StoreWhatsappClicked,
+                    storeSlug: slug,
+                  });
+                }
+              }}
+            >
+              <MessageCircle aria-hidden className="size-4" />
+              Entrar em contato
+            </a>
+          ) : (
+            <div className="invisible h-8 shrink-0" aria-hidden />
+          )}
+          {instagramHref && instagramLabel ? (
+            <a
+              href={instagramHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                buttonVariants({ variant: "instagram", size: "sm" }),
+                "w-full justify-center",
+              )}
+              aria-label={`Abrir Instagram de ${name}`}
+            >
+              <InstagramIcon className="size-4" />
+              {instagramLabel}
+            </a>
+          ) : (
+            <div className="invisible h-8 shrink-0" aria-hidden />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

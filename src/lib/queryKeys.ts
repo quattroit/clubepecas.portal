@@ -35,10 +35,21 @@ export const queryKeys = {
       priceMax?: number;
       newOnly?: boolean;
       sort?: string;
+      shuffleSeed?: string;
       page?: number;
+      pageSize?: number;
     }) => ["marketplace", "list", filters ?? {}] as const,
     detail: (slug: string) => ["marketplace", "detail", slug] as const,
     stores: ["marketplace", "stores"] as const,
+    storesList: (filters?: {
+      q?: string;
+      state?: string;
+      city?: string;
+      sort?: string;
+      shuffleSeed?: string;
+      page?: number;
+      pageSize?: number;
+    }) => ["marketplace", "stores", "list", filters ?? {}] as const,
     store: (slug: string) => ["marketplace", "store", slug] as const,
   },
   categories: {

@@ -2,9 +2,10 @@
 
 import { Store } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
+import { ListingPaginationControls } from "@/components/navigation/ListingPaginationControls";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ROUTES } from "@/constants/routes";
@@ -14,42 +15,21 @@ import { StoresRegionFilter } from "@/features/marketplace/components/StoresRegi
 import { useCities } from "@/hooks/api/useCities";
 import { useStores } from "@/hooks/api/useStores";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import type { Seller } from "@/types/Seller";
+import {
+  createListingShuffleSeed,
+  PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
+} from "@/utils/public-listing-pagination";
 import {
   buildStoresHref,
+  clampStoresListingPage,
+  hasActiveStoresListingFilters,
+  isRandomStoresSort,
   parseStoresListingFilters,
+  STORES_DEFAULT_SORT,
+  STORES_UNFILTERED_MAX_PAGES,
+  toStoresApiParams,
   type StoresListingFilters,
 } from "@/utils/stores-search";
-
-function matchesStoreFilters(
-  store: Seller,
-  filters: StoresListingFilters,
-): boolean {
-  if (filters.q) {
-    const query = filters.q.toLowerCase();
-    const haystack = store.name.toLowerCase();
-    if (!haystack.includes(query)) {
-      return false;
-    }
-  }
-
-  if (filters.state) {
-    if (store.state.toUpperCase() !== filters.state.toUpperCase()) {
-      return false;
-    }
-  }
-
-  if (filters.city) {
-    const cityFilter = filters.city.toLowerCase();
-    const bySlug = store.citySlug?.toLowerCase() === cityFilter;
-    const byName = store.city.toLowerCase() === cityFilter;
-    if (!bySlug && !byName) {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 /**
  * Listagem pública /lojas — mesma UI, dados da API.
@@ -58,40 +38,114 @@ function StoresPageView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filters = parseStoresListingFilters(searchParams);
+  const [shuffleSeed, setShuffleSeed] = useState(() => createListingShuffleSeed());
+  const page = clampStoresListingPage(filters, filters.page ?? 1);
+  const pageSize = filters.pageSize ?? PUBLIC_LISTING_DEFAULT_PAGE_SIZE;
+  const sort = filters.sort ?? STORES_DEFAULT_SORT;
+  const isRandomSort = isRandomStoresSort(sort);
+  const hasActiveFilters = hasActiveStoresListingFilters(filters);
+  const effectiveShuffleSeed = isRandomSort
+    ? page === 1
+      ? shuffleSeed
+      : (filters.shuffleSeed ?? shuffleSeed)
+    : undefined;
 
-  const storesQuery = useStores();
+  useEffect(() => {
+    if (page === 1 && filters.shuffleSeed) {
+      router.replace(buildStoresHref({ ...filters, shuffleSeed: undefined }));
+    }
+  }, [filters, page, router]);
+
+  useEffect(() => {
+    const rawPage = filters.page ?? 1;
+    if (!hasActiveFilters && rawPage > STORES_UNFILTERED_MAX_PAGES) {
+      router.replace(
+        buildStoresHref({
+          ...filters,
+          page: STORES_UNFILTERED_MAX_PAGES,
+        }),
+      );
+    }
+  }, [filters, hasActiveFilters, router]);
+
+  const storesQuery = useStores({
+    ...toStoresApiParams(filters),
+    ...(isRandomSort && effectiveShuffleSeed
+      ? { shuffleSeed: effectiveShuffleSeed }
+      : {}),
+    page,
+    pageSize,
+  });
   const citiesQuery = useCities();
-  const stores = storesQuery.data ?? [];
-
-  const filteredStores = useMemo(
-    () => stores.filter((store) => matchesStoreFilters(store, filters)),
-    [stores, filters],
-  );
-
-  const hasActiveFilters = Boolean(filters.q || filters.state || filters.city);
+  const stores = storesQuery.data?.items ?? [];
+  const total = storesQuery.data?.total ?? 0;
+  const currentPage = storesQuery.data?.page ?? page;
+  const totalPages = storesQuery.data?.totalPages ?? 1;
 
   const totalLabel = (() => {
     if (storesQuery.isLoading) return "Carregando lojas…";
     if (filters.q) {
-      return filteredStores.length === 1
+      return total === 1
         ? `1 loja para “${filters.q}”`
-        : `${filteredStores.length} lojas para “${filters.q}”`;
+        : `${total} lojas para “${filters.q}”`;
     }
     if (hasActiveFilters) {
-      return filteredStores.length === 1
+      return total === 1
         ? "1 loja nesta região"
-        : `${filteredStores.length} lojas nesta região`;
+        : `${total} lojas nesta região`;
     }
-    return filteredStores.length === 1
+    return total === 1
       ? "1 loja no marketplace"
-      : `${filteredStores.length} lojas no marketplace`;
+      : `${total} lojas no marketplace`;
   })();
 
   const applyFilters = useCallback(
     (next: StoresListingFilters) => {
-      router.push(buildStoresHref(next));
+      if (isRandomStoresSort(sort)) {
+        setShuffleSeed(createListingShuffleSeed());
+      }
+
+      router.push(
+        buildStoresHref({
+          ...next,
+          page: 1,
+        }),
+      );
     },
-    [router],
+    [router, sort],
+  );
+
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      const clampedPage = clampStoresListingPage(filters, nextPage);
+
+      router.push(
+        buildStoresHref({
+          ...filters,
+          page: clampedPage,
+          shuffleSeed:
+            isRandomStoresSort(sort) && clampedPage > 1 ? shuffleSeed : undefined,
+        }),
+      );
+    },
+    [filters, router, shuffleSeed, sort],
+  );
+
+  const changePageSize = useCallback(
+    (nextPageSize: number) => {
+      if (isRandomStoresSort(sort)) {
+        setShuffleSeed(createListingShuffleSeed());
+      }
+
+      router.push(
+        buildStoresHref({
+          ...filters,
+          pageSize: nextPageSize,
+          page: 1,
+        }),
+      );
+    },
+    [filters, router, sort],
   );
 
   return (
@@ -123,7 +177,7 @@ function StoresPageView() {
 
       {!storesQuery.isLoading &&
       !storesQuery.isError &&
-      filteredStores.length === 0 ? (
+      stores.length === 0 ? (
         <EmptyState
           title={
             hasActiveFilters
@@ -139,10 +193,18 @@ function StoresPageView() {
         />
       ) : null}
 
-      {!storesQuery.isLoading &&
-      !storesQuery.isError &&
-      filteredStores.length > 0 ? (
-        <SellerGrid sellers={filteredStores} />
+      {!storesQuery.isLoading && !storesQuery.isError && stores.length > 0 ? (
+        <>
+          <SellerGrid sellers={stores} />
+          <ListingPaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={goToPage}
+            onPageSizeChange={changePageSize}
+            pageSizeSelectId="stores-page-size"
+          />
+        </>
       ) : null}
     </div>
   );

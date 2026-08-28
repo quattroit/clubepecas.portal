@@ -97,4 +97,17 @@ export type SellerPublicListItemDto = {
 /** GET /api/v1/sellers */
 export type ListPublicSellersResponse = {
   items: SellerPublicListItemDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+};
+
+export type ListPublicSellersRequest = {
+  q?: string;
+  state?: string;
+  city?: string;
+  sort?: string;
+  shuffleSeed?: string;
+  page?: number;
+  pageSize?: number;
 };

@@ -24,7 +24,9 @@ export function useCategory(slug: string) {
   const categoryExists = Boolean(category);
 
   const advertisementsQuery = useAdvertisements(
-    slug ? { categorySlug: slug, page: 1 } : { page: 1 },
+    slug
+      ? { categorySlug: slug, page: 1, pageSize: 10, sort: "recent" }
+      : { page: 1, pageSize: 10, sort: "recent" },
     { enabled: Boolean(slug) && categoryExists },
   );
 

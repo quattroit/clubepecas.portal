@@ -29,6 +29,10 @@ export type GetMarketplaceRequest = {
   priceMin?: number;
   priceMax?: number;
   newOnly?: boolean;
-  /** recent | price-asc | price-desc */
+  /** recent | price-asc | price-desc | random */
   sort?: string;
+  /** Semente para ordenação aleatória estável entre páginas. */
+  shuffleSeed?: string;
+  page?: number;
+  pageSize?: number;
 };

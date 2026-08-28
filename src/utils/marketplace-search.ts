@@ -1,11 +1,18 @@
 import { ROUTES } from "@/constants/routes";
 
+import {
+  parsePublicListingPageSize,
+  PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
+} from "@/utils/public-listing-pagination";
+
 /**
  * Remove espaços nas extremidades. Não altera o miolo da busca.
  */
 export function normalizeSearchQuery(raw: string): string {
   return raw.trim();
 }
+
+export const MARKETPLACE_DEFAULT_SORT = "random";
 
 /** Filtros da listagem pública espelhados na URL `/anuncios`. */
 export type MarketplaceListingFilters = {
@@ -25,7 +32,54 @@ export type MarketplaceListingFilters = {
   priceMax?: string;
   newOnly?: boolean;
   sort?: string;
+  shuffleSeed?: string;
+  page?: number;
+  pageSize?: number;
 };
+
+/** Máximo de páginas navegáveis em `/anuncios` sem filtros aplicados. */
+export const MARKETPLACE_UNFILTERED_MAX_PAGES = 30;
+
+export function isRandomMarketplaceSort(sort?: string): boolean {
+  return (sort ?? MARKETPLACE_DEFAULT_SORT) === "random";
+}
+
+export function needsMarketplaceShuffleSeed(
+  filters: MarketplaceListingFilters,
+): boolean {
+  return isRandomMarketplaceSort(filters.sort) && !filters.shuffleSeed;
+}
+
+export function hasActiveMarketplaceListingFilters(
+  filters: MarketplaceListingFilters,
+): boolean {
+  return Boolean(
+    filters.q ||
+      filters.category ||
+      filters.brand ||
+      filters.model ||
+      filters.manufacturingYear ||
+      filters.modelYear ||
+      filters.state ||
+      filters.city ||
+      filters.priceMin ||
+      filters.priceMax ||
+      filters.newOnly,
+  );
+}
+
+export function clampMarketplaceListingPage(
+  filters: MarketplaceListingFilters,
+  page: number,
+): number {
+  const normalizedPage = Number.isInteger(page) && page > 0 ? page : 1;
+
+  if (hasActiveMarketplaceListingFilters(filters)) {
+    return normalizedPage;
+  }
+
+  return Math.min(normalizedPage, MARKETPLACE_UNFILTERED_MAX_PAGES);
+}
 
 function isAll(value: string | undefined): boolean {
   return !value || value.trim() === "" || value.trim() === "all";
@@ -64,7 +118,11 @@ export function parseMarketplaceListingFilters(
   const priceMax = search.get("priceMax")?.trim() ?? "";
   const newOnly =
     search.get("newOnly") === "true" || search.get("newOnly") === "1";
-  const sort = search.get("sort")?.trim() || "recent";
+  const sort = search.get("sort")?.trim() || MARKETPLACE_DEFAULT_SORT;
+  const shuffleSeed = search.get("shuffleSeed")?.trim() ?? "";
+  const pageRaw = Number(search.get("page") ?? "1");
+  const page = Number.isInteger(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+  const pageSize = parsePublicListingPageSize(search.get("pageSize"));
 
   return {
     ...(q ? { q } : {}),
@@ -78,7 +136,10 @@ export function parseMarketplaceListingFilters(
     ...(priceMin ? { priceMin } : {}),
     ...(priceMax ? { priceMax } : {}),
     ...(newOnly ? { newOnly: true } : {}),
-    ...(sort && sort !== "recent" ? { sort } : {}),
+    ...(sort && sort !== MARKETPLACE_DEFAULT_SORT ? { sort } : {}),
+    ...(shuffleSeed ? { shuffleSeed } : {}),
+    ...(page > 1 ? { page } : {}),
+    ...(pageSize !== PUBLIC_LISTING_DEFAULT_PAGE_SIZE ? { pageSize } : {}),
   };
 }
 
@@ -135,8 +196,24 @@ export function buildAdvertisementsHref(
     params.set("newOnly", "true");
   }
 
-  if (filters.sort && filters.sort !== "recent") {
-    params.set("sort", filters.sort);
+  const sort = filters.sort ?? MARKETPLACE_DEFAULT_SORT;
+  if (sort !== MARKETPLACE_DEFAULT_SORT) {
+    params.set("sort", sort);
+  }
+
+  if (isRandomMarketplaceSort(sort) && filters.shuffleSeed?.trim()) {
+    params.set("shuffleSeed", filters.shuffleSeed.trim());
+  }
+
+  if (filters.page && filters.page > 1) {
+    params.set("page", String(filters.page));
+  }
+
+  if (
+    filters.pageSize &&
+    filters.pageSize !== PUBLIC_LISTING_DEFAULT_PAGE_SIZE
+  ) {
+    params.set("pageSize", String(filters.pageSize));
   }
 
   const query = params.toString();
@@ -159,11 +236,17 @@ export function toMarketplaceApiParams(filters: MarketplaceListingFilters): {
   priceMax?: number;
   newOnly?: boolean;
   sort?: string;
+  shuffleSeed?: string;
+  page?: number;
+  pageSize?: number;
 } {
   const manufacturingYear = filters.manufacturingYear
     ? Number(filters.manufacturingYear)
     : NaN;
   const modelYear = filters.modelYear ? Number(filters.modelYear) : NaN;
+  const page = clampMarketplaceListingPage(filters, filters.page ?? 1);
+  const pageSize = filters.pageSize ?? PUBLIC_LISTING_DEFAULT_PAGE_SIZE;
+  const sort = filters.sort ?? MARKETPLACE_DEFAULT_SORT;
 
   return {
     ...(filters.q ? { q: filters.q } : {}),
@@ -185,6 +268,11 @@ export function toMarketplaceApiParams(filters: MarketplaceListingFilters): {
       ? { priceMax: Number(filters.priceMax) }
       : {}),
     ...(filters.newOnly ? { newOnly: true } : {}),
-    ...(filters.sort && filters.sort !== "recent" ? { sort: filters.sort } : {}),
+    sort,
+    ...(isRandomMarketplaceSort(sort) && filters.shuffleSeed
+      ? { shuffleSeed: filters.shuffleSeed }
+      : {}),
+    page,
+    pageSize,
   };
 }

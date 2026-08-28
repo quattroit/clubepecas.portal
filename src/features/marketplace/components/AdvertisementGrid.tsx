@@ -20,8 +20,8 @@ function AdvertisementGrid({
       aria-label="Anúncios"
     >
       {advertisements.map((advertisement) => (
-        <li key={advertisement.id || advertisement.slug}>
-          <AdvertisementCard advertisement={advertisement} />
+        <li key={advertisement.id || advertisement.slug} className="h-full">
+          <AdvertisementCard advertisement={advertisement} className="h-full" />
         </li>
       ))}
     </ul>

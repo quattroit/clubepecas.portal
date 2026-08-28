@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import type { MarketplaceListingFilters } from "@/utils/marketplace-search";
 
 const SORT_OPTIONS = [
+  { value: "random", label: "Aleatório" },
   { value: "recent", label: "Mais recentes" },
   { value: "price-asc", label: "Menor preço" },
   { value: "price-desc", label: "Maior preço" },
@@ -44,7 +45,7 @@ type AdvertisementsToolbarProps = {
 function AdvertisementsToolbar({
   className,
   searchQuery = "",
-  sort = "recent",
+  sort = "random",
   onSortChange,
   filterValues = {},
   filterCategories,

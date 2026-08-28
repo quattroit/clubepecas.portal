@@ -50,11 +50,14 @@ function AdvertisementCard({
     <Link
       href={href}
       className={cn(
-        "focus-visible:ring-ring block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        "focus-visible:ring-ring flex h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         className,
       )}
     >
-      <Card size="sm" className="card-interactive h-full gap-0 rounded-2xl py-0">
+      <Card
+        size="sm"
+        className="card-interactive flex h-full w-full flex-1 flex-col gap-0 rounded-2xl py-0"
+      >
         <div className="bg-muted relative aspect-[16/10] overflow-hidden">
           {imageUrl ? (
             <RemoteImage
@@ -100,31 +103,40 @@ function AdvertisementCard({
           <p className="text-small text-category truncate text-xs font-medium">
             {category}
           </p>
-          <h3 className="line-clamp-2 text-sm leading-snug font-semibold">
+          <h3 className="line-clamp-2 min-h-10 text-sm leading-snug font-semibold">
             {title}
           </h3>
           <p className="text-price text-base">{formatCurrency(price)}</p>
-          {vehicleYearsLabel ? (
-            <p className="text-muted-foreground text-xs">
-              Ano: {vehicleYearsLabel}
+
+          <div className="text-muted-foreground min-h-10 space-y-0.5 text-xs">
+            <p aria-hidden={!vehicleYearsLabel}>
+              {vehicleYearsLabel ? `Ano: ${vehicleYearsLabel}` : "\u00A0"}
             </p>
-          ) : null}
-          {typeof stockQuantity === "number" ? (
-            <p className="text-muted-foreground text-xs">
-              Estoque: {stockQuantity}{" "}
-              {stockQuantity === 1 ? "unidade" : "unidades"}
+            <p aria-hidden={typeof stockQuantity !== "number"}>
+              {typeof stockQuantity === "number"
+                ? `Estoque: ${stockQuantity} ${
+                    stockQuantity === 1 ? "unidade" : "unidades"
+                  }`
+                : "\u00A0"}
             </p>
-          ) : null}
-          <p className="text-small mt-auto flex items-center gap-1">
-            <MapPin className="text-location size-3 shrink-0" aria-hidden />
-            <span className="truncate text-xs">{location}</span>
-          </p>
-          {offersLocalDelivery ? (
-            <p className="text-primary flex items-center gap-1 text-xs font-medium">
+          </div>
+
+          <div className="mt-auto space-y-1">
+            <p className="text-small flex items-center gap-1">
+              <MapPin className="text-location size-3 shrink-0" aria-hidden />
+              <span className="truncate text-xs">{location}</span>
+            </p>
+            <p
+              className={cn(
+                "text-primary flex min-h-[1.125rem] items-center gap-1 text-xs font-medium",
+                !offersLocalDelivery && "invisible",
+              )}
+              aria-hidden={!offersLocalDelivery}
+            >
               <Truck className="size-3.5 shrink-0" aria-hidden />
               {localDeliveryLabel}
             </p>
-          ) : null}
+          </div>
         </CardContent>
       </Card>
     </Link>

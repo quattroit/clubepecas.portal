@@ -17,8 +17,11 @@ function SellerGrid({ sellers, className }: SellerGridProps) {
       aria-label="Vendedores"
     >
       {sellers.map((seller) => (
-        <li key={seller.slug || `${seller.name}-${seller.city}-${seller.state}`}>
-          <SellerCard seller={seller} />
+        <li
+          key={seller.slug || `${seller.name}-${seller.city}-${seller.state}`}
+          className="h-full"
+        >
+          <SellerCard seller={seller} className="h-full" />
         </li>
       ))}
     </ul>

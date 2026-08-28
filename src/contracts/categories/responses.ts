@@ -68,4 +68,7 @@ export type MarketplaceItemDto = {
 
 export type GetMarketplaceResponse = {
   items: MarketplaceItemDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
 };
