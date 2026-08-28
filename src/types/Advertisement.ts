@@ -45,6 +45,8 @@ export type Advertisement = {
   /** ISO date string — só quando o DTO fornece */
   updatedAt?: string | null;
   sellerId?: number;
+  /** Nome da loja anunciante (storeName da API). */
+  storeName?: string;
   slug?: string;
   compatibilityDescription?: string;
   /** Loja oferece Frete Local (motoboy / veículo próprio). */

@@ -34,7 +34,7 @@ import { useStores } from "@/hooks/api/useStores";
 import { usePlatformSettings } from "@/hooks/api/usePlatformSettings";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
-import { createListingShuffleSeed } from "@/utils/public-listing-pagination";
+import { createListingShuffleSeed, PUBLIC_LISTING_DEFAULT_PAGE_SIZE } from "@/utils/public-listing-pagination";
 
 const HOME_RECENT_ADS_LIMIT = 6;
 const HOME_FEATURED_STORES_LIMIT = 3;
@@ -115,7 +115,7 @@ function HomePageView() {
   });
   const storesQuery = useStores({
     page: 1,
-    pageSize: 30,
+    pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
     sort: "random",
     shuffleSeed: homeStoreShuffleSeed,
   });

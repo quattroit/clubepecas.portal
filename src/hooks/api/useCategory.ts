@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
 import { findCategoryBySlug } from "@/mappers/category.mapper";
+import { PUBLIC_LISTING_DEFAULT_PAGE_SIZE } from "@/utils/public-listing-pagination";
 
 /**
  * Detalhe de categoria por slug + anúncios filtrados na API (categorySlug).
@@ -25,8 +26,8 @@ export function useCategory(slug: string) {
 
   const advertisementsQuery = useAdvertisements(
     slug
-      ? { categorySlug: slug, page: 1, pageSize: 10, sort: "recent" }
-      : { page: 1, pageSize: 10, sort: "recent" },
+      ? { categorySlug: slug, page: 1, pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE, sort: "recent" }
+      : { page: 1, pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE, sort: "recent" },
     { enabled: Boolean(slug) && categoryExists },
   );
 

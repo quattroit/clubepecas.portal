@@ -1,6 +1,9 @@
-export const PUBLIC_LISTING_PAGE_SIZE_OPTIONS = [10, 20, 30] as const;
+export const PUBLIC_LISTING_PAGE_SIZE_OPTIONS = [12, 24, 36] as const;
 
-export const PUBLIC_LISTING_DEFAULT_PAGE_SIZE = 10;
+export const PUBLIC_LISTING_DEFAULT_PAGE_SIZE = 12;
+
+export const PUBLIC_LISTING_MAX_PAGE_SIZE =
+  PUBLIC_LISTING_PAGE_SIZE_OPTIONS[PUBLIC_LISTING_PAGE_SIZE_OPTIONS.length - 1];
 
 export type PublicListingPageSize =
   (typeof PUBLIC_LISTING_PAGE_SIZE_OPTIONS)[number];

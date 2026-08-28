@@ -1,7 +1,8 @@
+import type { ListPublicSellersRequest } from "@/contracts/seller/responses";
 import { mapSellerPublicListItemToSeller } from "@/mappers/seller.mapper";
 import { sellerService } from "@/services/seller.service";
 import type { Seller } from "@/types/Seller";
-import type { ListPublicSellersRequest } from "@/contracts/seller/responses";
+import { PUBLIC_LISTING_MAX_PAGE_SIZE } from "@/utils/public-listing-pagination";
 
 /**
  * Lista lojas públicas via GET /api/v1/sellers (payload leve).
@@ -19,7 +20,7 @@ export async function loadPublicStores(
 export async function loadPublicStoreSlugs(): Promise<string[]> {
   const slugs: string[] = [];
   let page = 1;
-  const pageSize = 30;
+  const pageSize = PUBLIC_LISTING_MAX_PAGE_SIZE;
 
   while (true) {
     const response = await sellerService.listPublic({ page, pageSize });

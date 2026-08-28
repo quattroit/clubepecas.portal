@@ -39,6 +39,7 @@ export function mapMarketplaceItemToAdvertisement(
     isNew: isNewCondition(item.condition),
     publishedAt: item.publishedAt,
     sellerId: item.sellerId,
+    storeName: item.storeName,
     offersLocalDelivery: Boolean(item.offersLocalDelivery),
     localDeliveryMaxRadiusKm: item.localDeliveryMaxRadiusKm ?? null,
   };

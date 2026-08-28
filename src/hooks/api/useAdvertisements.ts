@@ -7,6 +7,7 @@ import type { GetMarketplaceResponse } from "@/contracts/categories/responses";
 import { mapMarketplaceItemToAdvertisement } from "@/mappers/advertisement.mapper";
 import { queryKeys } from "@/lib/queryKeys";
 import { categoryService } from "@/services/category.service";
+import { PUBLIC_LISTING_DEFAULT_PAGE_SIZE } from "@/utils/public-listing-pagination";
 
 export type MarketplaceListFilters = GetMarketplaceRequest & {
   page?: number;
@@ -17,7 +18,7 @@ type UseAdvertisementsOptions = {
   enabled?: boolean;
 };
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = PUBLIC_LISTING_DEFAULT_PAGE_SIZE;
 
 type RawMarketplaceResponse = GetMarketplaceResponse &
   Record<string, unknown>;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Package, Truck } from "lucide-react";
+import { MapPin, Package, Store, Truck } from "lucide-react";
 
 import { RemoteImage } from "@/components/media/RemoteImage";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,7 @@ function AdvertisementCard({
     category,
     imageUrl,
     isNew,
+    storeName,
     offersLocalDelivery,
     localDeliveryMaxRadiusKm,
   } = advertisement;
@@ -102,6 +103,16 @@ function AdvertisementCard({
         <CardContent className="flex flex-1 flex-col gap-1 py-2.5">
           <p className="text-small text-category truncate text-xs font-medium">
             {category}
+          </p>
+          <p
+            className={cn(
+              "text-muted-foreground flex min-h-[1.125rem] items-center gap-1 text-xs",
+              !storeName?.trim() && "invisible",
+            )}
+            aria-hidden={!storeName?.trim()}
+          >
+            <Store className="size-3 shrink-0 opacity-70" aria-hidden />
+            <span className="truncate">{storeName?.trim() || "\u00A0"}</span>
           </p>
           <h3 className="line-clamp-2 min-h-10 text-sm leading-snug font-semibold">
             {title}
