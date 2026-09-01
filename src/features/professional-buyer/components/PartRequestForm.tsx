@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +8,7 @@ import { Loader2 } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { CityCombobox } from "@/components/ui/city-combobox";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +53,8 @@ type PartRequestFormProps = {
   onSubmit: (values: PartRequestFormValues) => void;
   submitLabel?: string;
   submittingLabel?: string;
+  cancelHref?: string;
+  cancelLabel?: string;
 };
 
 function PartRequestForm({
@@ -66,6 +69,8 @@ function PartRequestForm({
   onSubmit,
   submitLabel = mode === "edit" ? "Salvar alterações" : "Criar solicitação",
   submittingLabel = mode === "edit" ? "Salvando…" : "Criando…",
+  cancelHref,
+  cancelLabel = "Cancelar",
 }: PartRequestFormProps) {
   const vehicleYears = listVehicleYears();
   const citiesQuery = useCities();
@@ -664,16 +669,32 @@ function PartRequestForm({
         ) : null}
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-fit">
-        {isSubmitting ? (
-          <>
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-            {submittingLabel}
-          </>
-        ) : (
-          submitLabel
-        )}
-      </Button>
+      <div className="flex flex-wrap items-center gap-3">
+        {cancelHref ? (
+          <Link
+            href={cancelHref}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-fit",
+              isSubmitting && "pointer-events-none opacity-50",
+            )}
+            tabIndex={isSubmitting ? -1 : undefined}
+            aria-disabled={isSubmitting}
+          >
+            {cancelLabel}
+          </Link>
+        ) : null}
+        <Button type="submit" disabled={isSubmitting} className="w-fit">
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+              {submittingLabel}
+            </>
+          ) : (
+            submitLabel
+          )}
+        </Button>
+      </div>
     </form>
   );
 }
