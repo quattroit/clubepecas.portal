@@ -265,7 +265,7 @@ function AdminFilesView() {
                 {report.warnings.map((warning) => (
                   <li
                     key={warning}
-                    className="bg-amber-500/10 text-amber-900 dark:text-amber-200 rounded-lg px-3 py-2"
+                    className="bg-warning/10 text-warning rounded-lg px-3 py-2"
                   >
                     {warning}
                   </li>

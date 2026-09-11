@@ -367,7 +367,7 @@ function AdminVehicleModelsView() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[52rem] text-left text-sm">
                 <caption className="sr-only">Modelos de veículo do marketplace</caption>
-                <thead className="bg-muted/40 border-border border-b">
+                <thead className="bg-muted/50 border-border border-b">
                   <tr>
                     <th scope="col" className="w-10 px-2 py-3" aria-hidden />
                     <th

@@ -145,7 +145,7 @@ function SearchableCombobox({
           aria-invalid={invalid || undefined}
           aria-describedby={ariaDescribedBy}
           onBlur={onBlur}
-          className="placeholder:text-muted-foreground h-full w-full min-w-0 rounded-xl border-0 bg-transparent px-3.5 pr-16 text-sm outline-none"
+          className="text-foreground placeholder:text-placeholder h-full w-full min-w-0 rounded-xl border-0 bg-transparent px-3.5 pr-16 text-sm outline-none"
         />
         <div className="absolute top-0 right-0 flex h-full items-center gap-0.5 pr-1.5">
           <Combobox.Clear

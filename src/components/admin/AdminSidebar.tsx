@@ -265,13 +265,7 @@ function NavLink({
       aria-current={isActive ? "page" : undefined}
       aria-label={collapsed ? item.label : undefined}
     >
-      <Icon
-        className={cn(
-          "size-4 shrink-0 transition-opacity",
-          isActive ? "opacity-100" : "opacity-70",
-        )}
-        aria-hidden
-      />
+      <Icon className="size-4 shrink-0" aria-hidden />
       {!collapsed ? <span className="truncate">{item.label}</span> : null}
     </Link>
   );
@@ -305,17 +299,11 @@ function NavGroup({
           "text-small focus-visible:ring-sidebar-ring flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors outline-none focus-visible:ring-2",
           groupActive
             ? "text-sidebar-foreground font-medium"
-            : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         )}
         aria-expanded={open}
       >
-        <GroupIcon
-          className={cn(
-            "size-4 shrink-0",
-            groupActive ? "opacity-100" : "opacity-70",
-          )}
-          aria-hidden
-        />
+        <GroupIcon className="size-4 shrink-0" aria-hidden />
         <span className="min-w-0 flex-1 truncate text-left">{group.label}</span>
         <ChevronDown
           className={cn(

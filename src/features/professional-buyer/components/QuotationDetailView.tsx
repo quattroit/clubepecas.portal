@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { MessageCircle, Receipt } from "lucide-react";
 
@@ -7,7 +8,7 @@ import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { NotFound } from "@/components/feedback/NotFound";
 import { PageLoader } from "@/components/feedback/PageLoader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, advertisementPath } from "@/constants/routes";
 import { QuotationStatusBadge } from "@/features/professional-buyer/components/QuotationStatusBadge";
 import { useMyQuotation } from "@/hooks/api/useMyQuotation";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
@@ -18,7 +19,7 @@ import { parseRouteId } from "@/utils/parseRouteId";
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <dt className="text-label text-xs tracking-wide uppercase">
         {label}
       </dt>
       <dd className="text-sm">{value}</dd>
@@ -137,26 +138,40 @@ function QuotationDetailView() {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          {data.items.map((item) => (
+          {data.items.map((item) => {
+            const advertisementHref = advertisementPath(
+              item.advertisementSlug?.trim() || String(item.advertisementId),
+            );
+
+            return (
             <div
               key={item.id}
               className="border-border flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-start"
             >
-              <div className="bg-secondary flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+              <Link
+                href={advertisementHref}
+                className="bg-secondary flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg"
+                aria-label={`Ver anúncio: ${item.title}`}
+              >
                 {item.thumbnailUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- miniatura remota do anúncio
                   <img
                     src={item.thumbnailUrl}
-                    alt={item.title}
+                    alt=""
                     className="size-full object-cover"
                   />
                 ) : (
                   <Receipt className="text-muted-foreground size-6" aria-hidden />
                 )}
-              </div>
+              </Link>
 
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <p className="text-small font-medium">{item.title}</p>
+                <Link
+                  href={advertisementHref}
+                  className="text-small hover:text-primary line-clamp-2 font-medium"
+                >
+                  {item.title}
+                </Link>
                 <p className="text-muted-foreground text-xs">
                   Código: {item.advertisementCode}
                 </p>
@@ -166,9 +181,16 @@ function QuotationDetailView() {
                     Observação: {item.itemNotes}
                   </p>
                 ) : null}
+                <Link
+                  href={advertisementHref}
+                  className="text-primary hover:text-primary-hover mt-1 w-fit text-sm font-medium hover:underline"
+                >
+                  Ver anúncio
+                </Link>
               </div>
             </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
     </div>

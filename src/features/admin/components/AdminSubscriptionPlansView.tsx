@@ -245,7 +245,7 @@ function AdminSubscriptionPlansView() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[48rem] text-left text-sm">
                 <caption className="sr-only">Planos de assinatura</caption>
-                <thead className="bg-muted/40 border-border border-b">
+                <thead className="bg-muted/50 border-border border-b">
                   <tr>
                     <th
                       scope="col"

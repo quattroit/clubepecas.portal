@@ -72,7 +72,7 @@ function DetailRow({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <dt className="text-label text-xs tracking-wide uppercase">
         {label}
       </dt>
       <dd className="text-foreground text-sm">{value?.trim() || "—"}</dd>
@@ -120,7 +120,7 @@ function RepresentativeDetailDialog({
           <div className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto">
             <div className="bg-muted/40 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
               <div>
-                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                <p className="text-label text-xs tracking-wide uppercase">
                   Código
                 </p>
                 <p className="font-mono text-lg font-semibold">
@@ -146,7 +146,7 @@ function RepresentativeDetailDialog({
             </div>
 
             <div className="bg-muted/30 rounded-xl border px-4 py-3">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              <p className="text-label text-xs tracking-wide uppercase">
                 Link Público
               </p>
               <p className="mt-1 truncate font-mono text-sm" title={publicUrl}>
@@ -213,7 +213,7 @@ function RepresentativeDetailDialog({
             </div>
 
             <div className="bg-muted/30 rounded-xl border px-4 py-3">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              <p className="text-label text-xs tracking-wide uppercase">
                 Resumo
               </p>
               <p className="mt-1 text-2xl font-semibold tabular-nums">

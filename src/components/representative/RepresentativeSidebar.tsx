@@ -150,13 +150,7 @@ function RepresentativeSidebar({
                     aria-current={isActive ? "page" : undefined}
                     aria-label={collapsed ? item.label : undefined}
                   >
-                    <Icon
-                      className={cn(
-                        "size-4 shrink-0 transition-opacity",
-                        isActive ? "opacity-100" : "opacity-70",
-                      )}
-                      aria-hidden
-                    />
+                    <Icon className="size-4 shrink-0" aria-hidden />
                     {!collapsed ? <span>{item.label}</span> : null}
                   </Link>
                 </li>

@@ -29,7 +29,7 @@ function SummaryMetric({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <span className="text-label text-xs tracking-wide uppercase">
         {label}
       </span>
       <span className="text-2xl font-semibold tabular-nums">

@@ -105,7 +105,7 @@ function AdminTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[36rem] text-left text-sm">
           {caption ? <caption className="sr-only">{caption}</caption> : null}
-          <thead className="bg-muted/40 border-border border-b">
+          <thead className="bg-muted/50 border-border border-b">
             <tr>
               {columns.map((column) => {
                 const isSorted = sortColumnId === column.id;
@@ -116,7 +116,7 @@ function AdminTable<T>({
                     key={column.id}
                     scope="col"
                     className={cn(
-                      "text-muted-foreground px-4 py-3 text-xs font-semibold tracking-wide uppercase",
+                      "text-label px-4 py-3 text-xs font-semibold tracking-wide uppercase",
                       column.headerClassName,
                     )}
                     aria-sort={
@@ -147,7 +147,7 @@ function AdminTable<T>({
               {rowActions ? (
                 <th
                   scope="col"
-                  className="text-muted-foreground px-4 py-3 text-right text-xs font-semibold tracking-wide uppercase"
+                  className="text-label px-4 py-3 text-right text-xs font-semibold tracking-wide uppercase"
                 >
                   Ações
                 </th>

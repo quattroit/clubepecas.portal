@@ -58,7 +58,7 @@ function statusBadgeVariant(
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <dt className="text-label text-xs tracking-wide uppercase">
         {label}
       </dt>
       <dd className="text-sm">{value}</dd>

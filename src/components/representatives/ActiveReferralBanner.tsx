@@ -39,7 +39,7 @@ function ActiveReferralBanner({ className, hidden }: ActiveReferralBannerProps) 
         )}
       >
         <div className="min-w-0">
-          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          <p className="text-label text-xs tracking-wide uppercase">
             Indicado por
           </p>
           <p className="truncate font-medium">

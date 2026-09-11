@@ -46,7 +46,7 @@ function AdminStatusBadge({ status, label, className }: AdminStatusBadgeProps) {
       data-slot="admin-status-badge"
       variant={config.badge}
       className={cn(
-        status === "featured" && "bg-amber-500/15 text-amber-700 border-amber-500/20",
+        status === "featured" && "bg-warning/15 text-warning border-warning/25",
         status === "premium" && "bg-primary/15 text-primary border-primary/20",
         className,
       )}

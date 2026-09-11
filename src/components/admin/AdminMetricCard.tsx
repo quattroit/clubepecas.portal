@@ -85,7 +85,7 @@ function AdminMetricCard({
             <span
               className={cn(
                 "inline-flex items-center gap-1 text-xs font-medium tabular-nums",
-                trend === "up" && "text-emerald-600 dark:text-emerald-400",
+                trend === "up" && "text-success",
                 trend === "down" && "text-destructive",
                 trend === "neutral" && "text-muted-foreground",
               )}

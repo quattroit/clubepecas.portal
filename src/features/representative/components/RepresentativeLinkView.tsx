@@ -50,7 +50,7 @@ function RepresentativeLinkView() {
             <Skeleton className="h-10 w-full" />
           ) : (
             <div className="border-border bg-muted/30 flex flex-col gap-1 rounded-xl border px-4 py-3">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              <p className="text-label text-xs tracking-wide uppercase">
                 Código {code}
               </p>
               <p className="text-foreground truncate font-mono text-sm font-medium">

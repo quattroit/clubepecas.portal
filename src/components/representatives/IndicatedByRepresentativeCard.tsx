@@ -30,9 +30,9 @@ function IndicatedByRepresentativeCard({
       )}
     >
       <div className="flex items-start gap-2">
-        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+        <CheckCircle2 className="text-success mt-0.5 size-4 shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          <p className="text-label text-xs tracking-wide uppercase">
             Você foi indicado por
           </p>
           <p className="font-medium">{name}</p>

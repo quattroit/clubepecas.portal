@@ -78,13 +78,7 @@ function ProfessionalBuyerSidebar() {
                     )}
                     aria-current={isActive ? "page" : undefined}
                   >
-                    <Icon
-                      className={cn(
-                        "size-4 shrink-0 transition-opacity",
-                        isActive ? "opacity-100" : "opacity-70",
-                      )}
-                      aria-hidden
-                    />
+                    <Icon className="size-4 shrink-0" aria-hidden />
                     {item.label}
                   </Link>
                 </li>
@@ -98,7 +92,7 @@ function ProfessionalBuyerSidebar() {
             href={ROUTES.HOME}
             className="text-small text-sidebar-foreground hover:bg-sidebar-accent focus-visible:ring-sidebar-ring flex min-h-9 items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors outline-none focus-visible:ring-2"
           >
-            <Home className="size-4 shrink-0 opacity-70" aria-hidden />
+            <Home className="size-4 shrink-0" aria-hidden />
             Voltar ao site
           </Link>
         </div>

@@ -33,7 +33,6 @@ import {
 import { useContactPartRequestSupplier } from "@/hooks/api/useContactPartRequestSupplier";
 import { usePartRequestSuppliers } from "@/hooks/api/usePartRequestSuppliers";
 import { useSkipPartRequestSupplier } from "@/hooks/api/useSkipPartRequestSupplier";
-import { useUpdatePartRequestSuppliers } from "@/hooks/api/useUpdatePartRequestSuppliers";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { resolveMediaUrl } from "@/lib/photo-url";
 import { cn } from "@/lib/utils";
@@ -66,7 +65,7 @@ function ContactSummaryBar({
           key={metric.label}
           className="border-border bg-muted/30 flex flex-col gap-0.5 rounded-xl border px-3 py-2"
         >
-          <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          <span className="text-label text-xs tracking-wide uppercase">
             {metric.label}
           </span>
           <span className="text-lg font-semibold tabular-nums">{metric.value}</span>
@@ -90,29 +89,6 @@ function SupplierAvatar({ supplier }: { supplier: PartRequestSupplierDto }) {
   return (
     <div className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center rounded-xl">
       <Store className="size-5" aria-hidden />
-    </div>
-  );
-}
-
-function SupplierSelectionDetails({
-  supplier,
-}: {
-  supplier: PartRequestSupplierDto;
-}) {
-  const cityLabel = formatCityLabel({
-    name: supplier.cityName,
-    state: supplier.cityState,
-  });
-  const adsLabel =
-    supplier.compatibleAdvertisementCount === 1
-      ? "1 anúncio compatível"
-      : `${supplier.compatibleAdvertisementCount} anúncios compatíveis`;
-
-  return (
-    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-      <p className="truncate font-medium">{supplier.storeName}</p>
-      <p className="text-muted-foreground text-sm">{cityLabel}</p>
-      <p className="text-muted-foreground text-sm">{adsLabel}</p>
     </div>
   );
 }
@@ -166,62 +142,16 @@ function ReadOnlySupplierRow({ supplier }: { supplier: PartRequestSupplierDto })
   );
 }
 
-function EditableSupplierRow({
-  supplier,
-  disabled,
-  highlighted,
-  rowRef,
-  onToggle,
-  onPreview,
-}: {
-  supplier: PartRequestSupplierDto;
-  disabled: boolean;
-  highlighted: boolean;
-  rowRef?: (node: HTMLLIElement | null) => void;
-  onToggle: (sellerId: number, nextSelected: boolean) => void;
-  onPreview: (supplier: PartRequestSupplierDto) => void;
-}) {
-  return (
-    <li
-      ref={rowRef}
-      className={cn(
-        "border-border flex items-center gap-3 rounded-xl border p-3 transition-colors",
-        supplier.selected && "border-primary/30 bg-primary/5",
-        highlighted && "ring-primary ring-2 ring-offset-2",
-      )}
-    >
-      <input
-        type="checkbox"
-        className="size-4 shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-        checked={supplier.selected}
-        disabled={disabled}
-        aria-label={`Selecionar ${supplier.storeName}`}
-        onChange={() => onToggle(supplier.sellerId, !supplier.selected)}
-      />
-      <SupplierAvatar supplier={supplier} />
-      <SupplierSelectionDetails supplier={supplier} />
-      <Button
-        type="button"
-        variant="primary"
-        size="sm"
-        className="shrink-0"
-        onClick={() => onPreview(supplier)}
-      >
-        <Eye className="size-3.5" aria-hidden />
-        Ver peças
-      </Button>
-    </li>
-  );
-}
-
 function SelectedSupplierContactRow({
   supplier,
   highlighted,
   rowRef,
+  onPreview,
 }: {
   supplier: PartRequestSupplierDto;
   highlighted: boolean;
-  rowRef?: (node: HTMLLIElement | null) => void;
+  rowRef?: (node: HTMLElement | null) => void;
+  onPreview: (supplier: PartRequestSupplierDto) => void;
 }) {
   return (
     <li
@@ -233,6 +163,16 @@ function SelectedSupplierContactRow({
     >
       <SupplierAvatar supplier={supplier} />
       <SupplierContactDetails supplier={supplier} />
+      <Button
+        type="button"
+        variant="primary"
+        size="sm"
+        className="shrink-0"
+        onClick={() => onPreview(supplier)}
+      >
+        <Eye className="size-3.5" aria-hidden />
+        Ver peças
+      </Button>
     </li>
   );
 }
@@ -254,7 +194,6 @@ function PartRequestSuppliersSection({
     status,
     isOpen || isCancelled,
   );
-  const updateMutation = useUpdatePartRequestSuppliers(partRequestId);
   const contactMutation = useContactPartRequestSupplier(partRequestId);
   const skipMutation = useSkipPartRequestSupplier(partRequestId);
 
@@ -274,7 +213,7 @@ function PartRequestSuppliersSection({
     number | null
   >(null);
 
-  const rowRefs = useRef<Map<number, HTMLLIElement>>(new Map());
+  const rowRefs = useRef<Map<number, HTMLElement>>(new Map());
   const [highlightSellerId, setHighlightSellerId] = useState<number | null>(
     null,
   );
@@ -317,6 +256,17 @@ function PartRequestSuppliersSection({
     [focusedSellerId, selectedItems],
   );
 
+  const isFocusedPending =
+    focusedSupplier != null && isSupplierContactPending(focusedSupplier.contactStatus);
+
+  const upcomingItems = useMemo(
+    () =>
+      isFocusedPending
+        ? selectedItems.filter((item) => item.sellerId !== focusedSupplier.sellerId)
+        : selectedItems,
+    [isFocusedPending, selectedItems, focusedSupplier],
+  );
+
   const scrollToSeller = useCallback((sellerId: number) => {
     const node = rowRefs.current.get(sellerId);
     if (!node) return;
@@ -324,50 +274,6 @@ function PartRequestSuppliersSection({
     setHighlightSellerId(sellerId);
     window.setTimeout(() => setHighlightSellerId(null), 2000);
   }, []);
-
-  const handleToggle = (sellerId: number, nextSelected: boolean) => {
-    if (!isOpen || updateMutation.isPending) return;
-
-    const currentSelectedIds = localItems
-      .filter((item) => item.selected)
-      .map((item) => item.sellerId);
-
-    if (nextSelected && currentSelectedIds.length >= localMaximumSuppliers) {
-      toast.warning(
-        "Você atingiu o limite de fornecedores selecionados para esta solicitação.",
-      );
-      return;
-    }
-
-    const nextSelectedIds = nextSelected
-      ? [...currentSelectedIds, sellerId]
-      : currentSelectedIds.filter((id) => id !== sellerId);
-
-    const previousItems = localItems;
-    const previousSelectedCount = localSelectedCount;
-
-    setLocalItems((items) =>
-      items.map((item) =>
-        item.sellerId === sellerId ? { ...item, selected: nextSelected } : item,
-      ),
-    );
-    setLocalSelectedCount(nextSelectedIds.length);
-
-    updateMutation.mutate(nextSelectedIds, {
-      onSuccess: (data) => {
-        setLocalItems(data.items);
-        setLocalSelectedCount(data.selectedCount);
-        setLocalMaximumSuppliers(data.maximumSuppliers);
-        setLocalContactSummary(data.contactSummary);
-        setLocalNextPendingSellerId(data.nextPendingSellerId);
-      },
-      onError: (error) => {
-        setLocalItems(previousItems);
-        setLocalSelectedCount(previousSelectedCount);
-        toast.error(getFriendlyErrorMessage(error));
-      },
-    });
-  };
 
   const handleContact = (sellerId: number) => {
     contactMutation.mutate(sellerId, {
@@ -407,7 +313,7 @@ function PartRequestSuppliersSection({
   };
 
   const setRowRef = useCallback(
-    (sellerId: number) => (node: HTMLLIElement | null) => {
+    (sellerId: number) => (node: HTMLElement | null) => {
       if (node) {
         rowRefs.current.set(sellerId, node);
       } else {
@@ -432,8 +338,8 @@ function PartRequestSuppliersSection({
           {isOpen ? (
             <p className="text-muted-foreground text-sm">
               {cityLabel
-                ? `Buscando fornecedores em ${cityLabel}. Selecione até ${localMaximumSuppliers} e contate-os pelo WhatsApp.`
-                : `Selecione até ${localMaximumSuppliers} fornecedores e contate-os pelo WhatsApp.`}
+                ? `Buscando fornecedores em ${cityLabel}. Contate-os pelo WhatsApp ou pule para o próximo.`
+                : "Contate os fornecedores pelo WhatsApp ou pule para o próximo."}
             </p>
           ) : (
             <p className="text-muted-foreground text-sm">
@@ -442,12 +348,25 @@ function PartRequestSuppliersSection({
           )}
         </div>
         {isOpen && suppliersQuery.data ? (
-          <p className="text-muted-foreground text-sm tabular-nums">
-            Selecionados{" "}
-            <span className="text-foreground font-medium">
-              {localSelectedCount} / {localMaximumSuppliers}
-            </span>
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-muted-foreground text-sm tabular-nums">
+              Selecionados{" "}
+              <span className="text-foreground font-medium">
+                {localSelectedCount} / {localMaximumSuppliers}
+              </span>
+            </p>
+            {localNextPendingSellerId != null ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGoToNextPending}
+              >
+                Próximo fornecedor
+                <ChevronRight aria-hidden />
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 
@@ -478,62 +397,19 @@ function PartRequestSuppliersSection({
         />
       ) : null}
 
-      {isOpen && localItems.length > 0 ? (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-            Seleção de fornecedores
-          </h3>
-          <ul className="flex flex-col gap-2">
-            {localItems.map((supplier) => (
-              <EditableSupplierRow
-                key={supplier.sellerId}
-                supplier={supplier}
-                disabled={updateMutation.isPending}
-                highlighted={
-                  highlightSellerId === supplier.sellerId ||
-                  focusedSellerId === supplier.sellerId
-                }
-                rowRef={setRowRef(supplier.sellerId)}
-                onToggle={handleToggle}
-                onPreview={setPreviewSeller}
-              />
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
       {isOpen && selectedItems.length > 0 ? (
-        <div className="border-border flex flex-col gap-4 border-t pt-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <h3 className="text-base font-semibold">Contato com fornecedores</h3>
-              <p className="text-muted-foreground text-sm">
-                Contate os fornecedores selecionados pelo WhatsApp ou pule para
-                o próximo.
-              </p>
-            </div>
-            {localNextPendingSellerId != null ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleGoToNextPending}
-              >
-                Próximo fornecedor
-                <ChevronRight aria-hidden />
-              </Button>
-            ) : null}
-          </div>
-
+        <div className="flex flex-col gap-4">
           {localContactSummary.pending === 0 ? (
             <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-3 text-sm">
-              Todos os fornecedores selecionados já foram processados.
+              Todos os fornecedores já foram processados.
             </p>
           ) : null}
 
-          {focusedSupplier &&
-          isSupplierContactPending(focusedSupplier.contactStatus) ? (
-            <div className="border-primary/20 bg-primary/5 flex flex-col gap-3 rounded-xl border p-4">
+          {isFocusedPending ? (
+            <div
+              ref={setRowRef(focusedSupplier.sellerId)}
+              className="border-primary/20 bg-primary/5 flex flex-col gap-3 rounded-xl border p-4"
+            >
               <p className="text-sm font-medium">Fornecedor atual</p>
               <div className="flex items-start gap-3">
                 <SupplierAvatar supplier={focusedSupplier} />
@@ -573,19 +449,19 @@ function PartRequestSuppliersSection({
             </div>
           ) : null}
 
-          <ul className="flex flex-col gap-2">
-            {selectedItems.map((supplier) => (
-              <SelectedSupplierContactRow
-                key={supplier.sellerId}
-                supplier={supplier}
-                highlighted={
-                  highlightSellerId === supplier.sellerId ||
-                  focusedSellerId === supplier.sellerId
-                }
-                rowRef={setRowRef(supplier.sellerId)}
-              />
-            ))}
-          </ul>
+          {upcomingItems.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {upcomingItems.map((supplier) => (
+                <SelectedSupplierContactRow
+                  key={supplier.sellerId}
+                  supplier={supplier}
+                  highlighted={highlightSellerId === supplier.sellerId}
+                  rowRef={setRowRef(supplier.sellerId)}
+                  onPreview={setPreviewSeller}
+                />
+              ))}
+            </ul>
+          ) : null}
         </div>
       ) : null}
 

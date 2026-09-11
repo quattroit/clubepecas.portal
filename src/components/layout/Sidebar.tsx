@@ -144,7 +144,7 @@ function LockedNavItem({
       }
       aria-disabled
     >
-      <Icon className="size-4 shrink-0 opacity-70" aria-hidden />
+      <Icon className="size-4 shrink-0" aria-hidden />
       {item.label}
     </span>
   );
@@ -184,8 +184,7 @@ function NavLink({
     >
       <Icon
         className={cn(
-          "size-4 shrink-0 transition-opacity",
-          isActive ? "opacity-100" : "opacity-70",
+          "size-4 shrink-0",
         )}
         aria-hidden
       />
@@ -224,14 +223,13 @@ function NavGroup({
           "text-small focus-visible:ring-sidebar-ring flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors outline-none focus-visible:ring-2",
           groupActive
             ? "text-sidebar-foreground font-medium"
-            : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         )}
         aria-expanded={open}
       >
         <GroupIcon
           className={cn(
             "size-4 shrink-0",
-            groupActive ? "opacity-100" : "opacity-70",
           )}
           aria-hidden
         />
@@ -328,7 +326,7 @@ function Sidebar() {
             href={ROUTES.HOME}
             className="text-small text-sidebar-foreground hover:bg-sidebar-accent focus-visible:ring-sidebar-ring flex min-h-9 items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors outline-none focus-visible:ring-2"
           >
-            <Home className="size-4 shrink-0 opacity-70" aria-hidden />
+            <Home className="size-4 shrink-0" aria-hidden />
             Voltar ao site
           </Link>
         </div>

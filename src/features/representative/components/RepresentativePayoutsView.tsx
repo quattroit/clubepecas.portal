@@ -40,7 +40,7 @@ function statusBadgeVariant(
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <dt className="text-label text-xs tracking-wide uppercase">
         {label}
       </dt>
       <dd className="text-sm">{value}</dd>
@@ -211,7 +211,7 @@ function RepresentativePayoutsView() {
                 </p>
                 <div className="border-border max-h-64 overflow-y-auto rounded-lg border">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-muted/40 border-border border-b">
+                    <thead className="bg-muted/50 border-border border-b">
                       <tr>
                         <th className="px-3 py-2 text-xs font-semibold uppercase">Vendedor</th>
                         <th className="px-3 py-2 text-xs font-semibold uppercase">Tipo</th>

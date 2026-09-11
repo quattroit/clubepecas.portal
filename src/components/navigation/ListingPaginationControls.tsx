@@ -19,7 +19,7 @@ type ListingPaginationControlsProps = {
 };
 
 const selectClassName =
-  "border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3";
+  "border-input bg-surface text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3";
 
 /**
  * Seletor de itens por página + paginação para listagens públicas.

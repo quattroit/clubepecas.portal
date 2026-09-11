@@ -126,7 +126,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {capsLockOn ? (
           <p
             id={capsLockId}
-            className="text-amber-600 dark:text-amber-400 text-xs"
+            className="text-warning text-xs"
             role="status"
           >
             Caps Lock está ativado.

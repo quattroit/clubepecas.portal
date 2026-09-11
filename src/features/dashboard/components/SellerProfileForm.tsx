@@ -34,8 +34,8 @@ import {
 } from "@/utils/postalCode";
 
 const selectClassName = cn(
-  "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3",
-  "disabled:cursor-not-allowed disabled:opacity-50",
+  "border-input bg-surface text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3",
+  "disabled:cursor-not-allowed disabled:opacity-65 disabled:bg-muted disabled:text-muted-foreground",
 );
 
 type SellerProfileFormProps = {

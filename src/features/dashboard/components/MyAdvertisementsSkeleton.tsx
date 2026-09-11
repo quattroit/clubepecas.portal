@@ -10,7 +10,7 @@ function MyAdvertisementsSkeleton() {
       {Array.from({ length: 8 }).map((_, index) => (
         <div
           key={index}
-          className="bg-card overflow-hidden rounded-xl shadow-xs ring-1 ring-foreground/10"
+          className="bg-card overflow-hidden rounded-xl shadow-xs ring-1 ring-border"
         >
           <Skeleton className="aspect-[5/3] w-full rounded-none" />
           <div className="flex flex-col gap-1 px-2.5 py-2">

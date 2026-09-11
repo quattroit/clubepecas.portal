@@ -42,7 +42,7 @@ const DEFAULT_CITIES: FilterOption[] = [{ id: "all", label: "Todas" }];
 const DEFAULT_STATES = BRAZILIAN_STATE_OPTIONS;
 
 const selectClassName =
-  "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted";
+  "border-input bg-surface text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-65 disabled:bg-muted disabled:text-muted-foreground";
 
 /**
  * Card lateral de filtros — aplica via URL / API no submit de Pesquisar.

@@ -6,12 +6,13 @@
 
 /**
  * ClubePeças — Design Tokens (fonte oficial)
- * Industrial Premium — ~90% neutro / ~10% destaque
- * Primary #2563EB · Brand #0F2747 · Background #F4F7FB
+ * Industrial Premium — neutro com contraste reforçado
+ * Primary #2563EB · Brand #0F2747 · Background #F7F8FA
  */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-label: var(--label);
   --color-surface: var(--surface);
   --color-surface-foreground: var(--surface-foreground);
   --color-card: var(--card);
@@ -19,13 +20,16 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-placeholder: var(--placeholder);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-soft-blue: var(--soft-blue);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -80,35 +84,40 @@
 }
 
 :root {
-  /* Paleta oficial (hex de referência do brief) */
-  --background: #f4f7fb;
-  --foreground: #14233b;
+  /* Paleta global — contraste reforçado */
+  --background: #f7f8fa;
+  --foreground: #172b45;
+  --label: #263b53;
   --surface: #ffffff;
-  --surface-foreground: #14233b;
+  --surface-foreground: #172b45;
 
   --primary: #2563eb;
+  --primary-hover: #1d4ed8;
   --primary-foreground: #ffffff;
 
-  --secondary: #e8eef6;
-  --secondary-foreground: #14233b;
+  --secondary: #eff6ff;
+  --secondary-foreground: #172b45;
 
   --success: #16a34a;
   --success-foreground: #ffffff;
   --warning: #d97706;
-  --warning-foreground: #14233b;
+  --warning-foreground: #172b45;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
 
-  --muted: #eef2f7;
-  --muted-foreground: #64748b;
-  --accent: #e8eef6;
-  --accent-foreground: #14233b;
+  --muted: #f1f5f9;
+  --muted-foreground: #53657a;
+  --placeholder: #64748b;
+  --accent: #eff6ff;
+  --accent-foreground: #172b45;
+  --soft-blue: #eff6ff;
+
   --card: #ffffff;
-  --card-foreground: #14233b;
+  --card-foreground: #172b45;
   --popover: #ffffff;
-  --popover-foreground: #14233b;
-  --border: #e5eaf2;
-  --input: #e5eaf2;
+  --popover-foreground: #172b45;
+  --border: #d5dce5;
+  --input: #d5dce5;
   --ring: #2563eb;
 
   /* Azul petróleo — Header / Hero / CTA / Footer */
@@ -127,7 +136,7 @@
   --location: #e11d48;
   --store: #ea580c;
   --category: #2563eb;
-  --share: #64748b;
+  --share: #53657a;
 
   --radius: 0.75rem;
 
@@ -135,21 +144,21 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 
-  --elevation-xs: 0 1px 2px rgb(15 39 71 / 6%);
+  --elevation-xs: 0 1px 2px rgb(23 43 69 / 7%);
   --elevation-sm:
-    0 1px 3px rgb(15 39 71 / 8%), 0 1px 2px rgb(15 39 71 / 5%);
+    0 1px 3px rgb(23 43 69 / 9%), 0 1px 2px rgb(23 43 69 / 6%);
   --elevation-md:
-    0 8px 16px -4px rgb(15 39 71 / 12%), 0 3px 6px -2px rgb(15 39 71 / 7%);
+    0 8px 16px -4px rgb(23 43 69 / 11%), 0 3px 6px -2px rgb(23 43 69 / 7%);
   --elevation-lg:
-    0 18px 36px -8px rgb(15 39 71 / 16%), 0 8px 14px -4px rgb(15 39 71 / 8%);
+    0 18px 36px -8px rgb(23 43 69 / 14%), 0 8px 14px -4px rgb(23 43 69 / 8%);
 
   --sidebar: #ffffff;
-  --sidebar-foreground: #14233b;
+  --sidebar-foreground: #172b45;
   --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef2f7;
-  --sidebar-accent-foreground: #14233b;
-  --sidebar-border: #e5eaf2;
+  --sidebar-accent: #eff6ff;
+  --sidebar-accent-foreground: #172b45;
+  --sidebar-border: #d5dce5;
   --sidebar-ring: #2563eb;
 }
 
@@ -222,6 +231,13 @@
     color: var(--muted-foreground);
   }
 
+  .text-label {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--label);
+  }
+
   .text-price {
     font-family: var(--font-heading);
     font-size: 1.25rem;
@@ -290,6 +306,6 @@
   }
 
   .card-interactive:hover {
-    @apply shadow-md -translate-y-0.5 ring-primary/50;
+    @apply shadow-md -translate-y-0.5 ring-primary/40;
   }
 }

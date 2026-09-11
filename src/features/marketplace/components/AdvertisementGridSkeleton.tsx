@@ -11,7 +11,7 @@ function AdvertisementGridSkeleton() {
       {Array.from({ length: 8 }).map((_, index) => (
         <div
           key={index}
-          className="bg-card overflow-hidden rounded-2xl shadow-xs ring-1 ring-foreground/10"
+          className="bg-card overflow-hidden rounded-2xl shadow-xs ring-1 ring-border"
         >
           <Skeleton className="aspect-[16/10] w-full rounded-none" />
           <div className="flex flex-col gap-1.5 p-2.5">

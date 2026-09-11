@@ -46,7 +46,7 @@ function PlanUsageProgress({
             percent >= 100
               ? "bg-destructive"
               : percent >= 80
-                ? "bg-amber-500"
+                ? "bg-warning"
                 : "bg-primary",
           )}
           style={{ width: `${percent}%` }}

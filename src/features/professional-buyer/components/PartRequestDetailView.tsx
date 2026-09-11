@@ -37,7 +37,7 @@ import { parseRouteId } from "@/utils/parseRouteId";
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+      <dt className="text-label text-xs tracking-wide uppercase">
         {label}
       </dt>
       <dd className="text-sm">{value}</dd>
@@ -177,7 +177,7 @@ function PartRequestDetailView() {
           <dl className="grid gap-5 sm:grid-cols-2">
             <DetailField label="Status" value={data.statusLabel} />
             <div className="flex flex-col gap-1.5">
-              <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              <dt className="text-label text-xs tracking-wide uppercase">
                 Resultado
               </dt>
               <dd>
@@ -246,7 +246,7 @@ function PartRequestDetailView() {
 
           {data.description?.trim() ? (
             <div className="mt-6 flex flex-col gap-1.5">
-              <h2 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              <h2 className="text-label text-xs tracking-wide uppercase">
                 Descrição
               </h2>
               <p className="text-sm leading-relaxed whitespace-pre-wrap">

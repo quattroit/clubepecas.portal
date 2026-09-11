@@ -241,25 +241,39 @@ function PartRequestsListView() {
       ) : null}
 
       {!listQuery.isLoading && !listQuery.isError && items.length > 0 ? (
-        <div className="border-border overflow-hidden rounded-2xl border shadow-xs">
+        <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead className="bg-muted/40 border-border border-b">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="bg-muted/50 border-border border-b">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium">Título</th>
-                  <th className="px-4 py-3 text-left font-medium">Veículo</th>
-                  <th className="px-4 py-3 text-left font-medium">Cidade</th>
-                  <th className="px-4 py-3 text-left font-medium">Status</th>
-                  <th className="px-4 py-3 text-left font-medium">Resultado</th>
-                  <th className="px-4 py-3 text-left font-medium">Criada em</th>
-                  <th className="px-4 py-3 text-right font-medium">Ações</th>
+                  <th className="text-label px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase">
+                    Título
+                  </th>
+                  <th className="text-label px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase">
+                    Veículo
+                  </th>
+                  <th className="text-label px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase">
+                    Cidade
+                  </th>
+                  <th className="text-label px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase">
+                    Status
+                  </th>
+                  <th className="text-label px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase">
+                    Resultado
+                  </th>
+                  <th className="text-label px-4 py-3 text-left text-xs font-semibold tracking-wide uppercase">
+                    Criada em
+                  </th>
+                  <th className="text-label px-4 py-3 text-right text-xs font-semibold tracking-wide uppercase">
+                    Ações
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-border divide-y">
                 {items.map((item) => (
                   <tr
                     key={item.id}
-                    className="border-border hover:bg-muted/20 border-b last:border-b-0"
+                    className="hover:bg-muted/30 transition-colors"
                   >
                     <td className="px-4 py-3 font-medium">{item.title}</td>
                     <td className="text-muted-foreground px-4 py-3">
@@ -331,48 +345,45 @@ function PartRequestsListView() {
               </tbody>
             </table>
           </div>
-        </div>
-      ) : null}
+          <div className="border-border bg-muted/20 flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="pr-page-size"
+                className="text-small text-muted-foreground whitespace-nowrap"
+              >
+                Itens por página
+              </label>
+              <select
+                id="pr-page-size"
+                className={cn(selectClassName, "h-8 w-auto")}
+                value={pageSize}
+                onChange={(event) => {
+                  const next = parseQuotationPageSize(event.target.value);
+                  patch({
+                    pageSize:
+                      next === QUOTATION_DEFAULT_PAGE_SIZE
+                        ? undefined
+                        : String(next),
+                    page: "1",
+                  });
+                }}
+              >
+                {QUOTATION_PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {!listQuery.isLoading && !listQuery.isError && items.length > 0 ? (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="pr-page-size"
-              className="text-small text-muted-foreground whitespace-nowrap"
-            >
-              Itens por página
-            </label>
-            <select
-              id="pr-page-size"
-              className={cn(selectClassName, "h-8 w-auto")}
-              value={pageSize}
-              onChange={(event) => {
-                const next = parseQuotationPageSize(event.target.value);
-                patch({
-                  pageSize:
-                    next === QUOTATION_DEFAULT_PAGE_SIZE
-                      ? undefined
-                      : String(next),
-                  page: "1",
-                });
-              }}
-            >
-              {QUOTATION_PAGE_SIZE_OPTIONS.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
+            {totalPages > 1 ? (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={(nextPage) => patch({ page: String(nextPage) })}
+              />
+            ) : null}
           </div>
-
-          {totalPages > 1 ? (
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={(nextPage) => patch({ page: String(nextPage) })}
-            />
-          ) : null}
         </div>
       ) : null}
 

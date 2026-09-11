@@ -41,7 +41,7 @@ function PasswordRequirements({
             className={cn(
               "flex items-center gap-2 text-xs transition-colors",
               !hasInput && "text-muted-foreground",
-              hasInput && met && "text-emerald-600 dark:text-emerald-400",
+              hasInput && met && "text-success",
               hasInput && !met && "text-muted-foreground",
             )}
           >

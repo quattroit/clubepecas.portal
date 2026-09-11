@@ -423,7 +423,7 @@ function AdminDashboardView() {
               description={`${data.bestStore.city} — ${data.bestStore.state}`}
               actions={
                 <span className="text-muted-foreground inline-flex items-center gap-1 text-xs font-medium">
-                  <Trophy className="size-3.5 text-amber-600" aria-hidden />
+                  <Trophy className="text-warning size-3.5" aria-hidden />
                   Destaque
                 </span>
               }
@@ -524,7 +524,7 @@ function AdminDashboardView() {
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-muted-foreground inline-flex items-center gap-1 text-xs font-medium">
-                      <Trophy className="size-3.5 text-amber-600" aria-hidden />
+                      <Trophy className="text-warning size-3.5" aria-hidden />
                       Melhor anúncio
                     </span>
                     <span className="text-muted-foreground text-xs">

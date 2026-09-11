@@ -125,7 +125,7 @@ function AdvertisementsToolbar({
             value={sort}
             onChange={(event) => onSortChange?.(event.target.value)}
             aria-label="Ordenar anúncios"
-            className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 h-9 min-w-0 flex-1 rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3 sm:w-44 sm:flex-none"
+            className="border-input bg-surface text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-9 min-w-0 flex-1 rounded-lg border px-2.5 text-sm outline-none focus-visible:ring-3 sm:w-44 sm:flex-none"
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>

@@ -30,7 +30,7 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { BILLING_CYCLE_OPTIONS, billingCycleLabel } from "@/utils/billingCycle";
 
 const selectClassName =
-  "border-input bg-surface focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted";
+  "border-input bg-surface text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border px-3.5 text-sm outline-none transition-colors focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-65 disabled:bg-muted disabled:text-muted-foreground";
 
 type SubscriptionPlanFormDialogProps = {
   open: boolean;

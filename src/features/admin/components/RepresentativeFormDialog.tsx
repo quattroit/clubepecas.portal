@@ -147,7 +147,7 @@ function RepresentativeFormDialog({
 
           {mode === "edit" && representativeCode ? (
             <div className="bg-muted/40 rounded-xl border px-4 py-3">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              <p className="text-label text-xs tracking-wide uppercase">
                 Código do representante
               </p>
               <p className="text-foreground mt-1 font-mono text-lg font-semibold">

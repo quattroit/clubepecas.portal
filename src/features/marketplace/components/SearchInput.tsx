@@ -74,12 +74,12 @@ function SearchInput({
 
   const inputClassName =
     tone === "hero"
-      ? "text-foreground placeholder:text-muted-foreground h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-1 text-base shadow-none focus-visible:ring-0 sm:px-2"
+      ? "text-foreground placeholder:text-placeholder h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-1 text-base shadow-none focus-visible:ring-0 sm:px-2"
       : cn(
           "h-10 pr-3 pl-10",
           tone === "default" && "bg-surface",
           tone === "on-brand" &&
-            "border-brand-border bg-brand-foreground/8 text-brand-foreground placeholder:text-brand-muted focus-visible:border-primary focus-visible:ring-primary/40",
+            "border-brand-border bg-brand-foreground/8 text-brand-foreground placeholder:text-placeholder focus-visible:border-primary focus-visible:ring-primary/40",
         );
 
   const field = (
