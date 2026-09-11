@@ -10,7 +10,6 @@ import { AvailablePlansDialog } from "@/features/dashboard/components/subscripti
 import { PaymentHistoryCard } from "@/features/dashboard/components/subscription/PaymentHistoryCard";
 import { SubscriptionActionsCard } from "@/features/dashboard/components/subscription/SubscriptionActionsCard";
 import { SubscriptionFaqCard } from "@/features/dashboard/components/subscription/SubscriptionFaqCard";
-import { SubscriptionFinancialCard } from "@/features/dashboard/components/subscription/SubscriptionFinancialCard";
 import { SubscriptionHistoryCard } from "@/features/dashboard/components/subscription/SubscriptionHistoryCard";
 import { SubscriptionMessagesCard } from "@/features/dashboard/components/subscription/SubscriptionMessagesCard";
 import {
@@ -199,14 +198,6 @@ function MyPlanView() {
             />
           ) : null}
           <SubscriptionMessagesCard messages={subscription.messages} />
-          <SubscriptionFinancialCard
-            subscription={subscription}
-            actions={subscription.actions}
-            onRetryPayment={() => retryPaymentMutation.mutate()}
-            onNewCharge={() => newChargeMutation.mutate()}
-            retryLoading={retryPaymentMutation.isPending}
-            newChargeLoading={newChargeMutation.isPending}
-          />
           <SubscriptionUsageCard subscription={subscription} />
           <SubscriptionTimelineCard items={subscription.timeline} />
           <SubscriptionActionsCard

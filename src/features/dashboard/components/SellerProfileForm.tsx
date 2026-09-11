@@ -45,6 +45,7 @@ type SellerProfileFormProps = {
   submitError?: unknown;
   onSubmit: (values: SellerProfileFormValues) => void;
   onCancel?: () => void;
+  onChangePassword?: () => void;
   submitLabel?: string;
   submittingLabel?: string;
   /** Arquivo pendente (create) — enviado após criar o perfil. */
@@ -65,6 +66,7 @@ function SellerProfileForm({
   submitError,
   onSubmit,
   onCancel,
+  onChangePassword,
   submitLabel = mode === "edit" ? "Salvar alterações" : "Criar perfil",
   submittingLabel = mode === "edit" ? "Salvando…" : "Criando…",
   pendingPhotoFile = null,
@@ -637,32 +639,46 @@ function SellerProfileForm({
         disabled={isSubmitting}
       />
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        {onCancel ? (
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {onChangePassword ? (
           <Button
             type="button"
             variant="outline"
             disabled={isSubmitting}
-            onClick={onCancel}
+            onClick={onChangePassword}
           >
-            Cancelar
+            Alterar senha
           </Button>
-        ) : null}
-        <Button
-          type="submit"
-          variant="primary"
-          className={cn("min-w-[10rem]")}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-              {submittingLabel}
-            </>
-          ) : (
-            submitLabel
-          )}
-        </Button>
+        ) : (
+          <span className="hidden sm:block" />
+        )}
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          {onCancel ? (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={onCancel}
+            >
+              Cancelar
+            </Button>
+          ) : null}
+          <Button
+            type="submit"
+            variant="primary"
+            className={cn("min-w-[10rem]")}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                {submittingLabel}
+              </>
+            ) : (
+              submitLabel
+            )}
+          </Button>
+        </div>
       </div>
     </form>
   );

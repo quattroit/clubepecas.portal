@@ -10,7 +10,7 @@ export { MetricCard } from "@/features/dashboard/components/metrics/MetricCard";
 export { MetricsGrid } from "@/features/dashboard/components/metrics/MetricsGrid";
 export { SellerMetricsSection } from "@/features/dashboard/components/metrics/SellerMetricsSection";
 export { TopListingsTable } from "@/features/dashboard/components/metrics/TopListingsTable";
-export { ChangePasswordForm } from "@/features/dashboard/components/ChangePasswordForm";
+export { ChangePasswordDialog } from "@/features/dashboard/components/ChangePasswordDialog";
 export { SellerProfileForm } from "@/features/dashboard/components/SellerProfileForm";
 export { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 export { SellerProfileView } from "@/features/dashboard/components/SellerProfileView";

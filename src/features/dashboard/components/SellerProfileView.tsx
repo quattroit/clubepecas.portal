@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { SellerProfileForm } from "@/features/dashboard/components/SellerProfileForm";
-import { ChangePasswordForm } from "@/features/dashboard/components/ChangePasswordForm";
+import { ChangePasswordDialog } from "@/features/dashboard/components/ChangePasswordDialog";
 import { SellerProfileSkeleton } from "@/features/dashboard/components/SellerProfileSkeleton";
 import type { SellerProfileFormValues } from "@/features/dashboard/schemas/sellerProfileFormSchema";
 import { useCreateSeller } from "@/hooks/api/useCreateSeller";
@@ -37,6 +37,7 @@ function SellerProfileView() {
   const updateMutation = useUpdateSeller();
   const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
   const [pendingCoverFile, setPendingCoverFile] = useState<File | null>(null);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const createDefaults = useMemo(() => {
     const document = currentUserQuery.data?.document?.trim();
@@ -152,8 +153,12 @@ function SellerProfileView() {
               updateMutation.isError ? updateMutation.error : undefined
             }
             onSubmit={handleUpdate}
+            onChangePassword={() => setChangePasswordOpen(true)}
           />
-          <ChangePasswordForm />
+          <ChangePasswordDialog
+            open={changePasswordOpen}
+            onOpenChange={setChangePasswordOpen}
+          />
         </>
       ) : null}
     </div>

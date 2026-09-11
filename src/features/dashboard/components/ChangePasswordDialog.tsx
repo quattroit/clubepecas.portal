@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -7,7 +8,14 @@ import { Loader2 } from "lucide-react";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { PasswordRequirements } from "@/components/auth/PasswordRequirements";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
@@ -17,16 +25,16 @@ import {
 } from "@/features/dashboard/schemas/changePasswordFormSchema";
 import { useChangePassword } from "@/hooks/api/useChangePassword";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
-import { cn } from "@/lib/utils";
 
-type ChangePasswordFormProps = {
-  className?: string;
+type ChangePasswordDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
-/**
- * Card de segurança — alteração de senha no perfil do vendedor.
- */
-function ChangePasswordForm({ className }: ChangePasswordFormProps) {
+function ChangePasswordDialog({
+  open,
+  onOpenChange,
+}: ChangePasswordDialogProps) {
   const changePasswordMutation = useChangePassword();
   const {
     register,
@@ -42,6 +50,18 @@ function ChangePasswordForm({ className }: ChangePasswordFormProps) {
 
   const busy = isSubmitting || changePasswordMutation.isPending;
   const newPasswordValue = watch("newPassword") ?? "";
+  const resetMutation = changePasswordMutation.reset;
+
+  useEffect(() => {
+    if (!open) return;
+    reset(changePasswordFormDefaultValues);
+    resetMutation();
+  }, [open, reset, resetMutation]);
+
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && busy) return;
+    onOpenChange(nextOpen);
+  }
 
   const onSubmit = handleSubmit((values) => {
     changePasswordMutation.mutate(
@@ -54,20 +74,22 @@ function ChangePasswordForm({ className }: ChangePasswordFormProps) {
         onSuccess: () => {
           reset(changePasswordFormDefaultValues);
           changePasswordMutation.reset();
+          onOpenChange(false);
         },
       },
     );
   });
 
   return (
-    <Card className={cn("w-full max-w-md", className)}>
-      <CardHeader>
-        <CardTitle className="text-h3">Segurança</CardTitle>
-        <p className="text-small text-muted-foreground">
-          Altere sua senha de acesso. Você precisará da senha atual.
-        </p>
-      </CardHeader>
-      <CardContent>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Alterar senha</DialogTitle>
+          <DialogDescription>
+            Informe a senha atual e a nova senha de acesso.
+          </DialogDescription>
+        </DialogHeader>
+
         <form
           className="flex flex-col gap-4"
           onSubmit={onSubmit}
@@ -81,9 +103,7 @@ function ChangePasswordForm({ className }: ChangePasswordFormProps) {
               autoComplete="current-password"
               aria-invalid={Boolean(errors.currentPassword)}
               aria-describedby={
-                errors.currentPassword
-                  ? "current-password-error"
-                  : undefined
+                errors.currentPassword ? "current-password-error" : undefined
               }
               disabled={busy}
               {...register("currentPassword")}
@@ -135,9 +155,7 @@ function ChangePasswordForm({ className }: ChangePasswordFormProps) {
               autoComplete="new-password"
               aria-invalid={Boolean(errors.confirmPassword)}
               aria-describedby={
-                errors.confirmPassword
-                  ? "confirm-password-error"
-                  : undefined
+                errors.confirmPassword ? "confirm-password-error" : undefined
               }
               disabled={busy}
               {...register("confirmPassword")}
@@ -160,27 +178,36 @@ function ChangePasswordForm({ className }: ChangePasswordFormProps) {
             />
           ) : null}
 
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-fit"
-            disabled={busy}
-            aria-busy={busy}
-          >
-            {busy ? (
-              <>
-                <Loader2 className="size-4 animate-spin" aria-hidden />
-                Alterando…
-              </>
-            ) : (
-              "Alterar senha"
-            )}
-          </Button>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={() => handleOpenChange(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={busy}
+              aria-busy={busy}
+            >
+              {busy ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                  Alterando…
+                </>
+              ) : (
+                "Alterar senha"
+              )}
+            </Button>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-export { ChangePasswordForm };
-export type { ChangePasswordFormProps };
+export { ChangePasswordDialog };
+export type { ChangePasswordDialogProps };
