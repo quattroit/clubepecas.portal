@@ -16,9 +16,7 @@ type SubscriptionActionsCardProps = {
   actions?: SubscriptionAvailableActionsDto | null;
   retryPaymentLabel?: string;
   onChoosePlan: () => void;
-  onUpgrade?: () => void;
-  onDowngrade?: () => void;
-  onChangeBillingCycle?: () => void;
+  onBrowsePlans?: () => void;
   onCancel: () => void;
   onReactivate?: () => void;
   onRetryPayment?: () => void;
@@ -36,9 +34,7 @@ function SubscriptionActionsCard({
   actions,
   retryPaymentLabel = "Reintentar pagamento",
   onChoosePlan,
-  onUpgrade,
-  onDowngrade,
-  onChangeBillingCycle,
+  onBrowsePlans,
   onCancel,
   onReactivate,
   onRetryPayment,
@@ -114,34 +110,14 @@ function SubscriptionActionsCard({
         ) : null}
 
         {canManagePlan ? (
-          <>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onUpgrade}
-              disabled={!actions?.canUpgrade || !onUpgrade}
-            >
-              Upgrade
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onDowngrade}
-              disabled={!actions?.canDowngrade || !onDowngrade}
-            >
-              Downgrade
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onChangeBillingCycle}
-              disabled={
-                !actions?.canChangeBillingCycle || !onChangeBillingCycle
-              }
-            >
-              Alterar ciclo
-            </Button>
-          </>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={onBrowsePlans}
+            disabled={!onBrowsePlans}
+          >
+            Planos disponíveis
+          </Button>
         ) : null}
 
         {canRetry ? (

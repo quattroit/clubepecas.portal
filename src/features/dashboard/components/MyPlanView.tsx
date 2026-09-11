@@ -6,9 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { ChoosePlanDialog } from "@/features/dashboard/components/ChoosePlanDialog";
-import { AvailablePlansCard } from "@/features/dashboard/components/subscription/AvailablePlansCard";
+import { AvailablePlansDialog } from "@/features/dashboard/components/subscription/AvailablePlansDialog";
 import { PaymentHistoryCard } from "@/features/dashboard/components/subscription/PaymentHistoryCard";
-import { SelectSubscriptionPlanPriceDialog } from "@/features/dashboard/components/subscription/SelectSubscriptionPlanPriceDialog";
 import { SubscriptionActionsCard } from "@/features/dashboard/components/subscription/SubscriptionActionsCard";
 import { SubscriptionFaqCard } from "@/features/dashboard/components/subscription/SubscriptionFaqCard";
 import { SubscriptionFinancialCard } from "@/features/dashboard/components/subscription/SubscriptionFinancialCard";
@@ -42,8 +41,6 @@ import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { AdminStatusBadge } from "@/components/admin";
 import { AdminCard } from "@/components/admin/AdminCard";
 
-type PlanPriceDialogMode = "upgrade" | "downgrade" | "change-cycle" | null;
-
 /**
  * Central de Gestão da Assinatura (Sprint 8.4 + 8.5).
  * Renderiza exclusivamente dados da API — sem regras de negócio no cliente.
@@ -62,18 +59,17 @@ function MyPlanView() {
 
   const [chooseOpen, setChooseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
-  const [planPriceMode, setPlanPriceMode] =
-    useState<PlanPriceDialogMode>(null);
+  const [availablePlansOpen, setAvailablePlansOpen] = useState(false);
   const checkoutSyncAttempted = useRef(false);
 
-  const closePlanPriceDialog = () => setPlanPriceMode(null);
+  const closeAvailablePlansDialog = () => setAvailablePlansOpen(false);
 
   const upgradeMutation = useUpgradeSellerSubscription({
-    onActivatedWithoutCheckout: closePlanPriceDialog,
+    onActivatedWithoutCheckout: closeAvailablePlansDialog,
   });
   const downgradeMutation = useDowngradeSellerSubscription();
   const changeCycleMutation = useChangeSellerSubscriptionBillingCycle({
-    onActivatedWithoutCheckout: closePlanPriceDialog,
+    onActivatedWithoutCheckout: closeAvailablePlansDialog,
   });
   const cancelRenewalMutation = useCancelSellerSubscriptionRenewal();
   const reactivateMutation = useReactivateSellerSubscription();
@@ -112,47 +108,10 @@ function MyPlanView() {
       ? "Pagar agora"
       : "Reintentar pagamento";
 
-  const upgradePlans =
-    subscription?.availablePlans.filter(
-      (plan) => plan.isUpgrade && plan.isAvailable,
-    ) ?? [];
-  const downgradePlans =
-    subscription?.availablePlans.filter(
-      (plan) => plan.isDowngrade && plan.isAvailable,
-    ) ?? [];
-  const changeCyclePlans =
-    subscription?.availablePlans.filter((plan) => plan.isCurrent) ?? [];
-
-  const planPriceDialogPlans =
-    planPriceMode === "upgrade"
-      ? upgradePlans
-      : planPriceMode === "downgrade"
-        ? downgradePlans
-        : planPriceMode === "change-cycle"
-          ? changeCyclePlans
-          : [];
-
   const selectionLoading =
     upgradeMutation.isPending ||
     downgradeMutation.isPending ||
     changeCycleMutation.isPending;
-
-  function handleSelectPrice(subscriptionPlanPriceId: number) {
-    if (planPriceMode === "upgrade") {
-      upgradeMutation.mutate({ subscriptionPlanPriceId });
-      return;
-    }
-    if (planPriceMode === "downgrade") {
-      downgradeMutation.mutate(
-        { subscriptionPlanPriceId },
-        { onSuccess: closePlanPriceDialog },
-      );
-      return;
-    }
-    if (planPriceMode === "change-cycle") {
-      changeCycleMutation.mutate({ subscriptionPlanPriceId });
-    }
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -255,9 +214,7 @@ function MyPlanView() {
             actions={subscription.actions}
             retryPaymentLabel={retryPaymentLabel}
             onChoosePlan={openChoosePlan}
-            onUpgrade={() => setPlanPriceMode("upgrade")}
-            onDowngrade={() => setPlanPriceMode("downgrade")}
-            onChangeBillingCycle={() => setPlanPriceMode("change-cycle")}
+            onBrowsePlans={() => setAvailablePlansOpen(true)}
             onCancel={() => setCancelOpen(true)}
             onReactivate={() => reactivateMutation.mutate()}
             onRetryPayment={() => retryPaymentMutation.mutate()}
@@ -268,29 +225,6 @@ function MyPlanView() {
             retryLoading={retryPaymentMutation.isPending}
             newChargeLoading={newChargeMutation.isPending}
             syncLoading={syncPaymentMutation.isPending}
-          />
-          <AvailablePlansCard
-            plans={subscription.availablePlans}
-            currentBillingCycle={subscription.billingCycle}
-            selectionLoading={selectionLoading}
-            onUpgradePrice={
-              subscription.actions.canUpgrade
-                ? (subscriptionPlanPriceId) =>
-                    upgradeMutation.mutate({ subscriptionPlanPriceId })
-                : undefined
-            }
-            onDowngradePrice={
-              subscription.actions.canDowngrade
-                ? (subscriptionPlanPriceId) =>
-                    downgradeMutation.mutate({ subscriptionPlanPriceId })
-                : undefined
-            }
-            onChangeCyclePrice={
-              subscription.actions.canChangeBillingCycle
-                ? (subscriptionPlanPriceId) =>
-                    changeCycleMutation.mutate({ subscriptionPlanPriceId })
-                : undefined
-            }
           />
         </>
       ) : null}
@@ -335,35 +269,36 @@ function MyPlanView() {
 
       <ChoosePlanDialog open={chooseOpen} onOpenChange={setChooseOpen} />
 
-      <SelectSubscriptionPlanPriceDialog
-        open={planPriceMode != null}
-        onOpenChange={(open) => {
-          if (!open) closePlanPriceDialog();
-        }}
-        title={
-          planPriceMode === "upgrade"
-            ? "Fazer upgrade"
-            : planPriceMode === "downgrade"
-              ? "Agendar downgrade"
-              : "Alterar ciclo de cobrança"
-        }
-        description={
-          planPriceMode === "upgrade"
-            ? "Escolha o plano e o ciclo de cobrança. Planos pagos abrem o checkout seguro."
-            : planPriceMode === "downgrade"
-              ? "O downgrade é agendado para o fim do período atual."
-              : "Selecione outro ciclo do seu plano atual."
-        }
-        action={planPriceMode ?? "upgrade"}
-        plans={planPriceDialogPlans}
-        excludeBillingCycle={
-          planPriceMode === "change-cycle"
-            ? subscription?.billingCycle
-            : null
-        }
-        loading={selectionLoading}
-        onConfirm={handleSelectPrice}
-      />
+      {subscription ? (
+        <AvailablePlansDialog
+          open={availablePlansOpen}
+          onOpenChange={setAvailablePlansOpen}
+          plans={subscription.availablePlans}
+          currentBillingCycle={subscription.billingCycle}
+          loading={selectionLoading}
+          onUpgradePrice={
+            subscription.actions.canUpgrade
+              ? (subscriptionPlanPriceId) =>
+                  upgradeMutation.mutate({ subscriptionPlanPriceId })
+              : undefined
+          }
+          onDowngradePrice={
+            subscription.actions.canDowngrade
+              ? (subscriptionPlanPriceId) =>
+                  downgradeMutation.mutate(
+                    { subscriptionPlanPriceId },
+                    { onSuccess: closeAvailablePlansDialog },
+                  )
+              : undefined
+          }
+          onChangeCyclePrice={
+            subscription.actions.canChangeBillingCycle
+              ? (subscriptionPlanPriceId) =>
+                  changeCycleMutation.mutate({ subscriptionPlanPriceId })
+              : undefined
+          }
+        />
+      ) : null}
 
       <ConfirmDialog
         open={cancelOpen}
