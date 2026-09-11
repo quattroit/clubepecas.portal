@@ -349,18 +349,12 @@ function MyPlanView() {
         }
         description={
           planPriceMode === "upgrade"
-            ? "Escolha o plano e o ciclo. Planos pagos abrem o checkout seguro."
+            ? "Escolha o plano e o ciclo de cobrança. Planos pagos abrem o checkout seguro."
             : planPriceMode === "downgrade"
               ? "O downgrade é agendado para o fim do período atual."
               : "Selecione outro ciclo do seu plano atual."
         }
-        confirmLabel={
-          planPriceMode === "upgrade"
-            ? "Confirmar upgrade"
-            : planPriceMode === "downgrade"
-              ? "Agendar downgrade"
-              : "Confirmar ciclo"
-        }
+        action={planPriceMode ?? "upgrade"}
         plans={planPriceDialogPlans}
         excludeBillingCycle={
           planPriceMode === "change-cycle"
