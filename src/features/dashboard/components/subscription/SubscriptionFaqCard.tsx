@@ -16,7 +16,7 @@ const FAQ_ITEMS = [
   {
     question: "Posso trocar de plano?",
     answer:
-      "Sim. Você pode fazer upgrade, downgrade ou alterar o ciclo de cobrança diretamente nesta página, conforme as opções disponíveis para a sua assinatura.",
+      "Sim. No upgrade, o novo limite vale assim que o pagamento for confirmado. Você paga só a diferença proporcional aos dias restantes do ciclo; a próxima cobrança recorrente já sai no valor cheio do plano novo. Downgrade é agendado para o fim do período atual.",
   },
   {
     question: "Quando meu plano começa?",

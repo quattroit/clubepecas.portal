@@ -13,6 +13,7 @@ import {
   formatPlanPrice,
 } from "@/features/plans/utils/plan-display";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type AvailablePlanPriceHandler = (
   subscriptionPlanPriceId: number,
@@ -142,6 +143,14 @@ function AvailablePlanPicker({
                       ? onUpgradePrice
                       : onDowngradePrice;
 
+                  const hasProration =
+                    showUpgrade &&
+                    cycle.immediateChargeAmount != null &&
+                    cycle.recurringAmountAfterChange != null;
+                  const priceLabel = hasProration
+                    ? `agora ${formatCurrency(cycle.immediateChargeAmount!)} · depois ${formatPlanPrice(cycle.recurringAmountAfterChange!, cycle.billingCycle)}`
+                    : formatPlanPrice(cycle.price, cycle.billingCycle);
+
                   return (
                     <Button
                       key={cycle.subscriptionPlanPriceId}
@@ -161,7 +170,7 @@ function AvailablePlanPicker({
                     >
                       {label}
                       {" · "}
-                      {formatPlanPrice(cycle.price, cycle.billingCycle)}
+                      {priceLabel}
                     </Button>
                   );
                 })}

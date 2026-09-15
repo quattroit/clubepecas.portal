@@ -135,6 +135,10 @@ export type SubscriptionAvailablePlanCycleDto = {
   savingsAmount?: number | null;
   savingsPercent?: number | null;
   isRecommended: boolean;
+  /** Valor cobrado agora no upgrade com pró-rata. */
+  immediateChargeAmount?: number | null;
+  /** Valor cheio da próxima recorrência após upgrade com pró-rata. */
+  recurringAmountAfterChange?: number | null;
 };
 
 export type SubscriptionAvailablePlanDto = {

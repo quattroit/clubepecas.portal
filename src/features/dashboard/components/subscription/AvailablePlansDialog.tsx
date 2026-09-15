@@ -46,8 +46,9 @@ function AvailablePlansDialog({
         <DialogHeader>
           <DialogTitle>Planos disponíveis</DialogTitle>
           <DialogDescription>
-            Escolha um plano e o ciclo de cobrança. Planos pagos abrem o
-            checkout seguro.
+            No upgrade, você paga só a diferença proporcional aos dias
+            restantes. A próxima cobrança recorrente já sai no valor cheio do
+            novo plano.
           </DialogDescription>
         </DialogHeader>
 
