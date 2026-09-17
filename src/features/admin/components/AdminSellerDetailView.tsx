@@ -40,6 +40,7 @@ import type {
 } from "@/contracts/admin/sellers";
 import { AdvertisementStatus } from "@/contracts/common/enums";
 import { useAdminSeller } from "@/hooks/api/useAdminSeller";
+import { useConfigureAdminSellerDemo } from "@/hooks/api/useConfigureAdminSellerDemo";
 import { useUpdateAdminSellerRepresentative } from "@/hooks/api/useUpdateAdminSellerRepresentative";
 import { useUpdateAdminSellerStatus } from "@/hooks/api/useUpdateAdminSellerStatus";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
@@ -62,6 +63,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const PERIOD_OPTIONS: { value: MetricsPeriodParam; label: string }[] = [
   { value: "7d", label: "7 dias" },
@@ -120,11 +122,53 @@ function AdminSellerDetailView() {
   const sellerQuery = useAdminSeller(sellerId ?? 0, period);
   const updateStatus = useUpdateAdminSellerStatus();
   const updateRepresentative = useUpdateAdminSellerRepresentative();
+  const configureDemo = useConfigureAdminSellerDemo();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [repCodeDraft, setRepCodeDraft] = useState("");
   const [repDialogOpen, setRepDialogOpen] = useState(false);
+  const [demoDialogOpen, setDemoDialogOpen] = useState(false);
+  const [demoEndDate, setDemoEndDate] = useState("");
+  const [demoLimit, setDemoLimit] = useState("30");
 
   const data = sellerQuery.data;
+
+  const openDemoDialog = () => {
+    const end = data?.demo?.endDateUtc
+      ? new Date(data.demo.endDateUtc)
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const yyyy = end.getUTCFullYear();
+    const mm = String(end.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(end.getUTCDate()).padStart(2, "0");
+    setDemoEndDate(`${yyyy}-${mm}-${dd}`);
+    setDemoLimit(
+      String(
+        data?.demo?.advertisementLimitOverride ??
+          data?.demo?.advertisementLimit ??
+          30,
+      ),
+    );
+    setDemoDialogOpen(true);
+  };
+
+  const submitDemo = () => {
+    if (!sellerId) return;
+    const limit = Number.parseInt(demoLimit, 10);
+    if (!demoEndDate || Number.isNaN(limit) || limit < 0) {
+      toast.error("Informe uma data futura e um limite válido (0 = ilimitado).");
+      return;
+    }
+    const endDateUtc = new Date(`${demoEndDate}T23:59:59.000Z`).toISOString();
+    configureDemo.mutate(
+      {
+        id: sellerId,
+        endDateUtc,
+        advertisementLimit: limit,
+      },
+      {
+        onSuccess: () => setDemoDialogOpen(false),
+      },
+    );
+  };
 
   const setPeriod = (next: MetricsPeriodParam) => {
     if (!sellerId) return;
@@ -545,6 +589,82 @@ function AdminSellerDetailView() {
           ) : null}
         </AdminSection>
 
+        <AdminSection title="Demonstração">
+          {sellerQuery.isLoading ? (
+            <AdminCard>
+              <div className="bg-muted h-24 animate-pulse rounded-lg" />
+            </AdminCard>
+          ) : data ? (
+            <AdminCard>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <dl className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-muted-foreground text-xs">Situação</dt>
+                    <dd className="text-sm font-medium">
+                      {data.demo?.isDemo
+                        ? "Plano demonstração ativo"
+                        : data.demo
+                          ? "Plano pago / outro"
+                          : "Sem assinatura"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">Plano</dt>
+                    <dd className="text-sm">
+                      {data.demo?.planName ?? data.planLabel}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">
+                      Término da demonstração
+                    </dt>
+                    <dd className="text-sm tabular-nums">
+                      {formatDateTime(data.demo?.endDateUtc ?? null)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground text-xs">
+                      Limite de anúncios
+                    </dt>
+                    <dd className="text-sm tabular-nums">
+                      {data.demo == null
+                        ? "—"
+                        : data.demo.advertisementLimit <= 0
+                          ? "Ilimitado"
+                          : data.demo.advertisementLimit}
+                      {data.demo?.advertisementLimitOverride != null
+                        ? " (personalizado)"
+                        : null}
+                    </dd>
+                  </div>
+                </dl>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={openDemoDialog}
+                  disabled={
+                    Boolean(data.demo) &&
+                    !data.demo?.isDemo &&
+                    data.financial?.subscriptionStatus === 1
+                  }
+                >
+                  {data.demo?.isDemo
+                    ? "Ajustar demonstração"
+                    : "Ativar demonstração"}
+                </Button>
+              </div>
+              {Boolean(data.demo) &&
+              !data.demo?.isDemo &&
+              data.financial?.subscriptionStatus === 1 ? (
+                <p className="text-muted-foreground mt-3 text-xs">
+                  Não é possível aplicar demonstração enquanto houver plano pago
+                  ativo.
+                </p>
+              ) : null}
+            </AdminCard>
+          ) : null}
+        </AdminSection>
+
         <AdminSection title="Dados da loja">
           {sellerQuery.isLoading ? (
             <AdminCard>
@@ -688,6 +808,63 @@ function AdminSellerDetailView() {
                   { onSuccess: () => setRepDialogOpen(false) },
                 );
               }}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={demoDialogOpen} onOpenChange={setDemoDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {data?.demo?.isDemo
+                ? "Ajustar demonstração"
+                : "Ativar demonstração"}
+            </DialogTitle>
+            <DialogDescription>
+              Defina a data de término e o limite de anúncios para este
+              vendedor. Use 0 para anúncios ilimitados.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="admin-seller-demo-end">Data de término</Label>
+              <Input
+                id="admin-seller-demo-end"
+                type="date"
+                value={demoEndDate}
+                onChange={(event) => setDemoEndDate(event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="admin-seller-demo-limit">
+                Limite de anúncios
+              </Label>
+              <Input
+                id="admin-seller-demo-limit"
+                type="number"
+                min={0}
+                value={demoLimit}
+                onChange={(event) => setDemoLimit(event.target.value)}
+              />
+            </div>
+            {configureDemo.isError ? (
+              <p className="text-destructive text-xs">
+                {getFriendlyErrorMessage(configureDemo.error)}
+              </p>
+            ) : null}
+          </div>
+          <DialogFooter>
+            <DialogClose render={<Button type="button" variant="outline" />}>
+              Cancelar
+            </DialogClose>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={configureDemo.isPending || !data}
+              onClick={submitDemo}
             >
               Salvar
             </Button>

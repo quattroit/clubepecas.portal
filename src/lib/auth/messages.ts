@@ -142,6 +142,17 @@ const CODE_MESSAGES: Record<string, string> = {
     "Informe uma ordem de exibição válida (zero ou maior).",
   "admin.subscription_plans.in_use":
     "Este plano não pode ser excluído pois está em uso.",
+  "admin.seller.not_found": "Vendedor não encontrado.",
+  "admin.seller.demo.end_date_invalid":
+    "A data de término da demonstração deve ser futura.",
+  "admin.seller.demo.limit_invalid":
+    "O limite de anúncios deve ser zero ou maior.",
+  "admin.seller.demo.plan_missing":
+    "Nenhum plano de demonstração ativo encontrado.",
+  "admin.seller.demo.paid_plan_active":
+    "O vendedor possui um plano pago ativo.",
+  "admin.seller.demo.checkout_pending":
+    "Há um checkout pendente. Conclua ou cancele antes de configurar a demonstração.",
   "admin.subscription_plans.prices.required":
     "Adicione ao menos um ciclo de cobrança.",
   "admin.subscription_plans.prices.price.invalid":

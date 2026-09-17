@@ -91,6 +91,8 @@ import type {
   AdminSellersListResponse,
   UpdateAdminSellerRepresentativeRequest,
   UpdateAdminSellerRepresentativeResponse,
+  ConfigureAdminSellerDemoRequest,
+  ConfigureAdminSellerDemoResponse,
   UpdateAdminSellerStatusRequest,
   UpdateAdminSellerStatusResponse,
 } from "@/contracts/admin/sellers";
@@ -167,6 +169,15 @@ export const adminService = {
     return api
       .put<UpdateAdminSellerStatusResponse>(
         `/api/v1/admin/sellers/${id}/status`,
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  configureSellerDemo(id: number, payload: ConfigureAdminSellerDemoRequest) {
+    return api
+      .put<ConfigureAdminSellerDemoResponse>(
+        `/api/v1/admin/sellers/${id}/demo`,
         payload,
       )
       .then((response) => response.data);

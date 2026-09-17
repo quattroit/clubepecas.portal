@@ -114,6 +114,7 @@ export type AdminSellerDetailResponse = {
   conversionRate: number | null;
   advertisements: AdminSellerAdvertisementDto[];
   financial?: AdminSellerFinancialInfoDto | null;
+  demo?: AdminSellerDemoInfoDto | null;
 };
 
 export type AdminSellerFinancialInfoDto = {
@@ -122,6 +123,14 @@ export type AdminSellerFinancialInfoDto = {
   externalSubscriptionId?: string | null;
   subscriptionStatus?: number | null;
   currentPaymentStatus?: number | null;
+};
+
+export type AdminSellerDemoInfoDto = {
+  isDemo: boolean;
+  planName?: string | null;
+  endDateUtc?: string | null;
+  advertisementLimit: number;
+  advertisementLimitOverride?: number | null;
 };
 
 export type AdminSellerAdvertisementDto = {
@@ -158,4 +167,20 @@ export type UpdateAdminSellerRepresentativeResponse = {
   representativeCode: string | null;
   representativeName: string | null;
   representativeStatus: number | null;
+};
+
+export type ConfigureAdminSellerDemoRequest = {
+  endDateUtc: string;
+  advertisementLimit: number;
+};
+
+export type ConfigureAdminSellerDemoResponse = {
+  sellerId: number;
+  subscriptionId: number;
+  planName: string;
+  isDemo: boolean;
+  endDateUtc: string;
+  advertisementLimit: number;
+  advertisementLimitOverride?: number | null;
+  created: boolean;
 };
