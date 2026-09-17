@@ -103,7 +103,10 @@ function AdvertisementDetailPageView() {
               slug={advertisement.slug ?? slug ?? ""}
             />
           ) : null}
-          <ShareButtons />
+          <ShareButtons
+            title={advertisement.title}
+            slug={advertisement.slug ?? slug ?? ""}
+          />
         </div>
       </div>
 
