@@ -288,7 +288,7 @@ function Sidebar() {
           Navegação
         </p>
         <nav aria-label="Área autenticada">
-          <ul className="flex flex-row flex-wrap gap-2 md:flex-col md:gap-1">
+          <ul className="flex flex-col gap-1">
             {SELLER_NAV.map((entry) => {
               if (entry.type === "group") {
                 return (
@@ -308,7 +308,7 @@ function Sidebar() {
                 (item.requiresPlan && !hasPlan);
 
               return (
-                <li key={item.href}>
+                <li key={item.href} className="w-full">
                   <NavLink
                     item={item}
                     pathname={pathname}
