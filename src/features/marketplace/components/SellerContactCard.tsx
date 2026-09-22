@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { MessageCircle, Store, Truck } from "lucide-react";
 
+import { RemoteImage } from "@/components/media/RemoteImage";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { storePath } from "@/constants/routes";
@@ -41,6 +42,7 @@ function SellerContactCard({
     city,
     advertisementCount,
     avatarUrl,
+    coverUrl,
     slug,
     whatsApp,
     offersLocalDelivery,
@@ -88,19 +90,36 @@ function SellerContactCard({
 
   return (
     <>
-      <Card className={cn("shadow-sm", className)}>
-        <CardHeader>
+      <Card className={cn("relative overflow-hidden shadow-sm", className)}>
+        {coverUrl ? (
+          <div
+            className="pointer-events-none absolute inset-0"
+            aria-hidden
+          >
+            <RemoteImage
+              src={coverUrl}
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 100vw, 24rem"
+              className="object-cover object-right"
+            />
+            <div className="absolute inset-0 bg-linear-to-r from-card from-45% via-card/35 via-58% to-transparent" />
+          </div>
+        ) : null}
+
+        <CardHeader className="relative z-10">
           <CardTitle className="text-h3">Vendedor</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-5">
+        <CardContent className="relative z-10 flex flex-col gap-5">
           <div className="flex items-center gap-3.5">
-            <div className="bg-secondary text-store flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl">
+            <div className="bg-secondary text-store relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl">
               {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- avatar remoto do vendedor
-                <img
+                <RemoteImage
                   src={avatarUrl}
                   alt={`Logo de ${name}`}
-                  className="size-full object-cover"
+                  fill
+                  sizes="48px"
+                  className="object-cover"
                 />
               ) : (
                 <Store className="size-6" aria-hidden />

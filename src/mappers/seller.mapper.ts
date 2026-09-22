@@ -26,6 +26,8 @@ export function mapPublicSellerDtoToSeller(
     city: dto.city,
     state: dto.state,
     advertisementCount: dto.advertisementCount ?? 0,
+    avatarUrl: resolveSellerPhotoUrl(dto.photoUrl),
+    coverUrl: resolveSellerPhotoUrl(dto.coverUrl),
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),

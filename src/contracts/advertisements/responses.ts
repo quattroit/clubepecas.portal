@@ -75,6 +75,8 @@ export type PublicAdvertisementSellerDto = {
   whatsApp: string;
   instagram: string | null;
   slug: string;
+  photoUrl?: string | null;
+  coverUrl?: string | null;
   advertisementCount: number;
   offersLocalDelivery?: boolean;
   localDeliveryMaxRadiusKm?: number | null;
