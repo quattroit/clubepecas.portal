@@ -127,15 +127,6 @@ function HomePageView() {
   const allCategories = categoriesQuery.data ?? [];
   const categories = allCategories
     .filter((category) => category.parentId == null)
-    .map((root) => {
-      const childrenAds = allCategories
-        .filter((category) => category.parentId === root.id)
-        .reduce((sum, category) => sum + category.advertisementCount, 0);
-      return {
-        ...root,
-        advertisementCount: root.advertisementCount + childrenAds,
-      };
-    })
     .sort((a, b) => b.advertisementCount - a.advertisementCount)
     .slice(0, HOME_CATEGORIES_LIMIT);
 
