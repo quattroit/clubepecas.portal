@@ -12,6 +12,7 @@ export type CreateSellerRequest = {
   whatsApp: string;
   instagram?: string | null;
   photoUrl?: string | null;
+  specialtyIds?: number[];
 };
 
 export type UpdateSellerRequest = {
@@ -28,4 +29,5 @@ export type UpdateSellerRequest = {
   whatsApp: string;
   instagram?: string | null;
   photoUrl?: string | null;
+  specialtyIds?: number[];
 };

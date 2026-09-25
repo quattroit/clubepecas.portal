@@ -38,4 +38,12 @@ export type Seller = {
   localDeliveryMaxRadiusKm?: number | null;
   /** True se o vendedor já ativou algum plano demonstração. */
   demoAlreadyUsed?: boolean;
+  specialtyIds?: number[];
+  specialties?: SellerSpecialty[];
+};
+
+export type SellerSpecialty = {
+  id: number;
+  name: string;
+  slug: string;
 };

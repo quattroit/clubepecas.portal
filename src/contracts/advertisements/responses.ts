@@ -77,6 +77,10 @@ export type PublicAdvertisementSellerDto = {
   slug: string;
   photoUrl?: string | null;
   coverUrl?: string | null;
+  street?: string | null;
+  number?: string | null;
+  complement?: string | null;
+  neighborhood?: string | null;
   advertisementCount: number;
   offersLocalDelivery?: boolean;
   localDeliveryMaxRadiusKm?: number | null;

@@ -22,6 +22,29 @@ export function getChildCategories<T extends WithParentId>(
   return categories.filter((category) => category.parentId === parentId);
 }
 
+const byDisplayOrderThenName = <T extends WithParentId>(a: T, b: T) => {
+  const orderA = a.displayOrder ?? 0;
+  const orderB = b.displayOrder ?? 0;
+  if (orderA !== orderB) return orderA - orderB;
+  return (a.name ?? "").localeCompare(b.name ?? "", "pt-BR");
+};
+
+/**
+ * Subcategoria padrão ao escolher a raiz: prefere "Geral", senão a primeira
+ * por `displayOrder` / nome.
+ */
+export function pickDefaultChildCategory<T extends WithParentId>(
+  children: T[],
+): T | undefined {
+  if (children.length === 0) return undefined;
+
+  const sorted = [...children].sort(byDisplayOrderThenName);
+  const geral = sorted.find(
+    (category) => (category.name ?? "").trim().toLowerCase() === "geral",
+  );
+  return geral ?? sorted[0];
+}
+
 /** Resolve a raiz a partir de qualquer nó (próprio id se já for raiz). */
 export function resolveRootCategory<T extends WithParentId>(
   categories: T[],
@@ -40,26 +63,21 @@ export function resolveRootCategory<T extends WithParentId>(
 export function sortCategoriesHierarchically<T extends WithParentId>(
   categories: T[],
 ): T[] {
-  const byOrder = (a: T, b: T) => {
-    const orderA = a.displayOrder ?? 0;
-    const orderB = b.displayOrder ?? 0;
-    if (orderA !== orderB) return orderA - orderB;
-    return (a.name ?? "").localeCompare(b.name ?? "", "pt-BR");
-  };
-
-  const roots = getRootCategories(categories).sort(byOrder);
+  const roots = getRootCategories(categories).sort(byDisplayOrderThenName);
   const result: T[] = [];
 
   for (const root of roots) {
     result.push(root);
-    result.push(...getChildCategories(categories, root.id).sort(byOrder));
+    result.push(
+      ...getChildCategories(categories, root.id).sort(byDisplayOrderThenName),
+    );
   }
 
   // Órfãos (pai inexistente) no final, para não sumirem da listagem.
   const listedIds = new Set(result.map((item) => item.id));
   const orphans = categories
     .filter((item) => !listedIds.has(item.id))
-    .sort(byOrder);
+    .sort(byDisplayOrderThenName);
   result.push(...orphans);
 
   return result;

@@ -61,6 +61,9 @@ export const queryKeys = {
   vehicleBrands: {
     all: ["vehicleBrands"] as const,
   },
+  specialties: {
+    all: ["specialties"] as const,
+  },
   vehicleModels: {
     all: ["vehicleModels"] as const,
     list: (params: Record<string, unknown>) =>
@@ -142,6 +145,11 @@ export const queryKeys = {
       all: ["admin", "vehicleBrands"] as const,
       list: (params: Record<string, unknown>) =>
         ["admin", "vehicleBrands", "list", params] as const,
+    },
+    specialties: {
+      all: ["admin", "specialties"] as const,
+      list: (params: Record<string, unknown>) =>
+        ["admin", "specialties", "list", params] as const,
     },
     vehicleModels: {
       all: ["admin", "vehicleModels"] as const,

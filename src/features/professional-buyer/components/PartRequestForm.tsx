@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 
 import { ErrorMessage } from "@/components/feedback/ErrorMessage";
 import { CityCombobox } from "@/components/ui/city-combobox";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchableCombobox } from "@/components/ui/searchable-combobox";
 import { Textarea } from "@/components/ui/textarea";
 import { VehicleRequirement } from "@/contracts/common/enums";
 import {
@@ -25,6 +26,7 @@ import {
   type PartRequestFormValues,
 } from "@/features/professional-buyer/schemas/partRequestFormSchema";
 import { useCities } from "@/hooks/api/useCities";
+import { useSpecialties } from "@/hooks/api/useSpecialties";
 import { useVehicleModels } from "@/hooks/api/useVehicleModels";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
@@ -33,6 +35,7 @@ import type { VehicleBrand } from "@/types/VehicleBrand";
 import {
   getChildCategories,
   getRootCategories,
+  pickDefaultChildCategory,
   resolveRootCategory,
 } from "@/utils/category-hierarchy";
 import { listVehicleYears } from "@/utils/vehicle-years";
@@ -75,6 +78,11 @@ function PartRequestForm({
   const vehicleYears = listVehicleYears();
   const citiesQuery = useCities();
   const cities = useMemo(() => citiesQuery.data ?? [], [citiesQuery.data]);
+  const specialtiesQuery = useSpecialties();
+  const specialties = specialtiesQuery.data ?? [];
+  const [pendingSpecialtyId, setPendingSpecialtyId] = useState<string | null>(
+    null,
+  );
 
   const allowedRootCategories = useMemo(
     () =>
@@ -110,6 +118,8 @@ function PartRequestForm({
       ...defaultValues,
     },
   });
+
+  const specialtyIds = useWatch({ control, name: "specialtyIds" }) ?? [];
 
   const titleValue = watch("title") ?? "";
   const descriptionValue = watch("description") ?? "";
@@ -193,7 +203,27 @@ function PartRequestForm({
     }
 
     reset(merged);
+    setPendingSpecialtyId(null);
   }, [defaultValues, categories, reset]);
+
+  const selectedSpecialties = useMemo(
+    () =>
+      specialtyIds
+        .map((id) => specialties.find((item) => item.id === id))
+        .filter((item): item is (typeof specialties)[number] => Boolean(item)),
+    [specialtyIds, specialties],
+  );
+
+  const availableSpecialtyOptions = useMemo(
+    () =>
+      specialties
+        .filter((item) => !specialtyIds.includes(item.id))
+        .map((item) => ({
+          id: String(item.id),
+          label: item.name,
+        })),
+    [specialties, specialtyIds],
+  );
 
   const clearVehicleFields = () => {
     setValue("vehicleBrandId", "", { shouldValidate: false });
@@ -284,8 +314,17 @@ function PartRequestForm({
             }
             disabled={isSubmitting || categoriesLoading}
             {...register("rootCategoryId", {
-              onChange: () => {
-                setValue("categoryId", 0, { shouldValidate: false });
+              onChange: (event) => {
+                const rootId = Number(event.target.value);
+                const defaultChild =
+                  rootId > 0
+                    ? pickDefaultChildCategory(
+                        getChildCategories(categories, rootId),
+                      )
+                    : undefined;
+                setValue("categoryId", defaultChild?.id ?? 0, {
+                  shouldValidate: false,
+                });
                 clearErrors("categoryId");
                 clearVehicleFields();
               },
@@ -366,6 +405,140 @@ function PartRequestForm({
             </p>
           ) : null}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-end justify-between gap-3">
+          <Label htmlFor="pr-specialty">Especialidades</Label>
+          <span
+            className="text-muted-foreground text-xs tabular-nums"
+            aria-live="polite"
+          >
+            {specialtyIds.length}/3
+          </span>
+        </div>
+
+        <Controller
+          control={control}
+          name="specialtyIds"
+          render={({ field }) => {
+            const selected = field.value ?? [];
+            const atLimit = selected.length >= 3;
+            const canAdd =
+              Boolean(pendingSpecialtyId) &&
+              !atLimit &&
+              !isSubmitting &&
+              !specialtiesQuery.isLoading;
+
+            const handleAdd = () => {
+              if (!pendingSpecialtyId) return;
+              const nextId = Number(pendingSpecialtyId);
+              if (!Number.isInteger(nextId) || nextId <= 0) return;
+              if (selected.includes(nextId) || selected.length >= 3) return;
+              field.onChange([...selected, nextId]);
+              setPendingSpecialtyId(null);
+            };
+
+            return (
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                  <div className="min-w-0 flex-1">
+                    <SearchableCombobox
+                      id="pr-specialty"
+                      options={availableSpecialtyOptions}
+                      value={pendingSpecialtyId}
+                      disabled={
+                        isSubmitting ||
+                        specialtiesQuery.isLoading ||
+                        atLimit ||
+                        availableSpecialtyOptions.length === 0
+                      }
+                      invalid={Boolean(errors.specialtyIds)}
+                      placeholder={
+                        specialtiesQuery.isLoading
+                          ? "Carregando…"
+                          : atLimit
+                            ? "Limite de 3 especialidades"
+                            : availableSpecialtyOptions.length === 0
+                              ? "Todas já foram adicionadas"
+                              : "Selecione uma especialidade"
+                      }
+                      clearLabel="Limpar especialidade"
+                      triggerLabel="Abrir lista de especialidades"
+                      emptyMessage="Nenhuma especialidade encontrada."
+                      showOptionsWhenEmpty
+                      maxResults={50}
+                      aria-describedby={
+                        errors.specialtyIds
+                          ? "pr-specialties-error"
+                          : "pr-specialties-hint"
+                      }
+                      onChange={setPendingSpecialtyId}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant={canAdd ? "primary" : "outline"}
+                    className="sm:w-auto"
+                    disabled={!canAdd}
+                    onClick={handleAdd}
+                  >
+                    <Plus className="size-4" aria-hidden />
+                    Adicionar
+                  </Button>
+                </div>
+
+                {selectedSpecialties.length > 0 ? (
+                  <ul
+                    className="flex flex-col gap-2"
+                    aria-label="Especialidades selecionadas"
+                  >
+                    {selectedSpecialties.map((specialty) => (
+                      <li
+                        key={specialty.id}
+                        className="border-border bg-surface flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5"
+                      >
+                        <span className="min-w-0 truncate text-sm font-medium">
+                          {specialty.name}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0"
+                          disabled={isSubmitting}
+                          aria-label={`Remover ${specialty.name}`}
+                          onClick={() => {
+                            field.onChange(
+                              selected.filter((id) => id !== specialty.id),
+                            );
+                          }}
+                        >
+                          <X className="size-4" aria-hidden />
+                          Remover
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            );
+          }}
+        />
+
+        <p id="pr-specialties-hint" className="text-muted-foreground text-xs">
+          Obrigatório — selecione até 3 especialidades para filtrar fornecedores
+          compatíveis.
+        </p>
+        {errors.specialtyIds ? (
+          <p
+            id="pr-specialties-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            {errors.specialtyIds.message}
+          </p>
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

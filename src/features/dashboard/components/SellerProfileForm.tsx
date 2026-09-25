@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { Controller, useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -21,6 +21,7 @@ import {
   type SellerProfileFormValues,
 } from "@/features/dashboard/schemas/sellerProfileFormSchema";
 import { useCities } from "@/hooks/api/useCities";
+import { useSpecialties } from "@/hooks/api/useSpecialties";
 import { useViaCepLookup } from "@/hooks/api/useViaCepLookup";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
@@ -76,6 +77,8 @@ function SellerProfileForm({
 }: SellerProfileFormProps) {
   const citiesQuery = useCities();
   const cities = citiesQuery.data ?? [];
+  const specialtiesQuery = useSpecialties();
+  const specialties = specialtiesQuery.data ?? [];
 
   const {
     register,
@@ -99,11 +102,15 @@ function SellerProfileForm({
   const coverUrl = useWatch({ control, name: "coverUrl" }) ?? "";
   const cityId = useWatch({ control, name: "cityId" }) ?? 0;
   const zipCode = useWatch({ control, name: "zipCode" }) ?? "";
+  const specialtyIds = useWatch({ control, name: "specialtyIds" }) ?? [];
 
   const viaCepQuery = useViaCepLookup(zipCode, !isSubmitting);
   const lastAutofilledCep = useRef<string | null>(null);
 
   const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [pendingSpecialtyId, setPendingSpecialtyId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const digits = normalizePostalCode(zipCode);
@@ -133,6 +140,7 @@ function SellerProfileForm({
       ...sellerProfileFormDefaultValues,
       ...defaultValues,
     });
+    setPendingSpecialtyId(null);
 
     const nextCityId = defaultValues?.cityId ?? 0;
     if (!nextCityId || nextCityId <= 0) {
@@ -165,6 +173,25 @@ function SellerProfileForm({
         label: `${city.name} — ${city.state}`,
       }));
   }, [cities, selectedState]);
+
+  const selectedSpecialties = useMemo(
+    () =>
+      specialtyIds
+        .map((id) => specialties.find((item) => item.id === id))
+        .filter((item): item is (typeof specialties)[number] => Boolean(item)),
+    [specialtyIds, specialties],
+  );
+
+  const availableSpecialtyOptions = useMemo(
+    () =>
+      specialties
+        .filter((item) => !specialtyIds.includes(item.id))
+        .map((item) => ({
+          id: String(item.id),
+          label: item.name,
+        })),
+    [specialties, specialtyIds],
+  );
 
   const submit = handleSubmit((values) => {
     if (isSubmitting) return;
@@ -516,6 +543,139 @@ function SellerProfileForm({
             </p>
           ) : null}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-end justify-between gap-3">
+          <Label htmlFor="seller-specialty">Especialidades</Label>
+          <span
+            className="text-muted-foreground text-xs tabular-nums"
+            aria-live="polite"
+          >
+            {specialtyIds.length}/3
+          </span>
+        </div>
+
+        <Controller
+          control={control}
+          name="specialtyIds"
+          render={({ field }) => {
+            const selected = field.value ?? [];
+            const atLimit = selected.length >= 3;
+            const canAdd =
+              Boolean(pendingSpecialtyId) &&
+              !atLimit &&
+              !isSubmitting &&
+              !specialtiesQuery.isLoading;
+
+            const handleAdd = () => {
+              if (!pendingSpecialtyId) return;
+              const nextId = Number(pendingSpecialtyId);
+              if (!Number.isInteger(nextId) || nextId <= 0) return;
+              if (selected.includes(nextId) || selected.length >= 3) return;
+              field.onChange([...selected, nextId]);
+              setPendingSpecialtyId(null);
+            };
+
+            return (
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                  <div className="min-w-0 flex-1">
+                    <SearchableCombobox
+                      id="seller-specialty"
+                      options={availableSpecialtyOptions}
+                      value={pendingSpecialtyId}
+                      disabled={
+                        isSubmitting ||
+                        specialtiesQuery.isLoading ||
+                        atLimit ||
+                        availableSpecialtyOptions.length === 0
+                      }
+                      invalid={Boolean(errors.specialtyIds)}
+                      placeholder={
+                        specialtiesQuery.isLoading
+                          ? "Carregando…"
+                          : atLimit
+                            ? "Limite de 3 especialidades"
+                            : availableSpecialtyOptions.length === 0
+                              ? "Todas já foram adicionadas"
+                              : "Selecione uma especialidade"
+                      }
+                      clearLabel="Limpar especialidade"
+                      triggerLabel="Abrir lista de especialidades"
+                      emptyMessage="Nenhuma especialidade encontrada."
+                      showOptionsWhenEmpty
+                      maxResults={50}
+                      aria-describedby={
+                        errors.specialtyIds
+                          ? "seller-specialties-error"
+                          : "seller-specialties-hint"
+                      }
+                      onChange={setPendingSpecialtyId}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant={canAdd ? "primary" : "outline"}
+                    className="sm:w-auto"
+                    disabled={!canAdd}
+                    onClick={handleAdd}
+                  >
+                    <Plus className="size-4" aria-hidden />
+                    Adicionar
+                  </Button>
+                </div>
+
+                {selectedSpecialties.length > 0 ? (
+                  <ul className="flex flex-col gap-2" aria-label="Especialidades selecionadas">
+                    {selectedSpecialties.map((specialty) => (
+                      <li
+                        key={specialty.id}
+                        className="border-border bg-surface flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5"
+                      >
+                        <span className="min-w-0 truncate text-sm font-medium">
+                          {specialty.name}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0"
+                          disabled={isSubmitting}
+                          aria-label={`Remover ${specialty.name}`}
+                          onClick={() => {
+                            field.onChange(
+                              selected.filter((id) => id !== specialty.id),
+                            );
+                          }}
+                        >
+                          <X className="size-4" aria-hidden />
+                          Remover
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            );
+          }}
+        />
+
+        <p
+          id="seller-specialties-hint"
+          className="text-muted-foreground text-xs"
+        >
+          Obrigatório — selecione e adicione de 1 a 3 especialidades.
+        </p>
+        {errors.specialtyIds ? (
+          <p
+            id="seller-specialties-error"
+            className="text-destructive text-xs"
+            role="alert"
+          >
+            {errors.specialtyIds.message}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">

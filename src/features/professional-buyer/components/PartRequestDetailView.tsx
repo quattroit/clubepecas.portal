@@ -212,7 +212,28 @@ function PartRequestDetailView() {
       {data ? (
         <section className="border-border bg-surface rounded-2xl border p-5 shadow-xs sm:p-6">
           <dl className="grid gap-5 sm:grid-cols-2">
-            <DetailField label="Categoria" value={data.categoryName} />
+            <DetailField
+              label="Categoria"
+              value={
+                data.parentCategoryName?.trim() || data.categoryName || "—"
+              }
+            />
+            <DetailField
+              label="Subcategoria"
+              value={
+                data.parentCategoryName?.trim()
+                  ? data.categoryName || "—"
+                  : "—"
+              }
+            />
+            <DetailField
+              label="Especialidades"
+              value={
+                data.specialties?.length
+                  ? data.specialties.map((item) => item.name).join(", ")
+                  : "—"
+              }
+            />
             <DetailField
               label="Quantidade"
               value={String(data.requestedQuantity)}

@@ -19,6 +19,7 @@ import {
   buildStoreWhatsAppMessage,
   buildWhatsAppUrl,
 } from "@/utils/whatsapp";
+import { formatSellerAddress } from "@/utils/formatSellerAddress";
 
 type SellerCardProps = {
   seller: Seller;
@@ -30,6 +31,10 @@ function SellerCard({ seller, className }: SellerCardProps) {
     name,
     city,
     state,
+    street,
+    number,
+    complement,
+    neighborhood,
     advertisementCount,
     avatarUrl,
     coverUrl,
@@ -39,7 +44,15 @@ function SellerCard({ seller, className }: SellerCardProps) {
   } = seller;
   const adsLabel =
     advertisementCount === 1 ? "1 anúncio" : `${advertisementCount} anúncios`;
-  const location = state ? `${city}, ${state}` : city;
+  const location =
+    formatSellerAddress({
+      street,
+      number,
+      complement,
+      neighborhood,
+      city,
+      state,
+    }) ?? (state ? `${city}, ${state}` : city);
 
   const contactHref = whatsApp?.trim()
     ? buildWhatsAppUrl(whatsApp, buildStoreWhatsAppMessage())
@@ -97,9 +110,9 @@ function SellerCard({ seller, className }: SellerCardProps) {
 
           <div className="min-w-0 flex-1">
             <h3 className="truncate text-sm font-semibold">{name}</h3>
-            <p className="text-small flex items-center gap-1 text-xs">
-              <MapPin className="text-location size-3 shrink-0" aria-hidden />
-              {location}
+            <p className="text-small flex items-start gap-1 text-xs">
+              <MapPin className="text-location mt-0.5 size-3 shrink-0" aria-hidden />
+              <span className="line-clamp-2">{location}</span>
             </p>
             <Badge variant="secondary" className="mt-1">
               {adsLabel}

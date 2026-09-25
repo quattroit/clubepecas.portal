@@ -18,6 +18,10 @@ export type PartRequestDto = {
   engine: string | null;
   categoryId: number;
   categoryName: string;
+  /** Id da categoria raiz quando `categoryId` é subcategoria. */
+  parentCategoryId?: number | null;
+  /** Nome da categoria raiz quando `categoryId` é subcategoria. */
+  parentCategoryName?: string | null;
   requestedQuantity: number;
   cityId: number | null;
   cityName: string | null;
@@ -33,6 +37,12 @@ export type PartRequestDto = {
   closingNotes: string | null;
   createdAt: string;
   updatedAt: string | null;
+  specialtyIds?: number[];
+  specialties?: {
+    id: number;
+    name: string;
+    slug: string;
+  }[];
 };
 
 export type CreatePartRequestRequest = {
@@ -47,6 +57,7 @@ export type CreatePartRequestRequest = {
   requestedQuantity: number;
   cityId?: number | null;
   maximumSuppliers: number;
+  specialtyIds: number[];
 };
 
 export type UpdatePartRequestRequest = CreatePartRequestRequest;
@@ -105,6 +116,10 @@ export type PartRequestSupplierDto = {
   storeName: string;
   cityName: string;
   cityState: string;
+  street?: string | null;
+  number?: string | null;
+  complement?: string | null;
+  neighborhood?: string | null;
   compatibleAdvertisementCount: number;
   phone: string | null;
   whatsApp: string;
@@ -125,6 +140,8 @@ export type PartRequestSuppliersDto = {
   contactSummary: PartRequestSupplierContactSummaryDto;
   nextPendingSellerId: number | null;
   items: PartRequestSupplierDto[];
+  /** True quando a lista veio por especialidade/região (sem anúncio compatível). */
+  matchedBySpecialtyFallback?: boolean;
 };
 
 export type ContactPartRequestSupplierResponse = {

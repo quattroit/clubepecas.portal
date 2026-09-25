@@ -20,6 +20,7 @@ import {
   ScrollText,
   Settings,
   Store,
+  Tags,
   UserRound,
   Wallet,
   type LucideIcon,
@@ -113,6 +114,12 @@ const ADMIN_NAV: AdminNavEntry[] = [
           href: ROUTES.ADMIN_VEHICLE_MODELS,
           label: "Modelos",
           icon: CarFront,
+          exact: false,
+        },
+        {
+          href: ROUTES.ADMIN_SPECIALTIES,
+          label: "Especialidades",
+          icon: Tags,
           exact: false,
         },
         {

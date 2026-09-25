@@ -39,6 +39,7 @@ export function mapSellerToProfileFormValues(
       : "",
     photoUrl: seller.avatarUrl ?? "",
     coverUrl: seller.coverUrl ?? "",
+    specialtyIds: seller.specialtyIds ?? [],
   };
 }
 
@@ -77,6 +78,7 @@ function mapSellerProfileFormToRequest(
     whatsApp: values.whatsApp.trim(),
     instagram: emptyToNull(values.instagram),
     photoUrl: emptyToNull(values.photoUrl),
+    specialtyIds: values.specialtyIds,
   };
 }
 

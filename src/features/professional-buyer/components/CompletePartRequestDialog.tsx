@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { PartRequestOutcome } from "@/contracts/common/enums";
 import type { PartRequestSupplierDto } from "@/contracts/part-requests";
 import { cn } from "@/lib/utils";
+import { formatSellerAddress } from "@/utils/formatSellerAddress";
 
 type Step = "ask" | "found" | "notFound";
 
@@ -169,8 +170,16 @@ function CompletePartRequestDialog({
                               <span className="block font-medium">
                                 {supplier.storeName}
                               </span>
-                              <span className="text-muted-foreground text-xs">
-                                {supplier.cityName}/{supplier.cityState}
+                              <span className="text-muted-foreground line-clamp-2 text-xs">
+                                {formatSellerAddress({
+                                  street: supplier.street,
+                                  number: supplier.number,
+                                  complement: supplier.complement,
+                                  neighborhood: supplier.neighborhood,
+                                  city: supplier.cityName,
+                                  state: supplier.cityState,
+                                }) ??
+                                  `${supplier.cityName}/${supplier.cityState}`}
                               </span>
                             </span>
                           </button>

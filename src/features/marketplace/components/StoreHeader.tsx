@@ -24,6 +24,7 @@ import {
   buildStoreWhatsAppMessage,
   buildWhatsAppUrl,
 } from "@/utils/whatsapp";
+import { formatSellerAddress } from "@/utils/formatSellerAddress";
 
 type StoreHeaderProps = {
   seller: Seller;
@@ -38,6 +39,10 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     name,
     city,
     state,
+    street,
+    number,
+    complement,
+    neighborhood,
     advertisementCount,
     avatarUrl,
     coverUrl,
@@ -54,6 +59,15 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
   const localDeliveryLabel = formatLocalDeliveryOfferLabel(
     localDeliveryMaxRadiusKm,
   );
+  const address =
+    formatSellerAddress({
+      street,
+      number,
+      complement,
+      neighborhood,
+      city,
+      state,
+    }) ?? (state ? `${city}, ${state}` : city);
 
   const contactHref =
     whatsApp?.trim() && !offersLocalDelivery
@@ -153,9 +167,9 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
 
           <div className="min-w-0 flex-1">
             <h1 className="text-h1">{name}</h1>
-            <p className="text-small mt-1.5 flex items-center gap-1.5">
-              <MapPin className="text-location size-3.5 shrink-0" aria-hidden />
-              {city}, {state}
+            <p className="text-small mt-1.5 flex items-start gap-1.5">
+              <MapPin className="text-location mt-0.5 size-3.5 shrink-0" aria-hidden />
+              <span className="line-clamp-2">{address}</span>
             </p>
             <p className="text-small text-muted-foreground mt-1">{adsLabel}</p>
             {offersLocalDelivery ? (

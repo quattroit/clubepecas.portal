@@ -30,6 +30,10 @@ export function mapPublicSellerDtoToSeller(
     coverUrl: resolveSellerPhotoUrl(dto.coverUrl),
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
+    street: dto.street,
+    number: dto.number,
+    complement: dto.complement,
+    neighborhood: dto.neighborhood,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
     localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
   };
@@ -53,6 +57,10 @@ export function mapSellerPublicListItemToSeller(
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
+    street: dto.street,
+    number: dto.number,
+    complement: dto.complement,
+    neighborhood: dto.neighborhood,
   };
 }
 
@@ -72,6 +80,10 @@ export function mapSellerPublicProfileToSeller(
     description: dto.description ?? undefined,
     whatsApp: dto.whatsApp,
     instagram: dto.instagram,
+    street: dto.street,
+    number: dto.number,
+    complement: dto.complement,
+    neighborhood: dto.neighborhood,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
     localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
     registeredAt: dto.createdAt,
@@ -108,6 +120,8 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     representativeStatus: dto.representativeStatus,
     representativeStatusLabel: dto.representativeStatusLabel,
     demoAlreadyUsed: Boolean(dto.demoAlreadyUsed),
+    specialtyIds: dto.specialtyIds ?? [],
+    specialties: dto.specialties ?? [],
   };
 }
 

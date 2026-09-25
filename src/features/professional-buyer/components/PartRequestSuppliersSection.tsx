@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Eye,
+  Info,
   MessageCircle,
   Phone,
   SkipForward,
@@ -38,6 +39,7 @@ import { resolveMediaUrl } from "@/lib/photo-url";
 import { cn } from "@/lib/utils";
 import { formatCityLabel } from "@/mappers/city.mapper";
 import { formatDate, formatTime } from "@/utils/formatDate";
+import { formatSellerAddress } from "@/utils/formatSellerAddress";
 
 type PartRequestSuppliersSectionProps = {
   partRequestId: number;
@@ -98,10 +100,19 @@ function SupplierContactDetails({
 }: {
   supplier: PartRequestSupplierDto;
 }) {
-  const cityLabel = formatCityLabel({
-    name: supplier.cityName,
-    state: supplier.cityState,
-  });
+  const address =
+    formatSellerAddress({
+      street: supplier.street,
+      number: supplier.number,
+      complement: supplier.complement,
+      neighborhood: supplier.neighborhood,
+      city: supplier.cityName,
+      state: supplier.cityState,
+    }) ??
+    formatCityLabel({
+      name: supplier.cityName,
+      state: supplier.cityState,
+    });
 
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -111,7 +122,7 @@ function SupplierContactDetails({
           {supplier.contactStatusLabel}
         </Badge>
       </div>
-      <p className="text-muted-foreground text-sm">{cityLabel}</p>
+      <p className="text-muted-foreground line-clamp-2 text-sm">{address}</p>
       <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-sm">
         <span className="inline-flex items-center gap-1.5">
           <Phone className="size-3.5 shrink-0" aria-hidden />
@@ -153,6 +164,8 @@ function SelectedSupplierContactRow({
   rowRef?: (node: HTMLElement | null) => void;
   onPreview: (supplier: PartRequestSupplierDto) => void;
 }) {
+  const hasCompatibleAds = supplier.compatibleAdvertisementCount > 0;
+
   return (
     <li
       ref={rowRef}
@@ -163,16 +176,18 @@ function SelectedSupplierContactRow({
     >
       <SupplierAvatar supplier={supplier} />
       <SupplierContactDetails supplier={supplier} />
-      <Button
-        type="button"
-        variant="primary"
-        size="sm"
-        className="shrink-0"
-        onClick={() => onPreview(supplier)}
-      >
-        <Eye className="size-3.5" aria-hidden />
-        Ver peças
-      </Button>
+      {hasCompatibleAds ? (
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          className="shrink-0"
+          onClick={() => onPreview(supplier)}
+        >
+          <Eye className="size-3.5" aria-hidden />
+          Ver peças
+        </Button>
+      ) : null}
     </li>
   );
 }
@@ -370,6 +385,32 @@ function PartRequestSuppliersSection({
         ) : null}
       </div>
 
+      {isOpen &&
+      suppliersQuery.data?.matchedBySpecialtyFallback &&
+      localItems.length > 0 ? (
+        <div
+          role="status"
+          className="border-primary/30 bg-primary/10 text-foreground flex gap-3 rounded-xl border px-4 py-3.5 shadow-xs"
+        >
+          <Info
+            className="text-primary mt-0.5 size-5 shrink-0"
+            aria-hidden
+          />
+          <div className="flex min-w-0 flex-col gap-1">
+            <p className="text-sm font-semibold">
+              Nenhum anúncio compatível encontrado
+            </p>
+            <p className="text-sm leading-relaxed">
+              Os vendedores abaixo se enquadram na especialidade
+              {cityLabel
+                ? ` e na região de ${cityLabel}`
+                : " e na região de busca"}{" "}
+              e podem ter a peça que você procura. Contate-os pelo WhatsApp.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       {isOpen && localSelectedCount > 0 ? (
         <ContactSummaryBar summary={localContactSummary} />
       ) : null}
@@ -390,8 +431,8 @@ function PartRequestSuppliersSection({
           title="Nenhum fornecedor encontrado"
           description={
             cityLabel
-              ? `Não encontramos fornecedores em ${cityLabel} com anúncios compatíveis para este item. Tente outra cidade ou crie uma solicitação sem filtrar por cidade.`
-              : "Não encontramos fornecedores com anúncios compatíveis para este item. Verifique a categoria e os dados do veículo."
+              ? `Não encontramos fornecedores em ${cityLabel} com anúncios ou especialidades compatíveis para este item. Tente outra cidade ou outra especialidade.`
+              : "Não encontramos fornecedores com anúncios ou especialidades compatíveis para este item. Verifique a categoria, as especialidades e os dados do veículo."
           }
           icon={<Store aria-hidden />}
         />
@@ -416,15 +457,17 @@ function PartRequestSuppliersSection({
                 <SupplierContactDetails supplier={focusedSupplier} />
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setPreviewSeller(focusedSupplier)}
-                >
-                  <Eye className="size-3.5" aria-hidden />
-                  Ver peças
-                </Button>
+                {focusedSupplier.compatibleAdvertisementCount > 0 ? (
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setPreviewSeller(focusedSupplier)}
+                  >
+                    <Eye className="size-3.5" aria-hidden />
+                    Ver peças
+                  </Button>
+                ) : null}
                 <Button
                   type="button"
                   variant="whatsapp"

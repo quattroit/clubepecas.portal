@@ -72,6 +72,14 @@ import type {
   UpdateAdminVehicleBrandStatusResponse,
 } from "@/contracts/admin/vehicle-brands";
 import type {
+  AdminSpecialtiesListParams,
+  CreateAdminSpecialtyRequest,
+  GetAdminSpecialtiesResponse,
+  UpdateAdminSpecialtyRequest,
+  UpdateAdminSpecialtyStatusRequest,
+  UpdateAdminSpecialtyStatusResponse,
+} from "@/contracts/admin/specialties";
+import type {
   AdminVehicleModelsListParams,
   CreateAdminVehicleModelRequest,
   GetAdminVehicleModelsResponse,
@@ -515,6 +523,44 @@ export const adminService = {
     return api
       .put<ReorderAdminVehicleBrandsResponse>(
         "/api/v1/admin/vehicle-brands/reorder",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  listSpecialties(params: AdminSpecialtiesListParams = {}) {
+    return api
+      .get<GetAdminSpecialtiesResponse>("/api/v1/admin/specialties", {
+        params,
+      })
+      .then((response) => response.data);
+  },
+
+  createSpecialty(payload: CreateAdminSpecialtyRequest) {
+    return api
+      .post<GetAdminSpecialtiesResponse["items"][number]>(
+        "/api/v1/admin/specialties",
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  updateSpecialty(id: number, payload: UpdateAdminSpecialtyRequest) {
+    return api
+      .put<GetAdminSpecialtiesResponse["items"][number]>(
+        `/api/v1/admin/specialties/${id}`,
+        payload,
+      )
+      .then((response) => response.data);
+  },
+
+  updateSpecialtyStatus(
+    id: number,
+    payload: UpdateAdminSpecialtyStatusRequest,
+  ) {
+    return api
+      .patch<UpdateAdminSpecialtyStatusResponse>(
+        `/api/v1/admin/specialties/${id}/status`,
         payload,
       )
       .then((response) => response.data);

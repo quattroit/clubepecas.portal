@@ -8,6 +8,7 @@ export { AdminCitiesView } from "@/features/admin/components/AdminCitiesView";
 export { AdminRepresentativesView } from "@/features/admin/components/AdminRepresentativesView";
 export { AdminCommissionsView } from "@/features/admin/components/AdminCommissionsView";
 export { AdminVehicleBrandsView } from "@/features/admin/components/AdminVehicleBrandsView";
+export { AdminSpecialtiesView } from "@/features/admin/components/AdminSpecialtiesView";
 export { AdminVehicleModelsView } from "@/features/admin/components/AdminVehicleModelsView";
 export { AdminAnalyticsView } from "@/features/admin/components/AdminAnalyticsView";
 export { AdminSettingsView } from "@/features/admin/components/AdminSettingsView";

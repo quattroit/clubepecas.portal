@@ -113,6 +113,10 @@ export function createPartRequestFormSchema(
       maximumSuppliers: z.enum(supplierOptions, {
         message: "Selecione a quantidade de fornecedores",
       }),
+      specialtyIds: z
+        .array(z.number().int().positive())
+        .min(1, "Selecione pelo menos 1 especialidade")
+        .max(3, "Selecione no máximo 3 especialidades"),
     })
     .superRefine((values, ctx) => {
       const { vehicleRequirement } = getConfig();
@@ -176,4 +180,5 @@ export const partRequestFormDefaultValues: PartRequestFormInput = {
   requestedQuantity: "1",
   cityId: "",
   maximumSuppliers: String(PART_REQUEST_DEFAULT_MAX_SUPPLIERS),
+  specialtyIds: [],
 };

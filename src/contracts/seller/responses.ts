@@ -36,6 +36,12 @@ export type SellerMeDto = {
   representativeStatusLabel?: string | null;
   /** True se o vendedor já ativou algum plano demonstração. */
   demoAlreadyUsed?: boolean;
+  specialtyIds?: number[];
+  specialties?: {
+    id: number;
+    name: string;
+    slug: string;
+  }[];
 };
 
 export type PublicSellerAdvertisementDto = {
@@ -71,6 +77,10 @@ export type SellerPublicProfileResponse = {
   slug: string;
   whatsApp: string;
   instagram: string | null;
+  street?: string | null;
+  number?: string | null;
+  complement?: string | null;
+  neighborhood?: string | null;
   offersLocalDelivery?: boolean;
   localDeliveryMaxRadiusKm?: number | null;
   createdAt: string;
@@ -92,6 +102,10 @@ export type SellerPublicListItemDto = {
   coverUrl: string | null;
   whatsApp: string;
   instagram: string | null;
+  street?: string | null;
+  number?: string | null;
+  complement?: string | null;
+  neighborhood?: string | null;
   advertisementCount: number;
 };
 

@@ -64,6 +64,10 @@ export const sellerProfileFormSchema = z
       ),
     photoUrl: optionalUrl,
     coverUrl: optionalUrl,
+    specialtyIds: z
+      .array(z.number().int().positive())
+      .min(1, "Selecione pelo menos 1 especialidade")
+      .max(3, "Selecione no máximo 3 especialidades"),
   })
   .superRefine((values, ctx) => {
     if (!isValidDocument(values.document, values.personType)) {
@@ -95,4 +99,5 @@ export const sellerProfileFormDefaultValues: SellerProfileFormValues = {
   instagram: "",
   photoUrl: "",
   coverUrl: "",
+  specialtyIds: [],
 };

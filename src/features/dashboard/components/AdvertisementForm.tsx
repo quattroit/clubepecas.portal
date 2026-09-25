@@ -34,6 +34,7 @@ import type { VehicleBrand } from "@/types/VehicleBrand";
 import {
   getChildCategories,
   getRootCategories,
+  pickDefaultChildCategory,
   resolveRootCategory,
 } from "@/utils/category-hierarchy";
 import { listVehicleYears } from "@/utils/vehicle-years";
@@ -339,8 +340,17 @@ function AdvertisementForm({
             }
             disabled={isSubmitting || categoriesLoading}
             {...register("rootCategoryId", {
-              onChange: () => {
-                setValue("categoryId", 0, { shouldValidate: false });
+              onChange: (event) => {
+                const rootId = Number(event.target.value);
+                const defaultChild =
+                  rootId > 0
+                    ? pickDefaultChildCategory(
+                        getChildCategories(categories, rootId),
+                      )
+                    : undefined;
+                setValue("categoryId", defaultChild?.id ?? 0, {
+                  shouldValidate: false,
+                });
                 clearErrors("categoryId");
                 clearVehicleFields();
                 setValue("compatibilityDescription", "", {

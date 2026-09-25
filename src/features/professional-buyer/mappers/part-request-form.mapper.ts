@@ -36,6 +36,7 @@ function mapFormToRequest(
     requestedQuantity: Number(values.requestedQuantity),
     cityId: toOptionalId(values.cityId),
     maximumSuppliers: Number(values.maximumSuppliers),
+    specialtyIds: values.specialtyIds,
   };
 }
 
@@ -73,5 +74,6 @@ export function mapPartRequestDtoToFormInput(
     requestedQuantity: String(dto.requestedQuantity),
     cityId: dto.cityId ? String(dto.cityId) : "",
     maximumSuppliers: String(dto.maximumSuppliers),
+    specialtyIds: dto.specialtyIds ?? [],
   };
 }

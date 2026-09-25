@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MessageCircle, Store, Truck } from "lucide-react";
+import { MessageCircle, MapPin, Store, Truck } from "lucide-react";
 
 import { RemoteImage } from "@/components/media/RemoteImage";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
   buildAdvertisementWhatsAppMessage,
   buildWhatsAppUrl,
 } from "@/utils/whatsapp";
+import { formatSellerAddress } from "@/utils/formatSellerAddress";
 
 type SellerContactCardProps = {
   seller: Seller;
@@ -40,6 +41,11 @@ function SellerContactCard({
     id,
     name,
     city,
+    state,
+    street,
+    number,
+    complement,
+    neighborhood,
     advertisementCount,
     avatarUrl,
     coverUrl,
@@ -54,6 +60,15 @@ function SellerContactCard({
   const localDeliveryLabel = formatLocalDeliveryOfferLabel(
     localDeliveryMaxRadiusKm,
   );
+  const address =
+    formatSellerAddress({
+      street,
+      number,
+      complement,
+      neighborhood,
+      city,
+      state,
+    }) ?? city;
 
   const canContact = Boolean(whatsApp?.trim());
 
@@ -127,7 +142,10 @@ function SellerContactCard({
             </div>
             <div className="min-w-0">
               <h3 className="text-h3 truncate">{name}</h3>
-              <p className="text-small">{city}</p>
+              <p className="text-small mt-0.5 flex items-start gap-1.5">
+                <MapPin className="text-location mt-0.5 size-3.5 shrink-0" aria-hidden />
+                <span className="line-clamp-2">{address}</span>
+              </p>
               <p className="text-small text-muted-foreground">{adsLabel}</p>
               {offersLocalDelivery ? (
                 <p className="text-primary mt-1 flex items-center gap-1 text-xs font-medium">
