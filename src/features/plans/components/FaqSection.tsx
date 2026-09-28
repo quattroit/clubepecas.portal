@@ -19,7 +19,7 @@ const DEFAULT_FAQ_ITEMS: FaqItem[] = [
   {
     question: "Quando começa minha assinatura?",
     answer:
-      "A assinatura passa a valer imediatamente após sua contratação. Nesta fase do MVP, a ativação é imediata.",
+      "A assinatura passa a valer imediatamente após a contratação e confirmação do pagamento.",
   },
   {
     question: "Existe fidelidade?",
