@@ -72,6 +72,7 @@ export const queryKeys = {
   home: {
     all: ["home"] as const,
     stats: ["home", "stats"] as const,
+    recentAdvertisements: ["home", "recent-advertisements"] as const,
   },
   platformSettings: ["platform-settings"] as const,
   sellers: {

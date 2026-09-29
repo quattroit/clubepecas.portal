@@ -1,3 +1,4 @@
+import { CookieSettingsButton } from "@/components/cookie-consent/CookieSettingsButton";
 import { APP_NAME } from "@/constants/app";
 import { CONTACT_EMAIL, LEGAL_EFFECTIVE_DATE } from "@/constants/contact";
 import {
@@ -88,14 +89,17 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
       <InstitutionalSection id="cookies" title="3. Cookies">
         <p>
           Utilizamos cookies e tecnologias semelhantes essenciais ao
-          funcionamento do site (por exemplo, manutenção de sessão e preferências
-          básicas). Cookies analíticos ou de marketing, quando adotados, serão
-          comunicados e, quando exigido, sujeitos a consentimento.
+          funcionamento do site (por exemplo, manutenção de sessão, segurança e
+          indicação de representantes). Cookies analíticos e de marketing só são
+          utilizados com o seu consentimento, coletado por meio do banner de
+          cookies exibido na primeira visita.
         </p>
         <p>
-          Você pode gerenciar cookies nas configurações do navegador. A
-          desativação de cookies essenciais pode comprometer o uso de algumas
-          funcionalidades.
+          Você pode alterar suas preferências a qualquer momento pelo link{" "}
+          <CookieSettingsButton className="text-foreground text-sm font-medium underline-offset-2 hover:underline" />{" "}
+          no rodapé do site, ou gerenciar cookies nas configurações do
+          navegador. A desativação de cookies essenciais pode comprometer o uso
+          de algumas funcionalidades.
         </p>
       </InstitutionalSection>
 

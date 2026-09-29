@@ -28,15 +28,17 @@ import {
   StoresGridSkeleton,
 } from "@/features/marketplace";
 import { HeroStats } from "@/features/marketplace/components/HeroStats";
-import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
+import { useHomeRecentAdvertisements } from "@/hooks/api/useHomeRecentAdvertisements";
 import { useStores } from "@/hooks/api/useStores";
 import { usePlatformSettings } from "@/hooks/api/usePlatformSettings";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { cn } from "@/lib/utils";
-import { createListingShuffleSeed, PUBLIC_LISTING_DEFAULT_PAGE_SIZE } from "@/utils/public-listing-pagination";
+import {
+  createListingShuffleSeed,
+  PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
+} from "@/utils/public-listing-pagination";
 
-const HOME_RECENT_ADS_LIMIT = 8;
 const HOME_FEATURED_STORES_LIMIT = 3;
 const HOME_CATEGORIES_LIMIT = 4;
 
@@ -108,11 +110,7 @@ function SectionHeading({
 function HomePageView() {
   const categoriesQuery = useCategories();
   const homeStoreShuffleSeed = useMemo(() => createListingShuffleSeed(), []);
-  const advertisementsQuery = useAdvertisements({
-    page: 1,
-    pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
-    sort: "recent",
-  });
+  const advertisementsQuery = useHomeRecentAdvertisements();
   const storesQuery = useStores({
     page: 1,
     pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
@@ -123,17 +121,12 @@ function HomePageView() {
   const platformDescription =
     platformSettingsQuery.data?.platformDescription ?? APP_DESCRIPTION;
 
-  const marketplaceItems = advertisementsQuery.data?.items;
+  const recentAdvertisements = advertisementsQuery.data ?? [];
   const allCategories = categoriesQuery.data ?? [];
   const categories = allCategories
     .filter((category) => category.parentId == null)
     .sort((a, b) => b.advertisementCount - a.advertisementCount)
     .slice(0, HOME_CATEGORIES_LIMIT);
-
-  const recentAdvertisements = (marketplaceItems ?? []).slice(
-    0,
-    HOME_RECENT_ADS_LIMIT,
-  );
 
   const featuredStores = useMemo(
     () =>

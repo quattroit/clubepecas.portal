@@ -3,8 +3,10 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { CookieConsentHost } from "@/components/cookie-consent/CookieConsentHost";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { AuthQuerySync } from "@/components/providers/AuthQuerySync";
+import { CookieConsentProvider } from "@/components/providers/CookieConsentProvider";
 import { ErrorBoundary } from "@/components/providers/ErrorBoundary";
 import { QuotationDraftProvider } from "@/components/providers/QuotationDraftProvider";
 import { ReferralProvider } from "@/components/providers/ReferralProvider";
@@ -27,20 +29,23 @@ function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <RepresentativeAuthProvider>
-            <ReferralProvider>
-              <QuotationDraftProvider>
-                <AuthQuerySync />
-                <RepresentativeAuthQuerySync />
-                <ErrorBoundary>
-                  {children}
-                  <Toaster position="top-right" richColors closeButton />
-                </ErrorBoundary>
-              </QuotationDraftProvider>
-            </ReferralProvider>
-          </RepresentativeAuthProvider>
-        </AuthProvider>
+        <CookieConsentProvider>
+          <AuthProvider>
+            <RepresentativeAuthProvider>
+              <ReferralProvider>
+                <QuotationDraftProvider>
+                  <AuthQuerySync />
+                  <RepresentativeAuthQuerySync />
+                  <ErrorBoundary>
+                    {children}
+                    <CookieConsentHost />
+                    <Toaster position="top-right" richColors closeButton />
+                  </ErrorBoundary>
+                </QuotationDraftProvider>
+              </ReferralProvider>
+            </RepresentativeAuthProvider>
+          </AuthProvider>
+        </CookieConsentProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CookieSettingsButton } from "@/components/cookie-consent/CookieSettingsButton";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { Logo } from "@/components/layout/Logo";
 import { APP_DESCRIPTION, APP_NAME, APP_VERSION } from "@/constants/app";
@@ -86,6 +87,9 @@ async function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <CookieSettingsButton />
+            </li>
           </ul>
         </nav>
 

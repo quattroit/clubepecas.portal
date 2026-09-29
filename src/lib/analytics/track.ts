@@ -1,6 +1,7 @@
 import type { TrackAnalyticsEventRequest } from "@/contracts/analytics/requests";
 import { api } from "@/lib/api";
 import { getAnalyticsSessionId } from "@/lib/analytics/session";
+import { hasAnalyticsConsent } from "@/lib/cookie-consent";
 
 /**
  * Debounce in-memory para evitar duplicata de StrictMode / re-renders.
@@ -28,6 +29,7 @@ function getDocumentReferrer(): string | null {
 /**
  * Dispara um evento de analytics sem bloquear a UI.
  * Falhas são engolidas — o marketplace nunca depende disso.
+ * Respeita consentimento de cookies (LGPD).
  */
 export function trackAnalyticsEvent(
   payload: Omit<TrackAnalyticsEventRequest, "sessionId" | "referer"> & {
@@ -38,6 +40,7 @@ export function trackAnalyticsEvent(
   },
 ): void {
   if (typeof window === "undefined") return;
+  if (!hasAnalyticsConsent()) return;
 
   const { dedupeKey, ...body } = payload;
   if (dedupeKey && shouldSkip(dedupeKey)) {
