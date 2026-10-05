@@ -427,6 +427,7 @@ function ChoosePlanDialog({ open, onOpenChange }: ChoosePlanDialogProps) {
                       <span className="text-foreground font-medium">
                         {plan.advertisementLimit}
                       </span>
+                      {plan.isFree ? " · sem data de expiração" : null}
                     </p>
                   </div>
 

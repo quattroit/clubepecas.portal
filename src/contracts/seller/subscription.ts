@@ -24,6 +24,7 @@ export type SubscriptionPlanSummaryDto = {
   advertisementsRemaining: number;
   quotaUsagePercent: number;
   isUnlimited: boolean;
+  isFree: boolean;
 };
 
 export type SubscriptionPaymentSnapshotDto = {
@@ -369,6 +370,7 @@ export type SubscriptionPlanCatalogItemDto = {
   advertisementLimit: number;
   displayOrder: number;
   isDemo: boolean;
+  isFree: boolean;
   startingPrice: number;
   currency: string;
   prices: SubscriptionPlanPriceDto[];

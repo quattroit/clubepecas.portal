@@ -60,6 +60,7 @@ function SubscriptionPlanFormDialog({
     handleSubmit,
     control,
     reset,
+    setValue,
     watch,
     formState: { errors },
   } = useForm<SubscriptionPlanFormValues>({
@@ -301,7 +302,52 @@ function SubscriptionPlanFormDialog({
                   id="subscription-plan-is-demo"
                   checked={field.value}
                   disabled={isSubmitting}
-                  onCheckedChange={field.onChange}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      setValue("isFree", false, { shouldValidate: true });
+                    }
+                  }}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+          </div>
+
+          <div className="border-border flex items-center justify-between gap-4 rounded-xl border p-3">
+            <div className="min-w-0">
+              <Label
+                htmlFor="subscription-plan-is-free"
+                className="text-sm font-medium"
+              >
+                Plano grátis
+              </Label>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Não expira. Se um plano pago ou a demonstração não for
+                renovado, o vendedor passa automaticamente para este plano,
+                respeitando o limite de anúncios configurado. Só pode haver um
+                plano grátis, com preços ativos iguais a R$&nbsp;0.
+              </p>
+              {errors.isFree ? (
+                <p className="text-destructive mt-1 text-xs" role="alert">
+                  {errors.isFree.message}
+                </p>
+              ) : null}
+            </div>
+            <Controller
+              name="isFree"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="subscription-plan-is-free"
+                  checked={field.value}
+                  disabled={isSubmitting}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      setValue("isDemo", false, { shouldValidate: true });
+                    }
+                  }}
                   onBlur={field.onBlur}
                 />
               )}

@@ -68,6 +68,16 @@ function PlanComparison({ plans, className }: PlanComparisonProps) {
                 </td>
               ))}
             </tr>
+            <tr className="border-border border-b">
+              <th scope="row" className="text-muted-foreground px-4 py-3 font-medium">
+                Validade
+              </th>
+              {plans.map((plan) => (
+                <td key={plan.id} className="px-4 py-3">
+                  {plan.isFree ? "Sem expiração" : "Conforme o ciclo"}
+                </td>
+              ))}
+            </tr>
             <tr>
               <th scope="row" className="text-muted-foreground px-4 py-3 font-medium">
                 Status

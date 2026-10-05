@@ -155,6 +155,11 @@ function PlanCard({ plan, featured = false }: PlanCardProps) {
             </span>
             {plan.advertisementLimit > 0 ? " permitidos" : null}
           </p>
+          {plan.isFree ? (
+            <p className="text-small text-muted-foreground">
+              Sem data de expiração
+            </p>
+          ) : null}
         </CardContent>
 
         <CardFooter className="mt-auto shrink-0">
@@ -189,6 +194,7 @@ function PlanCard({ plan, featured = false }: PlanCardProps) {
                   {formatPlanAdvertisementLimit(plan.advertisementLimit)}
                 </span>
                 {plan.advertisementLimit > 0 ? " permitidos" : null}
+                {plan.isFree ? " · sem data de expiração" : null}
               </p>
             </div>
 

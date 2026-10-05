@@ -71,9 +71,11 @@ function SubscriptionSummaryCard({
           <div>
             <dt className="text-muted-foreground text-xs">Dias restantes</dt>
             <dd className="text-sm font-medium">
-              {subscription.remainingDays != null
-                ? `${subscription.remainingDays}`
-                : "—"}
+              {subscription.plan.isFree
+                ? "Sem expiração"
+                : subscription.remainingDays != null
+                  ? `${subscription.remainingDays}`
+                  : "—"}
             </dd>
           </div>
           <div>
@@ -85,17 +87,21 @@ function SubscriptionSummaryCard({
           <div>
             <dt className="text-muted-foreground text-xs">Fim do período</dt>
             <dd className="text-sm font-medium">
-              {subscription.periodEndUtc
-                ? formatDate(subscription.periodEndUtc)
-                : "—"}
+              {subscription.plan.isFree
+                ? "Sem expiração"
+                : subscription.periodEndUtc
+                  ? formatDate(subscription.periodEndUtc)
+                  : "—"}
             </dd>
           </div>
           <div>
             <dt className="text-muted-foreground text-xs">Próxima cobrança</dt>
             <dd className="text-sm font-medium">
-              {subscription.nextBillingDateUtc
-                ? formatDate(subscription.nextBillingDateUtc)
-                : "—"}
+              {subscription.plan.isFree
+                ? "Não há cobrança"
+                : subscription.nextBillingDateUtc
+                  ? formatDate(subscription.nextBillingDateUtc)
+                  : "—"}
             </dd>
           </div>
           {subscription.equivalentMonthlyPrice != null ? (

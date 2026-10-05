@@ -299,6 +299,11 @@ function AdminSubscriptionPlansView() {
                               Demo
                             </span>
                           ) : null}
+                          {plan.isFree ? (
+                            <span className="bg-muted text-muted-foreground rounded-md px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
+                              Grátis
+                            </span>
+                          ) : null}
                         </div>
                       </td>
                       <td className="text-foreground px-4 py-3 tabular-nums">

@@ -28,6 +28,7 @@ export function mapAdminSubscriptionPlanToForm(
     displayOrder: plan.displayOrder,
     isActive: plan.isActive,
     isDemo: plan.isDemo ?? false,
+    isFree: plan.isFree ?? false,
     prices: [...plan.prices]
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .map((price) => ({
@@ -71,6 +72,7 @@ export function mapSubscriptionPlanFormToCreateRequest(
     displayOrder: values.displayOrder,
     isActive: values.isActive,
     isDemo: values.isDemo,
+    isFree: values.isFree,
     prices: values.prices.map(mapPriceFormToRequest),
   };
 }
@@ -88,6 +90,7 @@ export function mapSubscriptionPlanFormToUpdateRequest(
     displayOrder: values.displayOrder,
     isActive: values.isActive,
     isDemo: values.isDemo,
+    isFree: values.isFree,
     prices: values.prices.map(mapPriceFormToRequest),
   };
 }

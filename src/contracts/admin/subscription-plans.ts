@@ -31,6 +31,7 @@ export type AdminSubscriptionPlanListItemDto = {
   displayOrder: number;
   isActive: boolean;
   isDemo: boolean;
+  isFree: boolean;
   slug?: string | null;
   /** Menor preço entre os ciclos ativos — usado como resumo na listagem. */
   startingPrice: number;
@@ -69,6 +70,7 @@ export type CreateAdminSubscriptionPlanRequest = {
   displayOrder?: number;
   isActive: boolean;
   isDemo: boolean;
+  isFree: boolean;
   prices: AdminSubscriptionPlanPriceRequest[];
 };
 
@@ -80,5 +82,6 @@ export type UpdateAdminSubscriptionPlanRequest = {
   displayOrder: number;
   isActive: boolean;
   isDemo: boolean;
+  isFree: boolean;
   prices: AdminSubscriptionPlanPriceRequest[];
 };

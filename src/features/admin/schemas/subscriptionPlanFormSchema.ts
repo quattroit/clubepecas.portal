@@ -67,6 +67,7 @@ export const subscriptionPlanFormSchema = z.object({
     .min(0, "Deve ser zero ou maior"),
   isActive: z.boolean(),
   isDemo: z.boolean(),
+  isFree: z.boolean(),
   prices: z
     .array(subscriptionPlanPriceFormSchema)
     .min(1, "Adicione ao menos um ciclo de cobrança")
@@ -75,6 +76,14 @@ export const subscriptionPlanFormSchema = z.object({
       return new Set(cycles).size === cycles.length;
     }, "Cada ciclo de cobrança pode ser adicionado apenas uma vez"),
 }).superRefine((values, ctx) => {
+  if (values.isDemo && values.isFree) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["isFree"],
+      message: "Um plano não pode ser demonstração e grátis ao mesmo tempo",
+    });
+  }
+
   if (
     values.isDemo &&
     values.prices.some(
@@ -85,6 +94,19 @@ export const subscriptionPlanFormSchema = z.object({
       code: "custom",
       path: ["isDemo"],
       message: "Plano demonstração exige preços ativos iguais a R$ 0",
+    });
+  }
+
+  if (
+    values.isFree &&
+    values.prices.some(
+      (price) => price.isActive && parsePriceInput(price.price) !== 0,
+    )
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["isFree"],
+      message: "Plano grátis exige preços ativos iguais a R$ 0",
     });
   }
 });
@@ -100,5 +122,6 @@ export const subscriptionPlanFormDefaultValues: SubscriptionPlanFormValues = {
   displayOrder: 0,
   isActive: true,
   isDemo: false,
+  isFree: false,
   prices: [subscriptionPlanPriceFormDefaultValues],
 };
