@@ -284,213 +284,215 @@ function ContactSellerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Como deseja receber?</DialogTitle>
-          <DialogDescription>
-            Escolha a forma de recebimento. Você sempre poderá falar com o
-            vendedor no WhatsApp.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="flex max-h-[min(85vh,100dvh-2rem)] max-w-md flex-col gap-0 overflow-hidden p-0">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-6">
+          <DialogHeader>
+            <DialogTitle>Como deseja receber?</DialogTitle>
+            <DialogDescription>
+              Escolha a forma de recebimento. Você sempre poderá falar com o
+              vendedor no WhatsApp.
+            </DialogDescription>
+          </DialogHeader>
 
-        <fieldset className="flex flex-col gap-3">
-          <legend className="sr-only">Forma de recebimento</legend>
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="radio"
-              name="receipt-mode"
-              className="mt-1"
-              checked={mode === "pickup"}
-              onChange={() => {
-                setMode("pickup");
-                setEstimate(null);
-              }}
-            />
-            <span>
-              <span className="font-medium">Retirada na loja</span>
-              <span className="text-muted-foreground block text-xs">
-                Combinar horário e endereço diretamente com o vendedor.
+          <fieldset className="flex flex-col gap-3">
+            <legend className="sr-only">Forma de recebimento</legend>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="radio"
+                name="receipt-mode"
+                className="mt-1"
+                checked={mode === "pickup"}
+                onChange={() => {
+                  setMode("pickup");
+                  setEstimate(null);
+                }}
+              />
+              <span>
+                <span className="font-medium">Retirada na loja</span>
+                <span className="text-muted-foreground block text-xs">
+                  Combinar horário e endereço diretamente com o vendedor.
+                </span>
               </span>
-            </span>
-          </label>
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="radio"
-              name="receipt-mode"
-              className="mt-1"
-              checked={mode === "local_delivery"}
-              onChange={() => setMode("local_delivery")}
-            />
-            <span>
-              <span className="font-medium">Entrega local (motoboy)</span>
-              <span className="text-muted-foreground block text-xs">
-                Informe o CEP e o número para uma estimativa mais precisa —
-                valor sujeito a confirmação.
+            </label>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="radio"
+                name="receipt-mode"
+                className="mt-1"
+                checked={mode === "local_delivery"}
+                onChange={() => setMode("local_delivery")}
+              />
+              <span>
+                <span className="font-medium">Entrega local (motoboy)</span>
+                <span className="text-muted-foreground block text-xs">
+                  Informe o CEP e o número para uma estimativa mais precisa —
+                  valor sujeito a confirmação.
+                </span>
               </span>
-            </span>
-          </label>
-        </fieldset>
+            </label>
+          </fieldset>
 
-        {mode === "local_delivery" ? (
-          <div className="flex flex-col gap-3">
-            {showRegisteredZipHint ? (
-              <div className="flex flex-col gap-2">
-                <p className="text-sm">
-                  CEP cadastrado:{" "}
-                  <span className="font-medium tabular-nums">
-                    {formatPostalCodeInput(registeredZip)}
-                  </span>
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="self-start"
-                  onClick={() => setEditingZip(true)}
-                >
-                  Alterar CEP
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="delivery-zip">CEP de entrega</Label>
-                <Input
-                  id="delivery-zip"
-                  inputMode="numeric"
-                  autoComplete="postal-code"
-                  placeholder="00000-000"
-                  value={zipCode}
-                  onChange={(event) => handleZipChange(event.target.value)}
-                />
-              </div>
-            )}
-
-            {viaCepQuery.isFetching ? (
-              <p className="text-muted-foreground flex items-center gap-2 text-sm">
-                <Loader2 className="size-4 animate-spin" aria-hidden />
-                Buscando endereço…
-              </p>
-            ) : null}
-
-            {viaCepQuery.isError ||
-            (viaCepEnabled &&
-              viaCepQuery.isFetched &&
-              viaCepQuery.data === null &&
-              !hasAddressBase) ? (
-              <p className="text-destructive text-sm" role="alert">
-                Não encontramos o endereço deste CEP. Confira o número
-                informado.
-              </p>
-            ) : null}
-
-            {addressReady && isValidPostalCode(zipDigits) ? (
-              <div className="border-border bg-secondary/40 flex flex-col gap-3 rounded-lg border px-3 py-3">
-                {street.trim() ? (
-                  <p className="text-sm">
-                    <span className="text-muted-foreground">Rua: </span>
-                    {street}
-                  </p>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="delivery-street">Rua</Label>
-                    <Input
-                      id="delivery-street"
-                      autoComplete="address-line1"
-                      placeholder="Nome da rua"
-                      value={street}
-                      onChange={(event) => setStreet(event.target.value)}
-                    />
-                  </div>
-                )}
-
-                {neighborhood.trim() ? (
-                  <p className="text-sm">
-                    <span className="text-muted-foreground">Bairro: </span>
-                    {neighborhood}
-                  </p>
-                ) : null}
-
-                {city.trim() && state.trim() ? (
-                  <p className="text-sm">
-                    <span className="text-muted-foreground">Cidade: </span>
-                    {city}/{state}
-                  </p>
-                ) : null}
-
+          {mode === "local_delivery" ? (
+            <div className="flex flex-col gap-3">
+              {showRegisteredZipHint ? (
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="delivery-number">Número</Label>
-                  <Input
-                    id="delivery-number"
-                    inputMode="text"
-                    autoComplete="address-line2"
-                    placeholder="Ex.: 123"
-                    value={number}
-                    onChange={(event) => setNumber(event.target.value)}
-                  />
-                  <p className="text-muted-foreground text-xs">
-                    Informe o número para o frete ficar mais preciso.
+                  <p className="text-sm">
+                    CEP cadastrado:{" "}
+                    <span className="font-medium tabular-nums">
+                      {formatPostalCodeInput(registeredZip)}
+                    </span>
                   </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="self-start"
+                    onClick={() => setEditingZip(true)}
+                  >
+                    Alterar CEP
+                  </Button>
                 </div>
-              </div>
-            ) : null}
-
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!canEstimate || estimateMutation.isPending}
-              onClick={handleEstimate}
-            >
-              {estimateMutation.isPending ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" aria-hidden />
-                  Calculando…
-                </>
               ) : (
-                "Calcular frete estimado"
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="delivery-zip">CEP de entrega</Label>
+                  <Input
+                    id="delivery-zip"
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    placeholder="00000-000"
+                    value={zipCode}
+                    onChange={(event) => handleZipChange(event.target.value)}
+                  />
+                </div>
               )}
-            </Button>
 
-            {estimateMutation.isError ? (
-              <p className="text-destructive text-sm" role="alert">
-                {getFriendlyErrorMessage(estimateMutation.error)} Você ainda
-                pode falar no WhatsApp.
-              </p>
-            ) : null}
+              {viaCepQuery.isFetching ? (
+                <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                  Buscando endereço…
+                </p>
+              ) : null}
 
-            {estimate ? (
-              <div className="border-border bg-secondary/40 flex flex-col gap-2 rounded-lg border px-3 py-3 text-sm">
-                {estimate.withinRadius && estimate.estimatedPrice != null ? (
+              {viaCepQuery.isError ||
+              (viaCepEnabled &&
+                viaCepQuery.isFetched &&
+                viaCepQuery.data === null &&
+                !hasAddressBase) ? (
+                <p className="text-destructive text-sm" role="alert">
+                  Não encontramos o endereço deste CEP. Confira o número
+                  informado.
+                </p>
+              ) : null}
+
+              {addressReady && isValidPostalCode(zipDigits) ? (
+                <div className="border-border bg-secondary/40 flex flex-col gap-3 rounded-lg border px-3 py-3">
+                  {street.trim() ? (
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Rua: </span>
+                      {street}
+                    </p>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="delivery-street">Rua</Label>
+                      <Input
+                        id="delivery-street"
+                        autoComplete="address-line1"
+                        placeholder="Nome da rua"
+                        value={street}
+                        onChange={(event) => setStreet(event.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {neighborhood.trim() ? (
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Bairro: </span>
+                      {neighborhood}
+                    </p>
+                  ) : null}
+
+                  {city.trim() && state.trim() ? (
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Cidade: </span>
+                      {city}/{state}
+                    </p>
+                  ) : null}
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="delivery-number">Número</Label>
+                    <Input
+                      id="delivery-number"
+                      inputMode="text"
+                      autoComplete="address-line2"
+                      placeholder="Ex.: 123"
+                      value={number}
+                      onChange={(event) => setNumber(event.target.value)}
+                    />
+                    <p className="text-muted-foreground text-xs">
+                      Informe o número para o frete ficar mais preciso.
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!canEstimate || estimateMutation.isPending}
+                onClick={handleEstimate}
+              >
+                {estimateMutation.isPending ? (
                   <>
-                    <p>
-                      Distância aproximada:{" "}
-                      <strong>
-                        {estimate.distanceKm?.toLocaleString("pt-BR", {
-                          maximumFractionDigits: 1,
-                        })}{" "}
-                        km
-                      </strong>
-                    </p>
-                    <p>
-                      Frete estimado:{" "}
-                      <strong>
-                        {formatCurrency(estimate.estimatedPrice)}
-                      </strong>
-                    </p>
+                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                    Calculando…
                   </>
                 ) : (
-                  <p>{estimate.message}</p>
+                  "Calcular frete estimado"
                 )}
-                {estimate.disclaimer ? (
-                  <p className="text-muted-foreground text-xs">
-                    {estimate.disclaimer}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+              </Button>
 
-        <DialogFooter>
+              {estimateMutation.isError ? (
+                <p className="text-destructive text-sm" role="alert">
+                  {getFriendlyErrorMessage(estimateMutation.error)} Você ainda
+                  pode falar no WhatsApp.
+                </p>
+              ) : null}
+
+              {estimate ? (
+                <div className="border-border bg-secondary/40 flex flex-col gap-2 rounded-lg border px-3 py-3 text-sm">
+                  {estimate.withinRadius && estimate.estimatedPrice != null ? (
+                    <>
+                      <p>
+                        Distância aproximada:{" "}
+                        <strong>
+                          {estimate.distanceKm?.toLocaleString("pt-BR", {
+                            maximumFractionDigits: 1,
+                          })}{" "}
+                          km
+                        </strong>
+                      </p>
+                      <p>
+                        Frete estimado:{" "}
+                        <strong>
+                          {formatCurrency(estimate.estimatedPrice)}
+                        </strong>
+                      </p>
+                    </>
+                  ) : (
+                    <p>{estimate.message}</p>
+                  )}
+                  {estimate.disclaimer ? (
+                    <p className="text-muted-foreground text-xs">
+                      {estimate.disclaimer}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+
+        <DialogFooter className="border-border shrink-0 border-t px-4 py-3 sm:px-6">
           <Button
             type="button"
             variant="outline"
