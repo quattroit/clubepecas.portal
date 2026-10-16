@@ -20,7 +20,6 @@ import type {
   ChangeSellerSubscriptionCheckoutResponse,
   CreateSellerSubscriptionCheckoutRequest,
   CreateSellerSubscriptionCheckoutResponse,
-  CreateSellerSubscriptionRequest,
   DowngradeSellerSubscriptionRequest,
   DowngradeSellerSubscriptionResponse,
   ListSellerSubscriptionHistoryResponse,
@@ -112,13 +111,6 @@ export const sellerService = {
       .get<ListSellerSubscriptionHistoryResponse>(
         "/api/v1/seller/subscription/history",
       )
-      .then((response) => response.data);
-  },
-
-  /** POST /api/v1/seller/subscription */
-  createSubscription(payload: CreateSellerSubscriptionRequest) {
-    return api
-      .post<SellerSubscriptionDto>("/api/v1/seller/subscription", payload)
       .then((response) => response.data);
   },
 

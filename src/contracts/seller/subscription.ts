@@ -259,12 +259,6 @@ export type ListSellerSubscriptionsResponse = {
   items: SellerSubscriptionListItemDto[];
 };
 
-/** POST /api/v1/seller/subscription */
-export type CreateSellerSubscriptionRequest = {
-  subscriptionPlanId: number;
-  billingCycle: BillingCycle;
-};
-
 /** POST /api/v1/seller/subscription/checkout */
 export type CreateSellerSubscriptionCheckoutRequest = {
   subscriptionPlanId: number;

@@ -77,7 +77,6 @@ function mapSellerProfileFormToRequest(
     complement: emptyToNull(values.complement),
     whatsApp: values.whatsApp.trim(),
     instagram: emptyToNull(values.instagram),
-    photoUrl: emptyToNull(values.photoUrl),
     specialtyIds: values.specialtyIds,
   };
 }
