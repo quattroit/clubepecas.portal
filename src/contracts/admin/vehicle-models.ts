@@ -14,6 +14,8 @@ export type AdminVehicleModelsListParams = {
   sort?: AdminVehicleModelSortParam;
   sortDir?: AdminVehicleModelSortDir;
   brandId?: number;
+  page?: number;
+  pageSize?: number;
 };
 
 export type AdminVehicleModelListItemDto = {
@@ -30,6 +32,10 @@ export type AdminVehicleModelListItemDto = {
 };
 
 export type GetAdminVehicleModelsResponse = {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
   items: AdminVehicleModelListItemDto[];
 };
 

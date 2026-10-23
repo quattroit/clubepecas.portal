@@ -13,6 +13,8 @@ export type AdminVehicleBrandsListParams = {
   status?: AdminVehicleBrandStatusFilter;
   sort?: AdminVehicleBrandSortParam;
   sortDir?: AdminVehicleBrandSortDir;
+  page?: number;
+  pageSize?: number;
 };
 
 export type AdminVehicleBrandListItemDto = {
@@ -26,6 +28,10 @@ export type AdminVehicleBrandListItemDto = {
 };
 
 export type GetAdminVehicleBrandsResponse = {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
   items: AdminVehicleBrandListItemDto[];
 };
 

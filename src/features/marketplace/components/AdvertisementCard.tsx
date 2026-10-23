@@ -40,7 +40,7 @@ function AdvertisementCard({
   const location = `${city}, ${state}`;
   const href = advertisementPath(slug ?? String(id));
   const vehicleYearsLabel =
-    typeof manufacturingYear === "number" && typeof modelYear === "number"
+    typeof manufacturingYear === "number" || typeof modelYear === "number"
       ? formatVehicleYears(manufacturingYear, modelYear)
       : null;
   const localDeliveryLabel = formatLocalDeliveryOfferLabel(

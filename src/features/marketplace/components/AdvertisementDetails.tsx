@@ -48,7 +48,7 @@ function AdvertisementDetails({
 
   const publishedLabel = formatPublishedAt(publishedAt);
   const vehicleYearsLabel =
-    typeof manufacturingYear === "number" && typeof modelYear === "number"
+    typeof manufacturingYear === "number" || typeof modelYear === "number"
       ? formatVehicleYears(manufacturingYear, modelYear)
       : null;
   const localDeliveryLabel = formatLocalDeliveryOfferLabel(

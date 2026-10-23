@@ -570,7 +570,7 @@ function AdvertisementForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="ad-manufacturing-year">
-                Ano de Fabricação{vehicleRequired ? "" : " (opcional)"}
+                Ano de Fabricação (opcional)
               </Label>
               <select
                 id="ad-manufacturing-year"
@@ -603,7 +603,7 @@ function AdvertisementForm({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="ad-model-year">Ano/Modelo</Label>
+              <Label htmlFor="ad-model-year">Ano/Modelo (opcional)</Label>
               <select
                 id="ad-model-year"
                 className={selectClassName}

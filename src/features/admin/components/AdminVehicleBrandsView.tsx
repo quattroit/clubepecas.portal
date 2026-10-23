@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Car, GripVertical, Pencil, Plus } from "lucide-react";
+import { Car, Pencil, Plus } from "lucide-react";
 
 import {
   AdminEmptyState,
@@ -14,6 +14,7 @@ import {
   AdminTableSkeleton,
   ConfirmDialog,
 } from "@/components/admin";
+import { Pagination } from "@/components/navigation/Pagination";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import type {
@@ -24,7 +25,6 @@ import { VehicleBrandFormDialog } from "@/features/admin/components/VehicleBrand
 import type { VehicleBrandFormValues } from "@/features/admin/schemas/vehicleBrandFormSchema";
 import { useAdminVehicleBrands } from "@/hooks/api/useAdminVehicleBrands";
 import { useCreateAdminVehicleBrand } from "@/hooks/api/useCreateAdminVehicleBrand";
-import { useReorderAdminVehicleBrands } from "@/hooks/api/useReorderAdminVehicleBrands";
 import { useUpdateAdminVehicleBrand } from "@/hooks/api/useUpdateAdminVehicleBrand";
 import { useUpdateAdminVehicleBrandStatus } from "@/hooks/api/useUpdateAdminVehicleBrandStatus";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
@@ -57,7 +57,7 @@ const selectClassName = cn(
 
 /**
  * Listagem administrativa de marcas de veículo — URL como fonte da verdade.
- * Reordenação via drag-and-drop HTML5 (persistida imediatamente ao soltar).
+ * A ordem de cada marca é editada no formulário.
  */
 function AdminVehicleBrandsView() {
   const router = useRouter();
@@ -69,7 +69,6 @@ function AdminVehicleBrandsView() {
   const createMutation = useCreateAdminVehicleBrand();
   const updateMutation = useUpdateAdminVehicleBrand();
   const statusMutation = useUpdateAdminVehicleBrandStatus();
-  const reorderMutation = useReorderAdminVehicleBrands();
 
   const [searchDraft, setSearchDraft] = useState(filters.q ?? "");
   const [lastSearchQ, setLastSearchQ] = useState(filters.q);
@@ -80,26 +79,16 @@ function AdminVehicleBrandsView() {
   const [statusTarget, setStatusTarget] =
     useState<AdminVehicleBrandListItemDto | null>(null);
 
-  const [items, setItems] = useState<AdminVehicleBrandListItemDto[]>([]);
-  const [lastLoadedData, setLastLoadedData] = useState(brandsQuery.data);
-  const [draggedId, setDraggedId] = useState<number | null>(null);
-  const [dragOverId, setDragOverId] = useState<number | null>(null);
-
-  // Sincroniza estado local a partir da URL/dados carregados durante a
-  // renderização (evita setState em efeito — ver react.dev/learn/you-might-not-need-an-effect).
   if (filters.q !== lastSearchQ) {
     setLastSearchQ(filters.q);
     setSearchDraft(filters.q ?? "");
   }
 
-  if (brandsQuery.data && brandsQuery.data !== lastLoadedData) {
-    setLastLoadedData(brandsQuery.data);
-    setItems(brandsQuery.data.items);
-  }
-
+  const items = brandsQuery.data?.items ?? [];
+  const currentPage = brandsQuery.data?.currentPage ?? filters.page ?? 1;
+  const totalPages = Math.max(1, brandsQuery.data?.totalPages ?? 1);
   const hasFilters = adminVehicleBrandsHasActiveFilters(filters);
   const sort = filters.sort ?? "order";
-  const canReorder = sort === "order" && !hasFilters;
 
   const applyFilters = useCallback(
     (next: AdminVehicleBrandsUrlFilters) => {
@@ -110,7 +99,11 @@ function AdminVehicleBrandsView() {
 
   const patchFilters = useCallback(
     (patch: Partial<AdminVehicleBrandsUrlFilters>) => {
-      applyFilters({ ...filters, ...patch });
+      applyFilters({
+        ...filters,
+        ...patch,
+        page: patch.page ?? 1,
+      });
     },
     [applyFilters, filters],
   );
@@ -150,42 +143,6 @@ function AdminVehicleBrandsView() {
     updateMutation.mutate(
       { id: editingBrand.id, ...mapVehicleBrandFormToUpdateRequest(values) },
       { onSuccess: () => setFormOpen(false) },
-    );
-  };
-
-  const handleDrop = (targetId: number) => {
-    if (!draggedId || draggedId === targetId) {
-      setDraggedId(null);
-      setDragOverId(null);
-      return;
-    }
-
-    const currentOrder = [...items];
-    const fromIndex = currentOrder.findIndex((item) => item.id === draggedId);
-    const toIndex = currentOrder.findIndex((item) => item.id === targetId);
-
-    if (fromIndex === -1 || toIndex === -1) {
-      setDraggedId(null);
-      setDragOverId(null);
-      return;
-    }
-
-    const [moved] = currentOrder.splice(fromIndex, 1);
-    currentOrder.splice(toIndex, 0, moved);
-
-    setItems(currentOrder);
-    setDraggedId(null);
-    setDragOverId(null);
-
-    reorderMutation.mutate(
-      { orderedIds: currentOrder.map((item) => item.id) },
-      {
-        onError: () => {
-          if (brandsQuery.data) {
-            setItems(brandsQuery.data.items);
-          }
-        },
-      },
     );
   };
 
@@ -280,11 +237,7 @@ function AdminVehicleBrandsView() {
 
       <AdminSection
         title="Listagem"
-        description={
-          canReorder
-            ? "Arraste as linhas para reordenar — a nova ordem é salva automaticamente."
-            : "Limpe a busca, os filtros e ordene por “Ordem” para reordenar por arrastar."
-        }
+        description="A ordem de uma marca é alterada na edição."
       >
         {brandsQuery.isError ? (
           <AdminEmptyState
@@ -305,7 +258,7 @@ function AdminVehicleBrandsView() {
             }
           />
         ) : brandsQuery.isLoading ? (
-          <AdminTableSkeleton columns={8} />
+          <AdminTableSkeleton columns={7} />
         ) : items.length === 0 ? (
           <AdminEmptyState
             title={
@@ -335,7 +288,6 @@ function AdminVehicleBrandsView() {
                 <caption className="sr-only">Marcas de veículo do marketplace</caption>
                 <thead className="bg-muted/50 border-border border-b">
                   <tr>
-                    <th scope="col" className="w-10 px-2 py-3" aria-hidden />
                     <th
                       scope="col"
                       className="text-muted-foreground px-4 py-3 text-xs font-semibold tracking-wide uppercase"
@@ -384,43 +336,8 @@ function AdminVehicleBrandsView() {
                   {items.map((brand) => (
                     <tr
                       key={brand.id}
-                      draggable={canReorder}
-                      onDragStart={(event) => {
-                        if (!canReorder) return;
-                        setDraggedId(brand.id);
-                        event.dataTransfer.effectAllowed = "move";
-                      }}
-                      onDragOver={(event) => {
-                        if (!canReorder || !draggedId) return;
-                        event.preventDefault();
-                        setDragOverId(brand.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggedId(null);
-                        setDragOverId(null);
-                      }}
-                      onDrop={(event) => {
-                        if (!canReorder) return;
-                        event.preventDefault();
-                        handleDrop(brand.id);
-                      }}
-                      className={cn(
-                        "hover:bg-muted/30 transition-colors",
-                        draggedId === brand.id && "opacity-50",
-                        dragOverId === brand.id &&
-                          draggedId &&
-                          draggedId !== brand.id &&
-                          "bg-primary/5 outline-primary/40 outline-2 -outline-offset-2",
-                      )}
+                      className="hover:bg-muted/30 transition-colors"
                     >
-                      <td className="px-2 py-3 text-center">
-                        {canReorder ? (
-                          <GripVertical
-                            className="text-muted-foreground mx-auto size-4 cursor-grab active:cursor-grabbing"
-                            aria-hidden
-                          />
-                        ) : null}
-                      </td>
                       <td className="text-foreground px-4 py-3 font-medium">
                         {brand.name}
                       </td>
@@ -465,6 +382,15 @@ function AdminVehicleBrandsView() {
                 </tbody>
               </table>
             </div>
+            {totalPages > 1 ? (
+              <div className="border-border border-t px-4 py-3">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => patchFilters({ page })}
+                />
+              </div>
+            ) : null}
           </div>
         )}
       </AdminSection>

@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { GripVertical, MapPin, Pencil, Plus } from "lucide-react";
+import { MapPin, Pencil, Plus } from "lucide-react";
 
 import {
   AdminEmptyState,
@@ -14,6 +14,7 @@ import {
   AdminTableSkeleton,
   ConfirmDialog,
 } from "@/components/admin";
+import { Pagination } from "@/components/navigation/Pagination";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import type {
@@ -24,7 +25,6 @@ import { CityFormDialog } from "@/features/admin/components/CityFormDialog";
 import type { CityFormValues } from "@/features/admin/schemas/cityFormSchema";
 import { useAdminCities } from "@/hooks/api/useAdminCities";
 import { useCreateAdminCity } from "@/hooks/api/useCreateAdminCity";
-import { useReorderAdminCities } from "@/hooks/api/useReorderAdminCities";
 import { useUpdateAdminCity } from "@/hooks/api/useUpdateAdminCity";
 import { useUpdateAdminCityStatus } from "@/hooks/api/useUpdateAdminCityStatus";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
@@ -57,7 +57,7 @@ const selectClassName = cn(
 
 /**
  * Listagem administrativa de cidades — URL como fonte da verdade.
- * Reordenação via drag-and-drop HTML5 (persistida imediatamente ao soltar).
+ * A ordem de cada cidade é editada no formulário.
  */
 function AdminCitiesView() {
   const router = useRouter();
@@ -69,7 +69,6 @@ function AdminCitiesView() {
   const createMutation = useCreateAdminCity();
   const updateMutation = useUpdateAdminCity();
   const statusMutation = useUpdateAdminCityStatus();
-  const reorderMutation = useReorderAdminCities();
 
   const [searchDraft, setSearchDraft] = useState(filters.q ?? "");
   const [lastSearchQ, setLastSearchQ] = useState(filters.q);
@@ -82,26 +81,17 @@ function AdminCitiesView() {
     null,
   );
 
-  const [items, setItems] = useState<AdminCityListItemDto[]>([]);
-  const [lastLoadedData, setLastLoadedData] = useState(citiesQuery.data);
-  const [draggedId, setDraggedId] = useState<number | null>(null);
-  const [dragOverId, setDragOverId] = useState<number | null>(null);
-
-  // Sincroniza estado local a partir da URL/dados carregados durante a
-  // renderização (evita setState em efeito — ver react.dev/learn/you-might-not-need-an-effect).
+  // Sincroniza a busca local a partir da URL durante a renderização.
   if (filters.q !== lastSearchQ) {
     setLastSearchQ(filters.q);
     setSearchDraft(filters.q ?? "");
   }
 
-  if (citiesQuery.data && citiesQuery.data !== lastLoadedData) {
-    setLastLoadedData(citiesQuery.data);
-    setItems(citiesQuery.data.items);
-  }
-
+  const items = citiesQuery.data?.items ?? [];
+  const currentPage = citiesQuery.data?.currentPage ?? filters.page ?? 1;
+  const totalPages = Math.max(1, citiesQuery.data?.totalPages ?? 1);
   const hasFilters = adminCitiesHasActiveFilters(filters);
   const sort = filters.sort ?? "order";
-  const canReorder = sort === "order" && !hasFilters;
 
   const applyFilters = useCallback(
     (next: AdminCitiesUrlFilters) => {
@@ -112,7 +102,11 @@ function AdminCitiesView() {
 
   const patchFilters = useCallback(
     (patch: Partial<AdminCitiesUrlFilters>) => {
-      applyFilters({ ...filters, ...patch });
+      applyFilters({
+        ...filters,
+        ...patch,
+        page: patch.page ?? 1,
+      });
     },
     [applyFilters, filters],
   );
@@ -152,42 +146,6 @@ function AdminCitiesView() {
     updateMutation.mutate(
       { id: editingCity.id, ...mapCityFormToUpdateRequest(values) },
       { onSuccess: () => setFormOpen(false) },
-    );
-  };
-
-  const handleDrop = (targetId: number) => {
-    if (!draggedId || draggedId === targetId) {
-      setDraggedId(null);
-      setDragOverId(null);
-      return;
-    }
-
-    const currentOrder = [...items];
-    const fromIndex = currentOrder.findIndex((item) => item.id === draggedId);
-    const toIndex = currentOrder.findIndex((item) => item.id === targetId);
-
-    if (fromIndex === -1 || toIndex === -1) {
-      setDraggedId(null);
-      setDragOverId(null);
-      return;
-    }
-
-    const [moved] = currentOrder.splice(fromIndex, 1);
-    currentOrder.splice(toIndex, 0, moved);
-
-    setItems(currentOrder);
-    setDraggedId(null);
-    setDragOverId(null);
-
-    reorderMutation.mutate(
-      { orderedIds: currentOrder.map((item) => item.id) },
-      {
-        onError: () => {
-          if (citiesQuery.data) {
-            setItems(citiesQuery.data.items);
-          }
-        },
-      },
     );
   };
 
@@ -282,11 +240,7 @@ function AdminCitiesView() {
 
       <AdminSection
         title="Listagem"
-        description={
-          canReorder
-            ? "Arraste as linhas para reordenar — a nova ordem é salva automaticamente."
-            : "Limpe a busca, os filtros e ordene por “Ordem” para reordenar por arrastar."
-        }
+        description="A ordem de uma cidade é alterada na edição."
       >
         {citiesQuery.isError ? (
           <AdminEmptyState
@@ -307,7 +261,7 @@ function AdminCitiesView() {
             }
           />
         ) : citiesQuery.isLoading ? (
-          <AdminTableSkeleton columns={8} />
+          <AdminTableSkeleton columns={7} />
         ) : items.length === 0 ? (
           <AdminEmptyState
             title={hasFilters ? "Nenhum resultado para os filtros aplicados" : "Nenhuma cidade cadastrada"}
@@ -333,7 +287,6 @@ function AdminCitiesView() {
                 <caption className="sr-only">Cidades do marketplace</caption>
                 <thead className="bg-muted/50 border-border border-b">
                   <tr>
-                    <th scope="col" className="w-10 px-2 py-3" aria-hidden />
                     <th
                       scope="col"
                       className="text-muted-foreground px-4 py-3 text-xs font-semibold tracking-wide uppercase"
@@ -388,43 +341,8 @@ function AdminCitiesView() {
                   {items.map((city) => (
                     <tr
                       key={city.id}
-                      draggable={canReorder}
-                      onDragStart={(event) => {
-                        if (!canReorder) return;
-                        setDraggedId(city.id);
-                        event.dataTransfer.effectAllowed = "move";
-                      }}
-                      onDragOver={(event) => {
-                        if (!canReorder || !draggedId) return;
-                        event.preventDefault();
-                        setDragOverId(city.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggedId(null);
-                        setDragOverId(null);
-                      }}
-                      onDrop={(event) => {
-                        if (!canReorder) return;
-                        event.preventDefault();
-                        handleDrop(city.id);
-                      }}
-                      className={cn(
-                        "hover:bg-muted/30 transition-colors",
-                        draggedId === city.id && "opacity-50",
-                        dragOverId === city.id &&
-                          draggedId &&
-                          draggedId !== city.id &&
-                          "bg-primary/5 outline-primary/40 outline-2 -outline-offset-2",
-                      )}
+                      className="hover:bg-muted/30 transition-colors"
                     >
-                      <td className="px-2 py-3 text-center">
-                        {canReorder ? (
-                          <GripVertical
-                            className="text-muted-foreground mx-auto size-4 cursor-grab active:cursor-grabbing"
-                            aria-hidden
-                          />
-                        ) : null}
-                      </td>
                       <td className="text-foreground px-4 py-3 font-medium">
                         {city.name}
                       </td>
@@ -472,6 +390,15 @@ function AdminCitiesView() {
                 </tbody>
               </table>
             </div>
+            {totalPages > 1 ? (
+              <div className="border-border border-t px-4 py-3">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => patchFilters({ page })}
+                />
+              </div>
+            ) : null}
           </div>
         )}
       </AdminSection>

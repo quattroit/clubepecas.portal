@@ -13,6 +13,8 @@ export type AdminVehicleModelsUrlFilters = {
   sort?: AdminVehicleModelSortParam;
   sortDir?: AdminVehicleModelSortDir;
   brandId?: number;
+  page?: number;
+  pageSize?: number;
 };
 
 const SORT_VALUES: AdminVehicleModelSortParam[] = [
@@ -58,6 +60,8 @@ export function parseAdminVehicleModelsFilters(
   const sort = isSort(sortRaw) ? sortRaw : undefined;
   const sortDir: AdminVehicleModelSortDir | undefined =
     sortDirRaw === "asc" || sortDirRaw === "desc" ? sortDirRaw : undefined;
+  const pageRaw = Number(search.get("page") ?? "1");
+  const pageSizeRaw = Number(search.get("pageSize") ?? "20");
 
   return {
     ...(q ? { q } : {}),
@@ -65,6 +69,12 @@ export function parseAdminVehicleModelsFilters(
     ...(brandId ? { brandId } : {}),
     ...(sort ? { sort } : {}),
     ...(sortDir ? { sortDir } : {}),
+    ...(Number.isFinite(pageRaw) && pageRaw > 1
+      ? { page: Math.floor(pageRaw) }
+      : {}),
+    ...(Number.isFinite(pageSizeRaw) && pageSizeRaw !== 20 && pageSizeRaw > 0
+      ? { pageSize: Math.min(100, Math.floor(pageSizeRaw)) }
+      : {}),
   };
 }
 
@@ -90,6 +100,12 @@ export function buildAdminVehicleModelsHref(
   if (filters.sortDir && filters.sortDir !== "asc") {
     params.set("sortDir", filters.sortDir);
   }
+  if (filters.page && filters.page > 1) {
+    params.set("page", String(filters.page));
+  }
+  if (filters.pageSize && filters.pageSize !== 20) {
+    params.set("pageSize", String(filters.pageSize));
+  }
 
   const query = params.toString();
   return query
@@ -109,6 +125,8 @@ export function toAdminVehicleModelsApiParams(
     ...(filters.brandId ? { brandId: filters.brandId } : {}),
     sort: filters.sort ?? "order",
     sortDir: filters.sortDir ?? "asc",
+    page: filters.page ?? 1,
+    pageSize: filters.pageSize ?? 20,
   };
 }
 

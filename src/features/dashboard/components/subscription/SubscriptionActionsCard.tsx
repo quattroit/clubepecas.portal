@@ -154,15 +154,17 @@ function SubscriptionActionsCard({
         >
           Sincronizar
         </Button>
-        <Button
-          type="button"
-          variant="destructive"
-          onClick={onCancel}
-          disabled={!actions?.canCancel || cancelLoading}
-          aria-busy={cancelLoading}
-        >
-          Cancelar renovação
-        </Button>
+        {actions?.canCancel ? (
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={onCancel}
+            disabled={cancelLoading}
+            aria-busy={cancelLoading}
+          >
+            Cancelar renovação
+          </Button>
+        ) : null}
       </CardContent>
     </Card>
   );

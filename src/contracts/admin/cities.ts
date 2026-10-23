@@ -10,6 +10,8 @@ export type AdminCitiesListParams = {
   status?: AdminCityStatusFilter;
   sort?: AdminCitySortParam;
   sortDir?: AdminCitySortDir;
+  page?: number;
+  pageSize?: number;
 };
 
 export type AdminCityListItemDto = {
@@ -24,6 +26,10 @@ export type AdminCityListItemDto = {
 };
 
 export type GetAdminCitiesResponse = {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
   items: AdminCityListItemDto[];
 };
 

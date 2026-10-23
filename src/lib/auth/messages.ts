@@ -74,6 +74,8 @@ const CODE_MESSAGES: Record<string, string> = {
     "Você já possui uma assinatura ativa. Cancele a atual antes de assinar outro plano.",
   "seller.subscription.demo_already_used":
     "Você já utilizou o plano demonstração.",
+  "seller.subscription.demo_plan":
+    "O plano demonstração não possui cobrança nem renovação.",
   "seller.subscription.not_found":
     "Nenhuma assinatura ativa encontrada.",
   "seller.subscription.plan_not_found": "Plano de assinatura não encontrado.",
@@ -109,6 +111,17 @@ const CODE_MESSAGES: Record<string, string> = {
   "city.state.invalid": "Informe uma UF válida com 2 letras.",
   "city.slug.duplicate": "Já existe uma cidade com este slug.",
   "city.name_state.duplicate": "Já existe uma cidade com este nome neste estado.",
+  "admin.cities.page.invalid": "A página deve ser maior ou igual a 1.",
+  "admin.cities.page_size.invalid":
+    "O tamanho da página deve estar entre 1 e 100.",
+  "admin.vehicle_brands.page.invalid":
+    "A página deve ser maior ou igual a 1.",
+  "admin.vehicle_brands.page_size.invalid":
+    "O tamanho da página deve estar entre 1 e 100.",
+  "admin.vehicle_models.page.invalid":
+    "A página deve ser maior ou igual a 1.",
+  "admin.vehicle_models.page_size.invalid":
+    "O tamanho da página deve estar entre 1 e 100.",
   "vehicle_brand.not_found": "Marca não encontrada.",
   "vehicle_brand.name.required": "Informe o nome da marca.",
   "vehicle_brand.slug.duplicate": "Já existe uma marca com este slug.",

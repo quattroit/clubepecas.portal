@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CarFront, GripVertical, Pencil, Plus } from "lucide-react";
+import { CarFront, Pencil, Plus } from "lucide-react";
 
 import {
   AdminEmptyState,
@@ -14,6 +14,7 @@ import {
   AdminTableSkeleton,
   ConfirmDialog,
 } from "@/components/admin";
+import { Pagination } from "@/components/navigation/Pagination";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import type {
@@ -27,7 +28,6 @@ import {
 } from "@/features/admin/schemas/vehicleModelFormSchema";
 import { useAdminVehicleModels } from "@/hooks/api/useAdminVehicleModels";
 import { useCreateAdminVehicleModel } from "@/hooks/api/useCreateAdminVehicleModel";
-import { useReorderAdminVehicleModels } from "@/hooks/api/useReorderAdminVehicleModels";
 import { useUpdateAdminVehicleModel } from "@/hooks/api/useUpdateAdminVehicleModel";
 import { useUpdateAdminVehicleModelStatus } from "@/hooks/api/useUpdateAdminVehicleModelStatus";
 import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
@@ -61,7 +61,7 @@ const selectClassName = cn(
 
 /**
  * Listagem administrativa de modelos de veículo — URL como fonte da verdade.
- * Reordenação via drag-and-drop HTML5 (persistida imediatamente ao soltar).
+ * A ordem de cada modelo é editada no formulário.
  */
 function AdminVehicleModelsView() {
   const router = useRouter();
@@ -74,7 +74,6 @@ function AdminVehicleModelsView() {
   const createMutation = useCreateAdminVehicleModel();
   const updateMutation = useUpdateAdminVehicleModel();
   const statusMutation = useUpdateAdminVehicleModelStatus();
-  const reorderMutation = useReorderAdminVehicleModels();
 
   const [searchDraft, setSearchDraft] = useState(filters.q ?? "");
   const [lastSearchQ, setLastSearchQ] = useState(filters.q);
@@ -85,24 +84,16 @@ function AdminVehicleModelsView() {
   const [statusTarget, setStatusTarget] =
     useState<AdminVehicleModelListItemDto | null>(null);
 
-  const [items, setItems] = useState<AdminVehicleModelListItemDto[]>([]);
-  const [lastLoadedData, setLastLoadedData] = useState(modelsQuery.data);
-  const [draggedId, setDraggedId] = useState<number | null>(null);
-  const [dragOverId, setDragOverId] = useState<number | null>(null);
-
   if (filters.q !== lastSearchQ) {
     setLastSearchQ(filters.q);
     setSearchDraft(filters.q ?? "");
   }
 
-  if (modelsQuery.data && modelsQuery.data !== lastLoadedData) {
-    setLastLoadedData(modelsQuery.data);
-    setItems(modelsQuery.data.items);
-  }
-
+  const items = modelsQuery.data?.items ?? [];
+  const currentPage = modelsQuery.data?.currentPage ?? filters.page ?? 1;
+  const totalPages = Math.max(1, modelsQuery.data?.totalPages ?? 1);
   const hasFilters = adminVehicleModelsHasActiveFilters(filters);
   const sort = filters.sort ?? "order";
-  const canReorder = sort === "order" && !hasFilters;
 
   const applyFilters = useCallback(
     (next: AdminVehicleModelsUrlFilters) => {
@@ -113,7 +104,11 @@ function AdminVehicleModelsView() {
 
   const patchFilters = useCallback(
     (patch: Partial<AdminVehicleModelsUrlFilters>) => {
-      applyFilters({ ...filters, ...patch });
+      applyFilters({
+        ...filters,
+        ...patch,
+        page: patch.page ?? 1,
+      });
     },
     [applyFilters, filters],
   );
@@ -159,42 +154,6 @@ function AdminVehicleModelsView() {
     updateMutation.mutate(
       { id: editingModel.id, ...mapVehicleModelFormToUpdateRequest(values) },
       { onSuccess: () => setFormOpen(false) },
-    );
-  };
-
-  const handleDrop = (targetId: number) => {
-    if (!draggedId || draggedId === targetId) {
-      setDraggedId(null);
-      setDragOverId(null);
-      return;
-    }
-
-    const currentOrder = [...items];
-    const fromIndex = currentOrder.findIndex((item) => item.id === draggedId);
-    const toIndex = currentOrder.findIndex((item) => item.id === targetId);
-
-    if (fromIndex === -1 || toIndex === -1) {
-      setDraggedId(null);
-      setDragOverId(null);
-      return;
-    }
-
-    const [moved] = currentOrder.splice(fromIndex, 1);
-    currentOrder.splice(toIndex, 0, moved);
-
-    setItems(currentOrder);
-    setDraggedId(null);
-    setDragOverId(null);
-
-    reorderMutation.mutate(
-      { orderedIds: currentOrder.map((item) => item.id) },
-      {
-        onError: () => {
-          if (modelsQuery.data) {
-            setItems(modelsQuery.data.items);
-          }
-        },
-      },
     );
   };
 
@@ -314,11 +273,7 @@ function AdminVehicleModelsView() {
 
       <AdminSection
         title="Listagem"
-        description={
-          canReorder
-            ? "Arraste as linhas para reordenar — a nova ordem é salva automaticamente."
-            : "Limpe a busca, os filtros e ordene por “Ordem” para reordenar por arrastar."
-        }
+        description="A ordem de um modelo é alterada na edição."
       >
         {modelsQuery.isError ? (
           <AdminEmptyState
@@ -339,7 +294,7 @@ function AdminVehicleModelsView() {
             }
           />
         ) : modelsQuery.isLoading ? (
-          <AdminTableSkeleton columns={9} />
+          <AdminTableSkeleton columns={8} />
         ) : items.length === 0 ? (
           <AdminEmptyState
             title={
@@ -369,7 +324,6 @@ function AdminVehicleModelsView() {
                 <caption className="sr-only">Modelos de veículo do marketplace</caption>
                 <thead className="bg-muted/50 border-border border-b">
                   <tr>
-                    <th scope="col" className="w-10 px-2 py-3" aria-hidden />
                     <th
                       scope="col"
                       className="text-muted-foreground px-4 py-3 text-xs font-semibold tracking-wide uppercase"
@@ -424,43 +378,8 @@ function AdminVehicleModelsView() {
                   {items.map((model) => (
                     <tr
                       key={model.id}
-                      draggable={canReorder}
-                      onDragStart={(event) => {
-                        if (!canReorder) return;
-                        setDraggedId(model.id);
-                        event.dataTransfer.effectAllowed = "move";
-                      }}
-                      onDragOver={(event) => {
-                        if (!canReorder || !draggedId) return;
-                        event.preventDefault();
-                        setDragOverId(model.id);
-                      }}
-                      onDragEnd={() => {
-                        setDraggedId(null);
-                        setDragOverId(null);
-                      }}
-                      onDrop={(event) => {
-                        if (!canReorder) return;
-                        event.preventDefault();
-                        handleDrop(model.id);
-                      }}
-                      className={cn(
-                        "hover:bg-muted/30 transition-colors",
-                        draggedId === model.id && "opacity-50",
-                        dragOverId === model.id &&
-                          draggedId &&
-                          draggedId !== model.id &&
-                          "bg-primary/5 outline-primary/40 outline-2 -outline-offset-2",
-                      )}
+                      className="hover:bg-muted/30 transition-colors"
                     >
-                      <td className="px-2 py-3 text-center">
-                        {canReorder ? (
-                          <GripVertical
-                            className="text-muted-foreground mx-auto size-4 cursor-grab active:cursor-grabbing"
-                            aria-hidden
-                          />
-                        ) : null}
-                      </td>
                       <td className="text-foreground px-4 py-3 font-medium">
                         {model.name}
                       </td>
@@ -508,6 +427,15 @@ function AdminVehicleModelsView() {
                 </tbody>
               </table>
             </div>
+            {totalPages > 1 ? (
+              <div className="border-border border-t px-4 py-3">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => patchFilters({ page })}
+                />
+              </div>
+            ) : null}
           </div>
         )}
       </AdminSection>

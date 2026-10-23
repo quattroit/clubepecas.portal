@@ -157,13 +157,6 @@ export function createAdvertisementFormSchema(
             message: "Selecione o modelo",
           });
         }
-        if (values.manufacturingYear == null) {
-          ctx.addIssue({
-            code: "custom",
-            path: ["manufacturingYear"],
-            message: "Informe o ano de fabricação",
-          });
-        }
       }
     });
 }

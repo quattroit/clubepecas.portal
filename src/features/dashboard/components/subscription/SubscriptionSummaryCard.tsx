@@ -97,7 +97,7 @@ function SubscriptionSummaryCard({
           <div>
             <dt className="text-muted-foreground text-xs">Próxima cobrança</dt>
             <dd className="text-sm font-medium">
-              {subscription.plan.isFree
+              {subscription.plan.isFree || subscription.plan.isDemo
                 ? "Não há cobrança"
                 : subscription.nextBillingDateUtc
                   ? formatDate(subscription.nextBillingDateUtc)

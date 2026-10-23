@@ -8,7 +8,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { adminService } from "@/services/admin.service";
 
 /**
- * Listagem administrativa de cidades (uma requisição — sem paginação).
+ * Listagem administrativa paginada de cidades.
  */
 export function useAdminCities(params: AdminCitiesListParams = {}) {
   const authReady = useAuthQueryEnabled();

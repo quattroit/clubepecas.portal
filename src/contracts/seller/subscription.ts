@@ -25,6 +25,7 @@ export type SubscriptionPlanSummaryDto = {
   quotaUsagePercent: number;
   isUnlimited: boolean;
   isFree: boolean;
+  isDemo: boolean;
 };
 
 export type SubscriptionPaymentSnapshotDto = {

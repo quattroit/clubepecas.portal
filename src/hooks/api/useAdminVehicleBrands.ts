@@ -8,7 +8,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { adminService } from "@/services/admin.service";
 
 /**
- * Listagem administrativa de marcas de veículo (uma requisição — sem paginação).
+ * Listagem administrativa paginada de marcas de veículo.
  */
 export function useAdminVehicleBrands(
   params: AdminVehicleBrandsListParams = {},

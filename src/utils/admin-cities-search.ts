@@ -12,6 +12,8 @@ export type AdminCitiesUrlFilters = {
   status?: AdminCityStatusFilter;
   sort?: AdminCitySortParam;
   sortDir?: AdminCitySortDir;
+  page?: number;
+  pageSize?: number;
 };
 
 const SORT_VALUES: AdminCitySortParam[] = ["name", "order", "sellerCount"];
@@ -47,12 +49,20 @@ export function parseAdminCitiesFilters(
   const sort = isSort(sortRaw) ? sortRaw : undefined;
   const sortDir: AdminCitySortDir | undefined =
     sortDirRaw === "asc" || sortDirRaw === "desc" ? sortDirRaw : undefined;
+  const pageRaw = Number(search.get("page") ?? "1");
+  const pageSizeRaw = Number(search.get("pageSize") ?? "20");
 
   return {
     ...(q ? { q } : {}),
     ...(status ? { status } : {}),
     ...(sort ? { sort } : {}),
     ...(sortDir ? { sortDir } : {}),
+    ...(Number.isFinite(pageRaw) && pageRaw > 1
+      ? { page: Math.floor(pageRaw) }
+      : {}),
+    ...(Number.isFinite(pageSizeRaw) && pageSizeRaw !== 20 && pageSizeRaw > 0
+      ? { pageSize: Math.min(100, Math.floor(pageSizeRaw)) }
+      : {}),
   };
 }
 
@@ -75,6 +85,12 @@ export function buildAdminCitiesHref(
   if (filters.sortDir && filters.sortDir !== "asc") {
     params.set("sortDir", filters.sortDir);
   }
+  if (filters.page && filters.page > 1) {
+    params.set("page", String(filters.page));
+  }
+  if (filters.pageSize && filters.pageSize !== 20) {
+    params.set("pageSize", String(filters.pageSize));
+  }
 
   const query = params.toString();
   return query ? `${ROUTES.ADMIN_CITIES}?${query}` : ROUTES.ADMIN_CITIES;
@@ -91,6 +107,8 @@ export function toAdminCitiesApiParams(
     ...(filters.status ? { status: filters.status } : {}),
     sort: filters.sort ?? "order",
     sortDir: filters.sortDir ?? "asc",
+    page: filters.page ?? 1,
+    pageSize: filters.pageSize ?? 20,
   };
 }
 
