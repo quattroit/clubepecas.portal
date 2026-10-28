@@ -142,21 +142,12 @@ export function createAdvertisementFormSchema(
         });
       }
 
-      if (requiresVehicle) {
-        if (values.vehicleBrandId == null) {
-          ctx.addIssue({
-            code: "custom",
-            path: ["vehicleBrandId"],
-            message: "Selecione a marca",
-          });
-        }
-        if (values.vehicleModelId == null) {
-          ctx.addIssue({
-            code: "custom",
-            path: ["vehicleModelId"],
-            message: "Selecione o modelo",
-          });
-        }
+      if (requiresVehicle && values.vehicleBrandId == null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["vehicleBrandId"],
+          message: "Selecione a marca",
+        });
       }
     });
 }

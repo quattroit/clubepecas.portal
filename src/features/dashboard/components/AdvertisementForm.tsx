@@ -510,9 +510,7 @@ function AdvertisementForm({
         <>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="ad-vehicle-model">
-                Modelo{vehicleRequired ? "" : " (opcional)"}
-              </Label>
+              <Label htmlFor="ad-vehicle-model">Modelo (opcional)</Label>
               <select
                 id="ad-vehicle-model"
                 className={selectClassName}
