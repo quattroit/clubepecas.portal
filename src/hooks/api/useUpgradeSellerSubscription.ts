@@ -43,9 +43,6 @@ export function useUpgradeSellerSubscription(options?: UpgradeOptions) {
         void queryClient.invalidateQueries({
           queryKey: queryKeys.seller.subscriptionPayments,
         });
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.seller.subscriptionHistory,
-        });
         toast.success("Upgrade aplicado.");
         options?.onActivatedWithoutCheckout?.();
         return;

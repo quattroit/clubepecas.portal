@@ -25,9 +25,6 @@ export function useDowngradeSellerSubscription() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscription,
       });
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.seller.subscriptionHistory,
-      });
       toast.success(result.message || "Downgrade agendado.");
     },
     onError: (error) => {

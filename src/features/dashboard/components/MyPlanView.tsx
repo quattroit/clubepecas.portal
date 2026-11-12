@@ -10,7 +10,6 @@ import { AvailablePlansDialog } from "@/features/dashboard/components/subscripti
 import { PaymentHistoryCard } from "@/features/dashboard/components/subscription/PaymentHistoryCard";
 import { SubscriptionActionsCard } from "@/features/dashboard/components/subscription/SubscriptionActionsCard";
 import { SubscriptionFaqCard } from "@/features/dashboard/components/subscription/SubscriptionFaqCard";
-import { SubscriptionHistoryCard } from "@/features/dashboard/components/subscription/SubscriptionHistoryCard";
 import { SubscriptionMessagesCard } from "@/features/dashboard/components/subscription/SubscriptionMessagesCard";
 import {
   SubscriptionCancellationNoticeCard,
@@ -32,7 +31,6 @@ import { useDowngradeSellerSubscription } from "@/hooks/api/useDowngradeSellerSu
 import { useReactivateSellerSubscription } from "@/hooks/api/useReactivateSellerSubscription";
 import { useRetrySellerSubscriptionPayment } from "@/hooks/api/useRetrySellerSubscriptionPayment";
 import { useSeller } from "@/hooks/api/useSeller";
-import { useSellerSubscriptionHistory } from "@/hooks/api/useSellerSubscriptionHistory";
 import { useSellerSubscriptionPayments } from "@/hooks/api/useSellerSubscriptionPayments";
 import { useSyncSellerSubscriptionPayment } from "@/hooks/api/useSyncSellerSubscriptionPayment";
 import { useUpgradeSellerSubscription } from "@/hooks/api/useUpgradeSellerSubscription";
@@ -50,9 +48,6 @@ function MyPlanView() {
   const sellerQuery = useSeller();
   const subscriptionQuery = useCurrentSellerSubscription();
   const paymentsQuery = useSellerSubscriptionPayments(
-    Boolean(subscriptionQuery.data),
-  );
-  const historyQuery = useSellerSubscriptionHistory(
     Boolean(subscriptionQuery.data),
   );
 
@@ -241,17 +236,6 @@ function MyPlanView() {
           ) : null}
           {!paymentsQuery.isLoading && !paymentsQuery.isError ? (
             <PaymentHistoryCard items={paymentsQuery.data ?? []} />
-          ) : null}
-
-          {historyQuery.isLoading ? <SubscriptionHistorySkeleton /> : null}
-          {historyQuery.isError ? (
-            <ErrorMessage
-              title="Não foi possível carregar o histórico da assinatura"
-              message={getFriendlyErrorMessage(historyQuery.error)}
-            />
-          ) : null}
-          {!historyQuery.isLoading && !historyQuery.isError ? (
-            <SubscriptionHistoryCard items={historyQuery.data ?? []} />
           ) : null}
         </>
       ) : null}

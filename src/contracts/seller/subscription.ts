@@ -230,19 +230,6 @@ export type ListSellerSubscriptionPaymentsResponse = {
   items: SubscriptionPaymentDto[];
 };
 
-/** GET /api/v1/seller/subscription/history */
-export type SubscriptionHistoryItemDto = {
-  occurredAtUtc: string;
-  type: string;
-  description: string;
-  source: string;
-  success: boolean;
-};
-
-export type ListSellerSubscriptionHistoryResponse = {
-  items: SubscriptionHistoryItemDto[];
-};
-
 /** GET /api/v1/seller/subscriptions — histórico de vínculos (contrato legado). */
 export type SellerSubscriptionListItemDto = {
   id: number;

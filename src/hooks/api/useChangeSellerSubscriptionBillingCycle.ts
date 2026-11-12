@@ -45,9 +45,6 @@ export function useChangeSellerSubscriptionBillingCycle(
         void queryClient.invalidateQueries({
           queryKey: queryKeys.seller.subscriptionPayments,
         });
-        void queryClient.invalidateQueries({
-          queryKey: queryKeys.seller.subscriptionHistory,
-        });
         toast.success("Ciclo de cobrança atualizado.");
         options?.onActivatedWithoutCheckout?.();
         return;

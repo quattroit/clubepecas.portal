@@ -20,9 +20,6 @@ export function useReactivateSellerSubscription() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscription,
       });
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.seller.subscriptionHistory,
-      });
       toast.success(result.message || "Assinatura reativada.");
     },
     onError: (error) => {

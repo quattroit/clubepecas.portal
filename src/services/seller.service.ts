@@ -22,7 +22,6 @@ import type {
   CreateSellerSubscriptionCheckoutResponse,
   DowngradeSellerSubscriptionRequest,
   DowngradeSellerSubscriptionResponse,
-  ListSellerSubscriptionHistoryResponse,
   ListSellerSubscriptionPaymentsResponse,
   ListSellerSubscriptionsResponse,
   PaymentRecoveryResponse,
@@ -101,15 +100,6 @@ export const sellerService = {
     return api
       .get<ListSellerSubscriptionPaymentsResponse>(
         "/api/v1/seller/subscription/payments",
-      )
-      .then((response) => response.data);
-  },
-
-  /** GET /api/v1/seller/subscription/history — eventos (audit + webhooks). */
-  listSubscriptionHistory() {
-    return api
-      .get<ListSellerSubscriptionHistoryResponse>(
-        "/api/v1/seller/subscription/history",
       )
       .then((response) => response.data);
   },

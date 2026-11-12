@@ -31,9 +31,6 @@ export function useSyncSellerSubscriptionPayment(
         queryClient.invalidateQueries({
           queryKey: queryKeys.seller.subscriptionPayments,
         }),
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.seller.subscriptionHistory,
-        }),
       ]);
       const paid = result.paymentStatus?.toLowerCase() === "paid";
       if (silent) {

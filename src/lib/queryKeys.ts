@@ -87,7 +87,6 @@ export const queryKeys = {
     subscription: ["seller", "subscription"] as const,
     subscriptions: ["seller", "subscriptions"] as const,
     subscriptionPayments: ["seller", "subscription", "payments"] as const,
-    subscriptionHistory: ["seller", "subscription", "history"] as const,
     payments: ["seller", "payments"] as const,
   },
   subscriptionPlans: {

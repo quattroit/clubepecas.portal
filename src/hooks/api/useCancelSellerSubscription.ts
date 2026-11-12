@@ -24,9 +24,6 @@ export function useCancelSellerSubscription() {
       void queryClient.invalidateQueries({
         queryKey: queryKeys.seller.subscriptions,
       });
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.seller.subscriptionHistory,
-      });
       toast.success(
         "Renovação cancelada. Você mantém os benefícios até o fim do período.",
       );
