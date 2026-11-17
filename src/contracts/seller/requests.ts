@@ -12,6 +12,8 @@ export type CreateSellerRequest = {
   whatsApp: string;
   instagram?: string | null;
   photoUrl?: string | null;
+  /** Quando true, endereço completo é exibido publicamente e retirada na loja fica disponível. */
+  showAddress: boolean;
   specialtyIds?: number[];
 };
 
@@ -29,5 +31,7 @@ export type UpdateSellerRequest = {
   whatsApp: string;
   instagram?: string | null;
   photoUrl?: string | null;
+  /** Quando true, endereço completo é exibido publicamente e retirada na loja fica disponível. */
+  showAddress: boolean;
   specialtyIds?: number[];
 };

@@ -51,6 +51,7 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
     instagram,
     offersLocalDelivery,
     localDeliveryMaxRadiusKm,
+    showAddress,
   } = seller;
   const [isSharing, setIsSharing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -267,6 +268,7 @@ function StoreHeader({ seller, className }: StoreHeaderProps) {
           onOpenChange={setDialogOpen}
           sellerSlug={slug}
           sellerWhatsApp={whatsApp}
+          showAddress={showAddress !== false}
           onBeforeOpenWhatsApp={handleStoreWhatsAppClick}
         />
       ) : null}

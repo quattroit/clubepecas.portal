@@ -46,6 +46,8 @@ type ContactSellerDialogProps = {
   sellerId?: number;
   sellerSlug?: string;
   sellerWhatsApp: string;
+  /** Quando false, oculta a opção de retirada na loja. Default true. */
+  showAddress?: boolean;
   /** Título do anúncio — se ausente, usa mensagem de loja. */
   advertisementTitle?: string;
   advertisementUrl?: string;
@@ -82,6 +84,7 @@ function ContactSellerDialog({
   sellerId,
   sellerSlug,
   sellerWhatsApp,
+  showAddress = true,
   advertisementTitle,
   advertisementUrl,
   onBeforeOpenWhatsApp,
@@ -90,8 +93,11 @@ function ContactSellerDialog({
   const isProfessionalBuyer = user?.role === UserRole.ProfessionalBuyer;
   const pbQuery = useMyProfessionalBuyer(open && isProfessionalBuyer);
   const estimateMutation = useEstimateLocalDelivery();
+  const allowPickup = showAddress !== false;
 
-  const [mode, setMode] = useState<ContactReceiptMode>("pickup");
+  const [mode, setMode] = useState<ContactReceiptMode>(
+    allowPickup ? "pickup" : "local_delivery",
+  );
   const [zipCode, setZipCode] = useState("");
   const [street, setStreet] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
@@ -116,7 +122,7 @@ function ContactSellerDialog({
   useEffect(() => {
     if (!open) return;
 
-    setMode("pickup");
+    setMode(allowPickup ? "pickup" : "local_delivery");
     setEstimate(null);
     setEditingZip(false);
     setStreet("");
@@ -133,7 +139,7 @@ function ContactSellerDialog({
       setZipCode(guest ? formatPostalCodeInput(guest) : "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when dialog opens / CEP cadastrado chega
-  }, [open, isProfessionalBuyer, registeredZip]);
+  }, [open, isProfessionalBuyer, registeredZip, allowPickup]);
 
   // Prefill do comprador profissional quando o perfil carregar (mesmo CEP cadastrado).
   useEffect(() => {
@@ -277,8 +283,9 @@ function ContactSellerDialog({
       : hasAddressBase;
 
   const canContinueWhatsApp =
-    mode === "pickup" ||
-    (isValidPostalCode(zipDigits) &&
+    (allowPickup && mode === "pickup") ||
+    (mode === "local_delivery" &&
+      isValidPostalCode(zipDigits) &&
       hasAddressBase &&
       number.trim().length > 0);
 
@@ -296,24 +303,26 @@ function ContactSellerDialog({
 
           <fieldset className="flex flex-col gap-3">
             <legend className="sr-only">Forma de recebimento</legend>
-            <label className="flex items-start gap-2 text-sm">
-              <input
-                type="radio"
-                name="receipt-mode"
-                className="mt-1"
-                checked={mode === "pickup"}
-                onChange={() => {
-                  setMode("pickup");
-                  setEstimate(null);
-                }}
-              />
-              <span>
-                <span className="font-medium">Retirada na loja</span>
-                <span className="text-muted-foreground block text-xs">
-                  Combinar horário e endereço diretamente com o vendedor.
+            {allowPickup ? (
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="receipt-mode"
+                  className="mt-1"
+                  checked={mode === "pickup"}
+                  onChange={() => {
+                    setMode("pickup");
+                    setEstimate(null);
+                  }}
+                />
+                <span>
+                  <span className="font-medium">Retirada na loja</span>
+                  <span className="text-muted-foreground block text-xs">
+                    Combinar horário e endereço diretamente com o vendedor.
+                  </span>
                 </span>
-              </span>
-            </label>
+              </label>
+            ) : null}
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="radio"

@@ -27,6 +27,7 @@ export type SellerMeDto = {
   number: string | null;
   complement: string | null;
   neighborhood: string | null;
+  showAddress: boolean;
   isActive: boolean;
   createdAt: string;
   representativeId?: number | null;
@@ -81,6 +82,7 @@ export type SellerPublicProfileResponse = {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
+  showAddress?: boolean;
   offersLocalDelivery?: boolean;
   localDeliveryMaxRadiusKm?: number | null;
   createdAt: string;
@@ -106,6 +108,7 @@ export type SellerPublicListItemDto = {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
+  showAddress?: boolean;
   advertisementCount: number;
 };
 

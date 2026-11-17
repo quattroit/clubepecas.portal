@@ -81,6 +81,7 @@ export type PublicAdvertisementSellerDto = {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
+  showAddress?: boolean;
   advertisementCount: number;
   offersLocalDelivery?: boolean;
   localDeliveryMaxRadiusKm?: number | null;

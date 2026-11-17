@@ -53,6 +53,7 @@ function SellerContactCard({
     whatsApp,
     offersLocalDelivery,
     localDeliveryMaxRadiusKm,
+    showAddress,
   } = seller;
   const [dialogOpen, setDialogOpen] = useState(false);
   const adsLabel =
@@ -193,6 +194,7 @@ function SellerContactCard({
           sellerId={id}
           sellerSlug={slug}
           sellerWhatsApp={whatsApp}
+          showAddress={showAddress !== false}
           advertisementTitle={advertisementTitle}
           onBeforeOpenWhatsApp={trackWhatsApp}
         />

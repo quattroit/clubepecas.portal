@@ -43,6 +43,7 @@ export const sellerProfileFormSchema = z
     number: z.string().trim().min(1, "Informe o número"),
     complement: optionalText,
     neighborhood: z.string().trim().min(1, "Informe o bairro"),
+    showAddress: z.boolean(),
     description: optionalText,
     whatsApp: z
       .string()
@@ -94,6 +95,7 @@ export const sellerProfileFormDefaultValues: SellerProfileFormValues = {
   number: "",
   complement: "",
   neighborhood: "",
+  showAddress: true,
   description: "",
   whatsApp: "",
   instagram: "",

@@ -32,6 +32,7 @@ export function mapSellerToProfileFormValues(
     number: seller.number ?? "",
     complement: seller.complement ?? "",
     neighborhood: seller.neighborhood ?? "",
+    showAddress: seller.showAddress !== false,
     description: seller.description ?? "",
     whatsApp: seller.whatsApp ?? "",
     instagram: seller.instagram
@@ -63,7 +64,7 @@ export function mapSellerProfileFormToUpdateRequest(
 
 function mapSellerProfileFormToRequest(
   values: SellerProfileFormValues,
-): CreateSellerRequest {
+): CreateSellerRequest & UpdateSellerRequest {
   return {
     storeName: values.storeName.trim(),
     cityId: values.cityId,
@@ -77,6 +78,7 @@ function mapSellerProfileFormToRequest(
     complement: emptyToNull(values.complement),
     whatsApp: values.whatsApp.trim(),
     instagram: emptyToNull(values.instagram),
+    showAddress: values.showAddress,
     specialtyIds: values.specialtyIds,
   };
 }

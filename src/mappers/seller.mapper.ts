@@ -34,6 +34,7 @@ export function mapPublicSellerDtoToSeller(
     number: dto.number,
     complement: dto.complement,
     neighborhood: dto.neighborhood,
+    showAddress: dto.showAddress !== false,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
     localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
   };
@@ -61,6 +62,7 @@ export function mapSellerPublicListItemToSeller(
     number: dto.number,
     complement: dto.complement,
     neighborhood: dto.neighborhood,
+    showAddress: dto.showAddress !== false,
   };
 }
 
@@ -84,6 +86,7 @@ export function mapSellerPublicProfileToSeller(
     number: dto.number,
     complement: dto.complement,
     neighborhood: dto.neighborhood,
+    showAddress: dto.showAddress !== false,
     offersLocalDelivery: Boolean(dto.offersLocalDelivery),
     localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
     registeredAt: dto.createdAt,
@@ -114,6 +117,7 @@ export function mapSellerMeToSeller(dto: SellerMeDto): Seller {
     number: dto.number,
     complement: dto.complement,
     neighborhood: dto.neighborhood,
+    showAddress: dto.showAddress !== false,
     representativeId: dto.representativeId,
     representativeCode: dto.representativeCode,
     representativeName: dto.representativeName,

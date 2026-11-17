@@ -120,6 +120,7 @@ export type PartRequestSupplierDto = {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
+  showAddress?: boolean;
   compatibleAdvertisementCount: number;
   phone: string | null;
   whatsApp: string;

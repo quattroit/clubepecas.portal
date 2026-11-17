@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SearchableCombobox } from "@/components/ui/searchable-combobox";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { SellerCoverPicker } from "@/features/dashboard/components/photos/SellerCoverPicker";
 import { SellerPhotoPicker } from "@/features/dashboard/components/photos/SellerPhotoPicker";
@@ -543,6 +544,31 @@ function SellerProfileForm({
             </p>
           ) : null}
         </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <Label htmlFor="seller-show-address">
+            Apresentar endereço junto a loja
+          </Label>
+          <p className="text-muted-foreground text-xs">
+            Quando desativado, o endereço completo fica oculto para
+            compradores e a retirada na loja deixa de ser oferecida no
+            contato.
+          </p>
+        </div>
+        <Controller
+          name="showAddress"
+          control={control}
+          render={({ field }) => (
+            <Switch
+              id="seller-show-address"
+              checked={field.value}
+              disabled={isSubmitting}
+              onCheckedChange={field.onChange}
+            />
+          )}
+        />
       </div>
 
       <div className="flex flex-col gap-2">

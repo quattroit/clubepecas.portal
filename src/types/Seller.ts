@@ -27,6 +27,8 @@ export type Seller = {
   number?: string | null;
   complement?: string | null;
   neighborhood?: string | null;
+  /** Quando true (default), endereço completo é exibido publicamente. */
+  showAddress?: boolean;
   representativeId?: number | null;
   representativeCode?: string | null;
   representativeName?: string | null;
