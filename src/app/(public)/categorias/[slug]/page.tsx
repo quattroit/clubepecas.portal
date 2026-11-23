@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { APP_NAME } from "@/constants/app";
 import { categoryPath } from "@/constants/routes";
 import { CategoryDetailPageView } from "@/features/marketplace/components/CategoryDetailPageView";
-import { findCategoryBySlug, mapCategoryItemsToCategories } from "@/mappers/category.mapper";
-import { categoryService } from "@/services/category.service";
+import {
+  getCachedPublicCategoryDetail,
+  getPublicCategoryBySlug,
+  throwUnlessMissingOrInvalid,
+} from "@/lib/public-record";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
@@ -14,14 +18,7 @@ type CategoryPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export async function generateStaticParams() {
-  try {
-    const response = await categoryService.listCategories();
-    return response.items.map((item) => ({ slug: item.slug }));
-  } catch {
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -29,12 +26,10 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const response = await categoryService.listCategories();
-    const categories = mapCategoryItemsToCategories(response.items);
-    const category = findCategoryBySlug(categories, slug);
+    const category = await getPublicCategoryBySlug(slug);
 
     if (!category) {
-      return { title: "Categoria não encontrada" };
+      notFound();
     }
 
     const description =
@@ -55,11 +50,41 @@ export async function generateMetadata({
         type: "website",
       },
     };
-  } catch {
+  } catch (error) {
+    throwUnlessMissingOrInvalid(error);
     return { title: "Categoria" };
   }
 }
 
-export default function CategoryDetailPage() {
-  return <CategoryDetailPageView />;
+export default async function CategoryDetailPage({
+  params,
+}: CategoryPageProps) {
+  const { slug } = await params;
+
+  try {
+    const category = await getPublicCategoryBySlug(slug);
+
+    if (!category) {
+      notFound();
+    }
+  } catch (error) {
+    throwUnlessMissingOrInvalid(error);
+    return <CategoryDetailPageView />;
+  }
+
+  const loaded = await getCachedPublicCategoryDetail(slug);
+
+  if (!loaded.category || !loaded.advertisements) {
+    notFound();
+  }
+
+  return (
+    <CategoryDetailPageView
+      initialCategories={loaded.categories}
+      initialCategoriesUpdatedAt={loaded.fetchedAt}
+      initialAdvertisements={loaded.advertisements}
+      initialAdvertisementsUpdatedAt={loaded.fetchedAt}
+      initialListingFilters={loaded.listingFilters}
+    />
+  );
 }

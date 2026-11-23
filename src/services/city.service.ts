@@ -6,9 +6,15 @@ import { api } from "@/lib/api";
  * GET /api/v1/cities — apenas ativas por padrão.
  */
 export const cityService = {
-  listCities() {
+  /**
+   * @param includeInactive quando true, inclui cidades inativas.
+   * O padrão da API (parâmetro omitido) continua sendo somente as ativas.
+   */
+  listCities(includeInactive = false) {
     return api
-      .get<GetCitiesResponse>("/api/v1/cities")
+      .get<GetCitiesResponse>("/api/v1/cities", {
+        params: includeInactive ? { includeInactive: true } : undefined,
+      })
       .then((response) => response.data);
   },
 };

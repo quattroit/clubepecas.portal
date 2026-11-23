@@ -17,20 +17,31 @@ import {
 import { AdvertisementDetailSkeleton } from "@/features/marketplace/components/AdvertisementDetailSkeleton";
 import { useTrackListingView } from "@/hooks/analytics/useTrackPageViews";
 import { useAdvertisement } from "@/hooks/api/useAdvertisement";
+import type { PublicAdvertisementDetail } from "@/lib/public-advertisement";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { NotFoundError } from "@/lib/errors";
 
+type AdvertisementDetailPageViewProps = {
+  initialData?: PublicAdvertisementDetail;
+  initialDataUpdatedAt?: number;
+};
+
 /**
  * Detalhe público /anuncios/[slug] — mesma UI, dados da API.
+ * Com `initialData`, o HTML inicial já sai preenchido pelo servidor.
  */
-function AdvertisementDetailPageView() {
+function AdvertisementDetailPageView({
+  initialData,
+  initialDataUpdatedAt,
+}: AdvertisementDetailPageViewProps) {
   const params = useParams<{ slug: string }>();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
-  const detailQuery = useAdvertisement(slug ?? "");
-  useTrackListingView(
-    detailQuery.isSuccess && detailQuery.data ? slug : null,
-  );
+  const detailQuery = useAdvertisement(slug ?? "", {
+    initialData,
+    initialDataUpdatedAt,
+  });
+  useTrackListingView(detailQuery.isSuccess && detailQuery.data ? slug : null);
 
   if (detailQuery.isLoading) {
     return <AdvertisementDetailSkeleton />;

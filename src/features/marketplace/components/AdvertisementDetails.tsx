@@ -20,6 +20,7 @@ function formatPublishedAt(value?: string) {
     day: "2-digit",
     month: "long",
     year: "numeric",
+    timeZone: "America/Sao_Paulo",
   }).format(new Date(value));
 }
 
@@ -59,7 +60,9 @@ function AdvertisementDetails({
     <div className={cn("flex flex-col gap-5", className)}>
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-small text-category font-medium">{category}</p>
-        {isNew ? <Badge variant="success">Novo</Badge> : (
+        {isNew ? (
+          <Badge variant="success">Novo</Badge>
+        ) : (
           <Badge variant="secondary">Usado</Badge>
         )}
         {offersLocalDelivery ? (

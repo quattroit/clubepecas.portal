@@ -4,15 +4,31 @@ import { useMemo } from "react";
 
 import { useAdvertisements } from "@/hooks/api/useAdvertisements";
 import { useCategories } from "@/hooks/api/useCategories";
+import type {
+  MarketplaceListFilters,
+  PublicMarketplaceList,
+} from "@/lib/public-marketplace";
 import { findCategoryBySlug } from "@/mappers/category.mapper";
+import type { Category } from "@/types/Category";
 import { PUBLIC_LISTING_DEFAULT_PAGE_SIZE } from "@/utils/public-listing-pagination";
+
+type UseCategoryOptions = {
+  initialCategories?: Category[];
+  initialCategoriesUpdatedAt?: number;
+  initialAdvertisements?: PublicMarketplaceList;
+  initialAdvertisementsUpdatedAt?: number;
+  initialListingFilters?: MarketplaceListFilters;
+};
 
 /**
  * Detalhe de categoria por slug + anúncios filtrados na API (categorySlug).
  * Reutiliza useCategories (catálogo) e useAdvertisements (marketplace.list).
  */
-export function useCategory(slug: string) {
-  const categoriesQuery = useCategories();
+export function useCategory(slug: string, options?: UseCategoryOptions) {
+  const categoriesQuery = useCategories({
+    initialData: options?.initialCategories,
+    initialDataUpdatedAt: options?.initialCategoriesUpdatedAt,
+  });
 
   const category = useMemo(
     () =>
@@ -23,13 +39,25 @@ export function useCategory(slug: string) {
   );
 
   const categoryExists = Boolean(category);
+  const listingFilters: MarketplaceListFilters = slug
+    ? {
+        categorySlug: slug,
+        page: 1,
+        pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
+        sort: "recent",
+      }
+    : {
+        page: 1,
+        pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE,
+        sort: "recent",
+      };
 
-  const advertisementsQuery = useAdvertisements(
-    slug
-      ? { categorySlug: slug, page: 1, pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE, sort: "recent" }
-      : { page: 1, pageSize: PUBLIC_LISTING_DEFAULT_PAGE_SIZE, sort: "recent" },
-    { enabled: Boolean(slug) && categoryExists },
-  );
+  const advertisementsQuery = useAdvertisements(listingFilters, {
+    enabled: Boolean(slug) && categoryExists,
+    initialData: options?.initialAdvertisements,
+    initialDataUpdatedAt: options?.initialAdvertisementsUpdatedAt,
+    initialDataFilters: options?.initialListingFilters,
+  });
 
   return {
     category,

@@ -1,14 +1,16 @@
 import type { MetadataRoute } from "next";
 
+import { SITEMAP_URL } from "@/lib/sitemap/constants";
+
 /**
- * Regras de indexação — área autenticada e páginas utilitárias fora do SEO.
+ * Rastreamento aberto. A exclusão de áreas privadas fica na metadata robots.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/painel/", "/login", "/cadastro", "/anunciar", "/confirmar-email"],
     },
+    sitemap: SITEMAP_URL,
   };
 }

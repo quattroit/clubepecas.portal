@@ -19,17 +19,37 @@ import { useCategory } from "@/hooks/api/useCategory";
 import { useCities } from "@/hooks/api/useCities";
 import { useVehicleBrands } from "@/hooks/api/useVehicleBrands";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
+import type {
+  MarketplaceListFilters as MarketplaceQueryFilters,
+  PublicMarketplaceList,
+} from "@/lib/public-marketplace";
 import { formatCityLabel } from "@/mappers/city.mapper";
+import type { Category } from "@/types/Category";
 import {
   buildAdvertisementsHref,
   type MarketplaceListingFilters,
 } from "@/utils/marketplace-search";
 
+type CategoryDetailPageViewProps = {
+  initialCategories?: Category[];
+  initialCategoriesUpdatedAt?: number;
+  initialAdvertisements?: PublicMarketplaceList;
+  initialAdvertisementsUpdatedAt?: number;
+  initialListingFilters?: MarketplaceQueryFilters;
+};
+
 /**
  * Detalhe público /categorias/[slug] — mesma UI, anúncios via marketplace filtrado.
  * Pesquisar/filtros navegam para `/anuncios` com os parâmetros.
+ * Com dados iniciais, o HTML já sai preenchido pelo servidor.
  */
-function CategoryDetailPageView() {
+function CategoryDetailPageView({
+  initialCategories,
+  initialCategoriesUpdatedAt,
+  initialAdvertisements,
+  initialAdvertisementsUpdatedAt,
+  initialListingFilters,
+}: CategoryDetailPageViewProps) {
   const router = useRouter();
   const params = useParams<{ slug: string }>();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
@@ -45,7 +65,13 @@ function CategoryDetailPageView() {
     isLoading,
     isError,
     error,
-  } = useCategory(slug ?? "");
+  } = useCategory(slug ?? "", {
+    initialCategories,
+    initialCategoriesUpdatedAt,
+    initialAdvertisements,
+    initialAdvertisementsUpdatedAt,
+    initialListingFilters,
+  });
   const citiesQuery = useCities();
   const vehicleBrandsQuery = useVehicleBrands();
 

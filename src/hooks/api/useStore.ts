@@ -2,42 +2,48 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { mapPublicSellerAdvertisementToAdvertisement } from "@/mappers/advertisement.mapper";
-import { mapSellerPublicProfileToSeller } from "@/mappers/seller.mapper";
+import type { PublicStoreDetail } from "@/lib/public-store";
+import { loadPublicStoreDetail } from "@/lib/public-store";
 import { queryKeys } from "@/lib/queryKeys";
-import { sellerService } from "@/services/seller.service";
+
+const STORE_STALE_TIME_MS = 60_000;
+
+type UseStoreOptions = {
+  initialData?: PublicStoreDetail;
+  initialDataUpdatedAt?: number;
+};
+
+function matchesSlug(
+  detail: PublicStoreDetail | undefined,
+  slug: string,
+): detail is PublicStoreDetail {
+  const detailSlug = detail?.seller.slug;
+
+  return (
+    detail !== undefined &&
+    typeof detailSlug === "string" &&
+    detailSlug.toLowerCase() === slug.toLowerCase()
+  );
+}
 
 /**
  * Detalhe público da loja por slug.
- *
- * Fluxo: sellerService.getPublicBySlug → DTO (com advertisements)
- * → mappers → seller + advertisements
+ * `initialData` vem do servidor. A queryKey inclui o slug, então outra loja
+ * não reaproveita o cache anterior.
  */
-export function useStore(slug: string) {
+export function useStore(slug: string, options?: UseStoreOptions) {
+  const seeded = options?.initialData;
+  const initialData = matchesSlug(seeded, slug) ? seeded : undefined;
+
   return useQuery({
     queryKey: queryKeys.marketplace.store(slug),
-    queryFn: async () => {
-      const dto = await sellerService.getPublicBySlug(slug);
-      const seller = mapSellerPublicProfileToSeller(dto);
-      const advertisements = dto.advertisements.map((item) =>
-        mapPublicSellerAdvertisementToAdvertisement(item, {
-          city: dto.city,
-          state: dto.state,
-          offersLocalDelivery: Boolean(dto.offersLocalDelivery),
-          localDeliveryMaxRadiusKm: dto.localDeliveryMaxRadiusKm ?? null,
-        }),
-      );
-      const categoriesCount = new Set(
-        advertisements.map((item) => item.category),
-      ).size;
-
-      return {
-        seller,
-        advertisements,
-        categoriesCount,
-      };
-    },
+    queryFn: () => loadPublicStoreDetail(slug),
     enabled: Boolean(slug),
     retry: false,
+    staleTime: STORE_STALE_TIME_MS,
+    initialData,
+    initialDataUpdatedAt: initialData
+      ? options?.initialDataUpdatedAt
+      : undefined,
   });
 }

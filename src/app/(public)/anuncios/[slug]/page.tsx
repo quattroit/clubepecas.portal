@@ -3,9 +3,13 @@ import type { Metadata } from "next";
 import { APP_NAME } from "@/constants/app";
 import { advertisementPath } from "@/constants/routes";
 import { AdvertisementDetailPageView } from "@/features/marketplace/components/AdvertisementDetailPageView";
-import { NotFoundError } from "@/lib/errors";
+import type { PublicAdvertisementDetail } from "@/lib/public-advertisement";
+import {
+  getCachedPublicAdvertisementDetail,
+  getPublicAdvertisementBySlug,
+  throwUnlessMissingOrInvalid,
+} from "@/lib/public-record";
 import { mapAdvertisementBySlugToAdvertisement } from "@/mappers/advertisement.mapper";
-import { advertisementService } from "@/services/advertisement.service";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
@@ -21,7 +25,7 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const dto = await advertisementService.getBySlug(slug);
+    const dto = await getPublicAdvertisementBySlug(slug);
     const advertisement = mapAdvertisementBySlugToAdvertisement(dto);
     const description =
       advertisement.description ??
@@ -47,11 +51,7 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    if (error instanceof NotFoundError) {
-      return {
-        title: "Anúncio não encontrado",
-      };
-    }
+    throwUnlessMissingOrInvalid(error);
 
     return {
       title: "Anúncio",
@@ -59,6 +59,26 @@ export async function generateMetadata({
   }
 }
 
-export default function AdvertisementDetailPage() {
-  return <AdvertisementDetailPageView />;
+export default async function AdvertisementDetailPage({
+  params,
+}: AdvertisementPageProps) {
+  const { slug } = await params;
+
+  let initialData: PublicAdvertisementDetail | undefined;
+  let initialDataUpdatedAt: number | undefined;
+
+  try {
+    const loaded = await getCachedPublicAdvertisementDetail(slug);
+    initialData = loaded.detail;
+    initialDataUpdatedAt = loaded.fetchedAt;
+  } catch (error) {
+    throwUnlessMissingOrInvalid(error);
+  }
+
+  return (
+    <AdvertisementDetailPageView
+      initialData={initialData}
+      initialDataUpdatedAt={initialDataUpdatedAt}
+    />
+  );
 }

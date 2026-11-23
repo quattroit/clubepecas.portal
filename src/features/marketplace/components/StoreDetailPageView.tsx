@@ -21,15 +21,28 @@ import { useTrackStoreView } from "@/hooks/analytics/useTrackPageViews";
 import { useStore } from "@/hooks/api/useStore";
 import { getFriendlyErrorMessage } from "@/lib/auth/messages";
 import { NotFoundError } from "@/lib/errors";
+import type { PublicStoreDetail } from "@/lib/public-store";
+
+type StoreDetailPageViewProps = {
+  initialData?: PublicStoreDetail;
+  initialDataUpdatedAt?: number;
+};
 
 /**
  * Detalhe público /lojas/[slug] — mesma UI, dados da API.
+ * Com `initialData`, o HTML inicial já sai preenchido pelo servidor.
  */
-function StoreDetailPageView() {
+function StoreDetailPageView({
+  initialData,
+  initialDataUpdatedAt,
+}: StoreDetailPageViewProps) {
   const params = useParams<{ slug: string }>();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
-  const storeQuery = useStore(slug ?? "");
+  const storeQuery = useStore(slug ?? "", {
+    initialData,
+    initialDataUpdatedAt,
+  });
   useTrackStoreView(storeQuery.isSuccess && storeQuery.data ? slug : null);
 
   if (storeQuery.isLoading) {

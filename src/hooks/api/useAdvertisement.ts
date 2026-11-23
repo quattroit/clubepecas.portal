@@ -2,41 +2,51 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  mapAdvertisementBySlugToAdvertisement,
-  mapRelatedMarketplaceItems,
-} from "@/mappers/advertisement.mapper";
-import { mapAdvertisementBySlugSeller } from "@/mappers/seller.mapper";
+import type { PublicAdvertisementDetail } from "@/lib/public-advertisement";
+import { loadPublicAdvertisementDetail } from "@/lib/public-advertisement";
 import { queryKeys } from "@/lib/queryKeys";
-import { advertisementService } from "@/services/advertisement.service";
-import { categoryService } from "@/services/category.service";
+
+const ADVERTISEMENT_STALE_TIME_MS = 60_000;
+
+type UseAdvertisementOptions = {
+  initialData?: PublicAdvertisementDetail;
+  initialDataUpdatedAt?: number;
+};
+
+function matchesSlug(
+  detail: PublicAdvertisementDetail | undefined,
+  slug: string,
+): detail is PublicAdvertisementDetail {
+  const detailSlug = detail?.advertisement.slug;
+
+  return (
+    detail !== undefined &&
+    typeof detailSlug === "string" &&
+    detailSlug.toLowerCase() === slug.toLowerCase()
+  );
+}
 
 /**
  * Detalhe público do anúncio por slug.
- * Relacionados: marketplace filtrado pela categoria do anúncio (evita lista completa sem filtro).
+ * `initialData` vem do servidor. A queryKey inclui o slug, então outro anúncio
+ * não reaproveita o cache anterior.
  */
-export function useAdvertisement(slug: string) {
+export function useAdvertisement(
+  slug: string,
+  options?: UseAdvertisementOptions,
+) {
+  const seeded = options?.initialData;
+  const initialData = matchesSlug(seeded, slug) ? seeded : undefined;
+
   return useQuery({
     queryKey: queryKeys.marketplace.detail(slug),
-    queryFn: async () => {
-      const dto = await advertisementService.getBySlug(slug);
-      const marketplace = await categoryService.getMarketplace({
-        categorySlug: dto.categorySlug || undefined,
-      });
-
-      const advertisement = mapAdvertisementBySlugToAdvertisement(dto);
-      const seller = mapAdvertisementBySlugSeller(dto);
-      const related = mapRelatedMarketplaceItems(marketplace.items, slug, 4);
-
-      return {
-        advertisement,
-        seller,
-        related,
-        images: advertisement.images ?? [],
-        thumbnails: advertisement.thumbnails ?? advertisement.images ?? [],
-      };
-    },
+    queryFn: () => loadPublicAdvertisementDetail(slug),
     enabled: Boolean(slug),
     retry: false,
+    staleTime: ADVERTISEMENT_STALE_TIME_MS,
+    initialData,
+    initialDataUpdatedAt: initialData
+      ? options?.initialDataUpdatedAt
+      : undefined,
   });
 }
