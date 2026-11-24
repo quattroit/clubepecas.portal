@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 import { useCookieConsent } from "@/components/providers/CookieConsentProvider";
@@ -24,14 +24,17 @@ function CookiePreferencesDialog() {
     analytics: consent?.analytics ?? false,
     marketing: consent?.marketing ?? false,
   });
+  const [wasOpen, setWasOpen] = useState(preferencesOpen);
 
-  useEffect(() => {
-    if (!preferencesOpen) return;
-    setDraft({
-      analytics: consent?.analytics ?? false,
-      marketing: consent?.marketing ?? false,
-    });
-  }, [preferencesOpen, consent]);
+  if (preferencesOpen !== wasOpen) {
+    setWasOpen(preferencesOpen);
+    if (preferencesOpen) {
+      setDraft({
+        analytics: consent?.analytics ?? false,
+        marketing: consent?.marketing ?? false,
+      });
+    }
+  }
 
   return (
     <Dialog open={preferencesOpen} onOpenChange={setPreferencesOpen}>
@@ -61,15 +64,21 @@ function CookiePreferencesDialog() {
                 representantes. Sempre ativos.
               </p>
             </div>
-            <Switch checked disabled aria-label="Cookies essenciais (sempre ativos)" />
+            <Switch
+              checked
+              disabled
+              aria-label="Cookies essenciais (sempre ativos)"
+            />
           </li>
 
           <li className="border-border flex items-start justify-between gap-4 rounded-xl border p-3.5">
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium">Analíticos</p>
               <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                Ajudam a entender o uso da plataforma (visualizações de anúncios
-                e lojas) de forma agregada e anônima.
+                Permitem medir visitas e visualizações de páginas, a navegação e
+                utilização do site, a origem dos acessos, além de interações e
+                estatísticas de uso por meio de ferramentas analíticas,
+                incluindo o Google Analytics.
               </p>
             </div>
             <Switch
@@ -107,7 +116,11 @@ function CookiePreferencesDialog() {
           >
             Cancelar
           </Button>
-          <Button type="button" variant="primary" onClick={() => savePreferences(draft)}>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={() => savePreferences(draft)}
+          >
             Salvar preferências
           </Button>
         </DialogFooter>
@@ -117,13 +130,8 @@ function CookiePreferencesDialog() {
 }
 
 function CookieConsentBanner() {
-  const {
-    ready,
-    consent,
-    acceptAll,
-    acceptEssentialOnly,
-    setPreferencesOpen,
-  } = useCookieConsent();
+  const { ready, consent, acceptAll, acceptEssentialOnly, setPreferencesOpen } =
+    useCookieConsent();
 
   if (!ready || consent) {
     return null;

@@ -39,9 +39,8 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
             sobrenome, e-mail e telefone (quando informado)
           </li>
           <li>
-            <span className="font-medium">Dados de perfil de vendedor:</span> nome
-            da loja, cidade, estado, descrição, WhatsApp e URL
-            de foto
+            <span className="font-medium">Dados de perfil de vendedor:</span>{" "}
+            nome da loja, cidade, estado, descrição, WhatsApp e URL de foto
           </li>
           <li>
             <span className="font-medium">Dados de anúncios:</span> título,
@@ -60,24 +59,21 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
         </ul>
       </InstitutionalSection>
 
-      <InstitutionalSection
-        id="finalidade"
-        title="2. Finalidade do tratamento"
-      >
+      <InstitutionalSection id="finalidade" title="2. Finalidade do tratamento">
         <p>Os dados são tratados para:</p>
         <ul className="list-disc space-y-2 pl-5">
           <li>Criar e gerenciar contas de usuários</li>
           <li>Permitir publicação, edição e exibição de anúncios</li>
-          <li>Exibir perfis públicos de lojas e facilitar o contato comercial</li>
+          <li>
+            Exibir perfis públicos de lojas e facilitar o contato comercial
+          </li>
           <li>Autenticar acessos e prevenir fraudes e abusos</li>
           <li>Prestação de suporte e atendimento institucional</li>
           <li>
             Cumprir obrigações legais e responder a requisições de autoridades
             competentes
           </li>
-          <li>
-            Melhorar a experiência, desempenho e segurança da plataforma
-          </li>
+          <li>Melhorar a experiência, desempenho e segurança da plataforma</li>
         </ul>
         <p>
           A base legal pode incluir execução de contrato, legítimo interesse
@@ -92,7 +88,9 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
           funcionamento do site (por exemplo, manutenção de sessão, segurança e
           indicação de representantes). Cookies analíticos e de marketing só são
           utilizados com o seu consentimento, coletado por meio do banner de
-          cookies exibido na primeira visita.
+          cookies exibido na primeira visita. Com consentimento de analytics,
+          podemos utilizar o Google Analytics (GA4) para medir visitas,
+          navegação, origem dos acessos e estatísticas agregadas de uso.
         </p>
         <p>
           Você pode alterar suas preferências a qualquer momento pelo link{" "}
@@ -123,6 +121,13 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
             sempre sob dever de confidencialidade e finalidade limitada
           </li>
           <li>
+            <span className="font-medium">Ferramentas analíticas:</span> com o
+            seu consentimento, dados de uso agregados podem ser processados pelo
+            Google Analytics (Google LLC) para estatísticas de visitas e
+            navegação. Você pode revogar essa autorização a qualquer momento nas
+            preferências de cookies
+          </li>
+          <li>
             <span className="font-medium">Obrigações legais:</span> quando
             necessário para cumprir lei, ordem judicial ou requisição de
             autoridade
@@ -144,9 +149,7 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
       </InstitutionalSection>
 
       <InstitutionalSection id="direitos" title="6. Direitos do usuário">
-        <p>
-          Nos termos da LGPD, o titular pode solicitar, conforme o caso:
-        </p>
+        <p>Nos termos da LGPD, o titular pode solicitar, conforme o caso:</p>
         <ul className="list-disc space-y-2 pl-5">
           <li>Confirmação da existência de tratamento</li>
           <li>Acesso aos dados</li>
@@ -164,14 +167,11 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
         </p>
       </InstitutionalSection>
 
-      <InstitutionalSection
-        id="encarregado"
-        title="7. Contato do encarregado"
-      >
+      <InstitutionalSection id="encarregado" title="7. Contato do encarregado">
         <p>
           Para questões relacionadas à privacidade e à proteção de dados
-          pessoais no {APP_NAME}, entre em contato com o encarregado
-          (DPO/canal de privacidade) pelo e-mail:
+          pessoais no {APP_NAME}, entre em contato com o encarregado (DPO/canal
+          de privacidade) pelo e-mail:
         </p>
         <p>
           <a
@@ -183,17 +183,16 @@ function PrivacidadePageView({ email = CONTACT_EMAIL }: { email?: string }) {
         </p>
         <p className="text-small text-muted-foreground">
           Este endereço é um placeholder institucional e deverá ser confirmado
-          ou substituído pelo contato oficial do encarregado antes da
-          publicação em produção.
+          ou substituído pelo contato oficial do encarregado antes da publicação
+          em produção.
         </p>
       </InstitutionalSection>
 
       <InstitutionalSection id="alteracoes" title="8. Alterações da política">
         <p>
           Esta Política poderá ser atualizada para refletir mudanças legais,
-          operacionais ou tecnológicas. A data de vigência será mantida
-          visível nesta página. Recomendamos a consulta periódica deste
-          documento.
+          operacionais ou tecnológicas. A data de vigência será mantida visível
+          nesta página. Recomendamos a consulta periódica deste documento.
         </p>
       </InstitutionalSection>
     </InstitutionalPageShell>
