@@ -59,8 +59,10 @@ function ensureGtagQueue(): GtagFn {
   const w = getGaWindow();
   w.dataLayer = w.dataLayer ?? [];
   if (typeof w.gtag !== "function") {
-    w.gtag = function gtag(...args: unknown[]) {
-      w.dataLayer!.push(args);
+    // gtag.js só reconhece Arguments como comando; Array é ignorado em silêncio.
+    w.gtag = function gtag() {
+      // eslint-disable-next-line prefer-rest-params -- protocolo oficial do gtag.js
+      w.dataLayer!.push(arguments);
     };
   }
   return w.gtag;
